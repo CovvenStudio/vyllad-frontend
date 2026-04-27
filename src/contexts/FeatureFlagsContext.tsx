@@ -43,13 +43,11 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
     if (status !== 'authenticated') return;
 
     const onFocus = () => { void refresh(); };
-    const intervalId = window.setInterval(() => { void refresh(); }, 30_000);
 
     window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', onFocus);
 
     return () => {
-      window.clearInterval(intervalId);
       window.removeEventListener('focus', onFocus);
       document.removeEventListener('visibilitychange', onFocus);
     };
