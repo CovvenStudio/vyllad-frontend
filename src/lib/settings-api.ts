@@ -11,6 +11,7 @@ export interface SchedulingConfigDto {
   availableWeekdays: number[];
   maxClientChoices: number;
   agentSlotIntervalMinutes: number;
+  maxVisitsPerTime: number;
 }
 
 export interface UpdateSchedulingConfigDto {
@@ -18,6 +19,7 @@ export interface UpdateSchedulingConfigDto {
   availableWeekdays?: number[];
   maxClientChoices?: number;
   agentSlotIntervalMinutes?: number;
+  maxVisitsPerTime?: number;
 }
 
 export const getSchedulingConfig = (agencyId: string) =>

@@ -37,6 +37,23 @@ export interface UpdateAppointmentStatusInput {
   status: 'confirmed' | 'completed' | 'cancelled';
 }
 
+export interface BlockVisitSlotInput {
+  date: string;
+  time: string;
+  reason?: string;
+}
+
+export interface BlockedVisitSlotDto {
+  id: string;
+  agencyId: string;
+  propertyId: string;
+  date: string;
+  time: string;
+  blockedByUserId: string;
+  reason?: string;
+  createdAt: string;
+}
+
 // ── API functions ─────────────────────────────────────────────────────────────
 
 export function listAppointments(
@@ -101,6 +118,47 @@ export function deleteAppointment(agencyId: string, id: string): Promise<void> {
   return apiFetch<void>(`/agencies/${agencyId}/appointments/${id}`, {
     method: 'DELETE',
   });
+}
+
+export function listBlockedVisitSlots(
+  agencyId: string,
+  propertyId: string,
+  date?: string,
+): Promise<BlockedVisitSlotDto[]> {
+  const qs = new URLSearchParams();
+  if (date) qs.set('date', date);
+  const query = qs.toString() ? `?${qs.toString()}` : '';
+
+  return apiFetch<BlockedVisitSlotDto[]>(
+    `/agencies/${agencyId}/properties/${propertyId}/blocked-visit-slots${query}`,
+  );
+}
+
+export function blockVisitSlot(
+  agencyId: string,
+  propertyId: string,
+  input: BlockVisitSlotInput,
+): Promise<BlockedVisitSlotDto> {
+  return apiFetch<BlockedVisitSlotDto>(
+    `/agencies/${agencyId}/properties/${propertyId}/blocked-visit-slots`,
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export function unblockVisitSlot(
+  agencyId: string,
+  propertyId: string,
+  date: string,
+  time: string,
+): Promise<void> {
+  const qs = new URLSearchParams({ date, time });
+  return apiFetch<void>(
+    `/agencies/${agencyId}/properties/${propertyId}/blocked-visit-slots?${qs.toString()}`,
+    { method: 'DELETE' },
+  );
 }
 
 // ── Public: cancel / reschedule via token ────────────────────────────────────────

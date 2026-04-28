@@ -181,9 +181,10 @@ export interface VisitInfoResponse {
     availableWeekdays: number[];
     maxClientChoices: number;
     agentSlotIntervalMinutes: number;
+    maxVisitsPerTime: number;
   };
-  bookedSlots: { date: string; time: string; agentId: string }[];
-  propertyAgentIds: string[];
+  slotOccupancy: { date: string; time: string; count: number }[];
+  blockedSlots: { date: string; time: string }[];
   activeAppointment?: { id: string; cancelToken: string };
 }
 

@@ -64,10 +64,27 @@ export default function AgencySettings() {
     availableWeekdays: [1, 2, 3, 4, 5],
     maxClientChoices: 3,
     agentSlotIntervalMinutes: 30,
+    maxVisitsPerTime: 1,
   });
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [maxClientChoicesDraft, setMaxClientChoicesDraft] = useState('3');
+  const [maxVisitsPerTimeDraft, setMaxVisitsPerTimeDraft] = useState('1');
+
+  const commitMaxClientChoices = useCallback(() => {
+    const parsed = Number(maxClientChoicesDraft);
+    const next = Number.isFinite(parsed) ? Math.min(5, Math.max(1, parsed)) : config.maxClientChoices;
+    setConfig(c => ({ ...c, maxClientChoices: next }));
+    setMaxClientChoicesDraft(String(next));
+  }, [maxClientChoicesDraft, config.maxClientChoices]);
+
+  const commitMaxVisitsPerTime = useCallback(() => {
+    const parsed = Number(maxVisitsPerTimeDraft);
+    const next = Number.isFinite(parsed) ? Math.min(20, Math.max(1, parsed)) : config.maxVisitsPerTime;
+    setConfig(c => ({ ...c, maxVisitsPerTime: next }));
+    setMaxVisitsPerTimeDraft(String(next));
+  }, [maxVisitsPerTimeDraft, config.maxVisitsPerTime]);
 
   const load = useCallback(async () => {
     if (!currentAgencyId) return;
@@ -75,6 +92,8 @@ export default function AgencySettings() {
     try {
       const data = await getSchedulingConfig(currentAgencyId);
       setConfig(data);
+      setMaxClientChoicesDraft(String(data.maxClientChoices));
+      setMaxVisitsPerTimeDraft(String(data.maxVisitsPerTime));
     } catch {
       // use defaults
     } finally {
@@ -88,8 +107,13 @@ export default function AgencySettings() {
     if (!currentAgencyId) return;
     setSaving(true);
     try {
+      commitMaxClientChoices();
+      commitMaxVisitsPerTime();
+
       const updated = await updateSchedulingConfig(currentAgencyId, config);
       setConfig(updated);
+      setMaxClientChoicesDraft(String(updated.maxClientChoices));
+      setMaxVisitsPerTimeDraft(String(updated.maxVisitsPerTime));
       toast({ title: 'Configuração guardada!', description: 'As definições de agendamento foram actualizadas.' });
     } catch {
       toast({ title: 'Erro ao guardar', variant: 'destructive' });
@@ -246,32 +270,54 @@ export default function AgencySettings() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="rounded-2xl border bg-card p-6 grid sm:grid-cols-2 gap-6"
+            className="rounded-2xl border bg-card p-5 sm:p-6"
           >
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Users className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1">
-                <Label className="font-semibold text-sm block mb-1">Máximo de opções do cliente</Label>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Quantos slots o cliente pode propor (1–5).
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-sm font-semibold">Capacidade e granularidade</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Ajuste limites de proposta, intervalo interno e capacidade por horário.
                 </p>
-                <Input
-                  type="number"
-                  min={1} max={5}
-                  value={config.maxClientChoices}
-                  onChange={e => setConfig(c => ({ ...c, maxClientChoices: Number(e.target.value) }))}
-                  className="h-9 w-24 rounded-xl"
-                />
+              </div>
+              <div className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+                Configuração global
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Clock className="w-4 h-4 text-primary" />
+            <div className="space-y-3">
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Users className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+                    {config.maxClientChoices} {config.maxClientChoices > 1 ? 'opções' : 'opção'}
+                  </span>
+                </div>
+                <Label className="font-semibold text-sm block mb-1">Máximo de opções do cliente</Label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Quantos períodos o cliente pode sugerir (1-5).
+                </p>
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={maxClientChoicesDraft}
+                  onChange={e => setMaxClientChoicesDraft(e.target.value)}
+                  onBlur={commitMaxClientChoices}
+                  className="h-9 w-full max-w-[140px] rounded-xl"
+                />
               </div>
-              <div className="flex-1">
+
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+                    {config.agentSlotIntervalMinutes} min
+                  </span>
+                </div>
                 <Label className="font-semibold text-sm block mb-1">Intervalo do agente (min)</Label>
                 <p className="text-xs text-muted-foreground mb-3">
                   Granularidade dos sub-slots que o agente vê dentro de cada período.
@@ -292,6 +338,30 @@ export default function AgencySettings() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="rounded-2xl border bg-background/60 p-4">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <CalendarDays className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+                    {config.maxVisitsPerTime} visita{config.maxVisitsPerTime > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <Label className="font-semibold text-sm block mb-1">Máximo de visitas por horário</Label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Limite de visitas confirmadas no mesmo horário (HH:MM) para o imóvel.
+                </p>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={maxVisitsPerTimeDraft}
+                  onChange={e => setMaxVisitsPerTimeDraft(e.target.value)}
+                  onBlur={commitMaxVisitsPerTime}
+                  className="h-9 w-full max-w-[140px] rounded-xl"
+                />
               </div>
             </div>
           </motion.div>

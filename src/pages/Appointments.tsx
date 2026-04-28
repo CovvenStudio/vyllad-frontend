@@ -23,7 +23,15 @@ import type { LeadDto } from '@/lib/leads-api';
 import type { AgentDto } from '@/lib/agents-api';
 import type { PropertyDto } from '@/lib/properties-api';
 import type { AppointmentDto } from '@/lib/appointments-api';
-import { cancelAppointmentPublic, rescheduleAppointment, cancelAppointment, updateAppointmentStatus } from '@/lib/appointments-api';
+import {
+  cancelAppointmentPublic,
+  rescheduleAppointment,
+  cancelAppointment,
+  updateAppointmentStatus,
+  listBlockedVisitSlots,
+  blockVisitSlot,
+  unblockVisitSlot,
+} from '@/lib/appointments-api';
 import { getSchedulingConfig } from '@/lib/settings-api';
 import type { SchedulingConfigDto } from '@/lib/settings-api';
 
@@ -39,6 +47,18 @@ const MONTHS = [
   'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
   'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro',
 ];
+
+function toLocalDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function toMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
 
 // ─── Mini Calendar ────────────────────────────────────────────────────────────
 
@@ -171,6 +191,7 @@ const statusConfig = {
 // ─── Schedule Modal ───────────────────────────────────────────────────────────
 
 interface ScheduleModalProps {
+  agencyId: string;
   lead: LeadDto;
   property: PropertyDto | undefined;
   agents: AgentDto[];
@@ -193,7 +214,8 @@ function generateSubSlots(start: string, end: string, intervalMinutes: number): 
   return slots;
 }
 
-const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppointments, onClose, onConfirm }: ScheduleModalProps) => {
+const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, confirmedAppointments, onClose, onConfirm }: ScheduleModalProps) => {
+  const { toast } = useToast();
   const proposedSlots = lead.proposedSlots ?? [];
   const hasSuggestions = proposedSlots.length > 0;
 
@@ -211,6 +233,9 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
   const [agentId, setAgentId] = useState(defaultAgentId);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [blockedTimes, setBlockedTimes] = useState<Set<string>>(new Set());
+  const [loadingBlockedTimes, setLoadingBlockedTimes] = useState(false);
+  const [togglingBlockedTime, setTogglingBlockedTime] = useState<string | null>(null);
 
   // When user picks a proposed slot, jump to that date and surface sub-slots for that period
   const handlePickSuggestion = (slot: { date: string; periodLabel: string }) => {
@@ -225,8 +250,7 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
     return schedulingConfig.periods.find(p => p.label === suggestion.periodLabel) ?? null;
   }, [date, proposedSlots, schedulingConfig]);
 
-  const agentSlots = useMemo(() => {
-    // Raw slots from config or fallback
+  const timeSlots = useMemo(() => {
     let raw: string[];
     if (!schedulingConfig) {
       raw = TIME_SLOTS;
@@ -239,14 +263,99 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
       }
       raw = allSlots.length ? allSlots : TIME_SLOTS;
     }
-    // Remove times already confirmed for the selected agent on this date
-    const takenOnDate = new Set(
-      confirmedAppointments
-        .filter(a => a.agentId === agentId && a.date === date && a.status === 'confirmed')
-        .map(a => a.time)
-    );
-    return raw.filter(t => !takenOnDate.has(t));
-  }, [activePeriod, schedulingConfig, confirmedAppointments, agentId, date]);
+    const now = new Date();
+    const today = toLocalDateString(now);
+    if (date !== today) return raw;
+
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    return raw.filter((slot) => toMinutes(slot) > nowMinutes);
+  }, [activePeriod, schedulingConfig, date]);
+
+  const maxVisitsPerTime = Math.max(schedulingConfig?.maxVisitsPerTime ?? 1, 1);
+
+  const occupancyByTime = useMemo(() => {
+    const occupancyByTime = new Map<string, number>();
+
+    for (const appointment of confirmedAppointments) {
+      if (appointment.propertyId !== lead.propertyId) continue;
+      if (appointment.date !== date) continue;
+      if (appointment.status !== 'confirmed') continue;
+
+      occupancyByTime.set(appointment.time, (occupancyByTime.get(appointment.time) ?? 0) + 1);
+    }
+
+    return occupancyByTime;
+  }, [confirmedAppointments, date, lead.propertyId]);
+
+  const availableSlots = useMemo(() => {
+    return timeSlots.filter((slot) => {
+      if (blockedTimes.has(slot)) return false;
+      return (occupancyByTime.get(slot) ?? 0) < maxVisitsPerTime;
+    });
+  }, [timeSlots, blockedTimes, occupancyByTime, maxVisitsPerTime]);
+
+  useEffect(() => {
+    if (!agencyId || !lead.propertyId || !date) {
+      setBlockedTimes(new Set());
+      return;
+    }
+
+    let mounted = true;
+    setLoadingBlockedTimes(true);
+
+    listBlockedVisitSlots(agencyId, lead.propertyId, date)
+      .then((items) => {
+        if (!mounted) return;
+        setBlockedTimes(new Set(items.map((item) => item.time)));
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setBlockedTimes(new Set());
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoadingBlockedTimes(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [agencyId, lead.propertyId, date]);
+
+  useEffect(() => {
+    if (!time) return;
+    if (!availableSlots.includes(time)) setTime('');
+  }, [availableSlots, time]);
+
+  const handleToggleBlockedTime = async (slot: string) => {
+    if (!agencyId || !lead.propertyId) return;
+
+    setTogglingBlockedTime(slot);
+    try {
+      if (blockedTimes.has(slot)) {
+        await unblockVisitSlot(agencyId, lead.propertyId, date, slot);
+        setBlockedTimes((prev) => {
+          const next = new Set(prev);
+          next.delete(slot);
+          return next;
+        });
+        toast({ title: `Horário ${slot} desbloqueado` });
+      } else {
+        await blockVisitSlot(agencyId, lead.propertyId, { date, time: slot });
+        setBlockedTimes((prev) => {
+          const next = new Set(prev);
+          next.add(slot);
+          return next;
+        });
+        if (time === slot) setTime('');
+        toast({ title: `Horário ${slot} bloqueado` });
+      }
+    } catch {
+      toast({ title: 'Não foi possível atualizar o bloqueio', variant: 'destructive' });
+    } finally {
+      setTogglingBlockedTime(null);
+    }
+  };
 
   const canSubmit = date && time && agentId && !submitting;
 
@@ -346,7 +455,7 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
               <MiniCalendar
                 value={date}
                 onChange={d => { setDate(d); setTime(''); }}
-                minDate={new Date().toISOString().slice(0, 10)}
+                minDate={toLocalDateString(new Date())}
                 availableWeekdays={schedulingConfig?.availableWeekdays}
               />
             </div>
@@ -362,7 +471,7 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
                 )}
               </Label>
               <div className="grid grid-cols-4 gap-2">
-                {agentSlots.map(t => (
+                {availableSlots.map(t => (
                   <button
                     key={t}
                     type="button"
@@ -376,6 +485,48 @@ const ScheduleModal = ({ lead, property, agents, schedulingConfig, confirmedAppo
                     {t}
                   </button>
                 ))}
+                {availableSlots.length === 0 && (
+                  <p className="text-xs text-muted-foreground col-span-4">
+                    Não há horários disponíveis para esta data/período.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Manual block/unblock */}
+            <div>
+              <Label className="text-xs font-medium mb-2 block">Bloqueio manual por horário</Label>
+              <p className="text-[11px] text-muted-foreground mb-2">
+                Use quando quiser fechar um horário antes de atingir o limite de visitas.
+              </p>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {timeSlots.map((slot) => {
+                  const isBlocked = blockedTimes.has(slot);
+                  const isBusy = togglingBlockedTime === slot;
+                  const occupancy = occupancyByTime.get(slot) ?? 0;
+                  return (
+                    <button
+                      key={`block-${slot}`}
+                      type="button"
+                      onClick={() => handleToggleBlockedTime(slot)}
+                      disabled={isBusy || loadingBlockedTimes}
+                      className={`px-2.5 py-2 rounded-lg border text-xs transition-all ${
+                        isBlocked
+                          ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
+                          : 'border-border hover:border-primary/40 hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="font-semibold">{slot}</div>
+                      <div className="text-[10px] opacity-80">
+                        {isBusy
+                          ? 'A atualizar...'
+                          : isBlocked
+                            ? 'Bloqueado'
+                            : `Ocupação ${occupancy}/${maxVisitsPerTime}`}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -1090,6 +1241,7 @@ const Appointments = () => {
       {/* Schedule modal */}
       {schedulingFor && (
         <ScheduleModal
+          agencyId={currentAgencyId}
           lead={schedulingFor}
           property={properties.find(p => p.id === schedulingFor.propertyId)}
           agents={agents}

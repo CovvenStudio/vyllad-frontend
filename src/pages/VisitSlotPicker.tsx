@@ -27,7 +27,16 @@ function toDateStr(y: number, m: number, d: number) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
-/** Generate HH:MM sub-slots within [start, end) at intervalMinutes (used for booked check). */
+function toLocalDateStr(date: Date) {
+  return toDateStr(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function toMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
+
+/** Generate HH:MM times within [start, end) at intervalMinutes. */
 function generateSubSlotsPublic(start: string, end: string, intervalMinutes: number): string[] {
   const [sh, sm] = start.split(':').map(Number);
   const [eh, em] = end.split(':').map(Number);
@@ -119,7 +128,7 @@ function MiniCalendar({
             const isBlocked   = blockedDates?.has(ds) ?? false;
             const isDisabled  = isPast || isDayOff || isBlocked;
             const isSelected  = selectedDates.has(ds);
-            const isToday     = ds === new Date().toISOString().slice(0, 10);
+            const isToday     = ds === toLocalDateStr(new Date());
 
             return (
               <button
@@ -166,40 +175,68 @@ function StepChoose({
     { label: 'Final do dia',    start: '16:00', end: '18:00' },
   ];
   const intervalMin = config?.agentSlotIntervalMinutes ?? 30;
-  const bookedSlots = info.bookedSlots ?? [];
-  const propertyAgentIds = info.propertyAgentIds ?? [];
-  const totalAgents = Math.max(propertyAgentIds.length, 1);
+  const maxVisitsPerTime = Math.max(config?.maxVisitsPerTime ?? 1, 1);
+  const slotOccupancy = info.slotOccupancy ?? [];
+  const blockedSlots = info.blockedSlots ?? [];
+  const now = new Date();
+  const today = toLocalDateStr(now);
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const occupancyByDateTime = useMemo(() => {
+    const map = new Map<string, Map<string, number>>();
+    for (const occ of slotOccupancy) {
+      if (!map.has(occ.date)) map.set(occ.date, new Map());
+      map.get(occ.date)!.set(occ.time, occ.count);
+    }
+    return map;
+  }, [slotOccupancy]);
+
+  const blockedByDate = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const b of blockedSlots) {
+      if (!map.has(b.date)) map.set(b.date, new Set());
+      map.get(b.date)!.add(b.time);
+    }
+    return map;
+  }, [blockedSlots]);
 
   // Pre-compute: for each date, which period labels are fully booked
-  // A period is "fully booked" only if ALL agents for the property are booked
-  // at every sub-slot within that period.
+  // A period is unavailable only when ALL times in that period are either
+  // blocked manually or already at max visits for that exact time.
   const fullyBookedPeriods = useMemo<Map<string, Set<string>>>(() => {
     const map = new Map<string, Set<string>>();
-    for (const period of periods) {
-      const subSlots = generateSubSlotsPublic(period.start, period.end, intervalMin);
-      if (subSlots.length === 0) continue;
-      // Group booked times by date, then by agentId
-      const bookedByDateAgent = new Map<string, Map<string, Set<string>>>();
-      for (const bs of bookedSlots) {
-        if (!bookedByDateAgent.has(bs.date)) bookedByDateAgent.set(bs.date, new Map());
-        const byAgent = bookedByDateAgent.get(bs.date)!;
-        if (!byAgent.has(bs.agentId)) byAgent.set(bs.agentId, new Set());
-        byAgent.get(bs.agentId)!.add(bs.time);
-      }
-      for (const [date, byAgent] of bookedByDateAgent) {
-        // A sub-slot is "taken" only if ALL agents are booked at that time
-        const allSlotsTaken = subSlots.every(slot => {
-          const agentsToCheck = propertyAgentIds.length > 0 ? propertyAgentIds : [...byAgent.keys()];
-          return agentsToCheck.every(agId => byAgent.get(agId)?.has(slot));
+    const dates = new Set<string>([
+      ...occupancyByDateTime.keys(),
+      ...blockedByDate.keys(),
+    ]);
+
+    for (const date of dates) {
+      const occupancyForDate = occupancyByDateTime.get(date) ?? new Map<string, number>();
+      const blockedForDate = blockedByDate.get(date) ?? new Set<string>();
+
+      for (const period of periods) {
+        const times = generateSubSlotsPublic(period.start, period.end, intervalMin)
+          .filter((time) => date !== today || toMinutes(time) > nowMinutes);
+        if (times.length === 0) {
+          if (!map.has(date)) map.set(date, new Set());
+          map.get(date)!.add(period.label);
+          continue;
+        }
+
+        const allTimesUnavailable = times.every((time) => {
+          if (blockedForDate.has(time)) return true;
+          return (occupancyForDate.get(time) ?? 0) >= maxVisitsPerTime;
         });
-        if (allSlotsTaken) {
+
+        if (allTimesUnavailable) {
           if (!map.has(date)) map.set(date, new Set());
           map.get(date)!.add(period.label);
         }
       }
     }
+
     return map;
-  }, [bookedSlots, propertyAgentIds, periods, intervalMin, totalAgents]);
+  }, [blockedByDate, occupancyByDateTime, periods, intervalMin, maxVisitsPerTime, nowMinutes, today]);
 
   // Dates where ALL periods are fully booked → disable in calendar
   const fullyBookedDates = useMemo(() => {
@@ -209,35 +246,51 @@ function StepChoose({
         dates.add(date);
       }
     }
+
+    const todayBookedPeriods = fullyBookedPeriods.get(today);
+    if (todayBookedPeriods && periods.every(p => todayBookedPeriods.has(p.label))) {
+      dates.add(today);
+    }
+
     return dates;
-  }, [fullyBookedPeriods, periods]);
+  }, [fullyBookedPeriods, periods, today]);
 
   const [slots, setSlots] = useState<ProposedSlotDto[]>([]);
   // date currently being period-picked
   const [pendingDate, setPendingDate] = useState<string | null>(null);
 
   const selectedDates = new Set(slots.map(s => s.date));
-  const minDate = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0, 10);
-  })();
+  const minDate = toLocalDateStr(new Date());
 
   const handleToggleDate = (date: string) => {
     if (fullyBookedDates.has(date)) return;
-    if (selectedDates.has(date)) {
-      setSlots(s => s.filter(sl => sl.date !== date));
-      if (pendingDate === date) setPendingDate(null);
-    } else {
-      if (slots.length >= maxPick) return;
-      setPendingDate(date);
+    if (pendingDate === date) {
+      setPendingDate(null);
+      return;
     }
+
+    const hasAnyForDate = selectedDates.has(date);
+    if (!hasAnyForDate && slots.length >= maxPick) return;
+    setPendingDate(date);
   };
 
   const handlePickPeriod = (periodLabel: string) => {
     if (!pendingDate) return;
-    setSlots(s => [...s.filter(sl => sl.date !== pendingDate), { date: pendingDate, periodLabel }]);
-    setPendingDate(null);
+    setSlots((current) => {
+      const alreadySelected = current.some(
+        (slot) => slot.date === pendingDate && slot.periodLabel === periodLabel,
+      );
+
+      if (alreadySelected) {
+        return current.filter(
+          (slot) => !(slot.date === pendingDate && slot.periodLabel === periodLabel),
+        );
+      }
+
+      if (current.length >= maxPick) return current;
+
+      return [...current, { date: pendingDate, periodLabel }];
+    });
   };
 
   const handleRemoveSlot = (idx: number) => {
@@ -249,7 +302,7 @@ function StepChoose({
     return d.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });
   };
 
-  const canSubmit = slots.length > 0 && !pendingDate;
+  const canSubmit = slots.length > 0;
 
   return (
     <div className="space-y-6">
@@ -291,25 +344,55 @@ function StepChoose({
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <p className="text-[11px] text-gray-500 mb-2">
+              Selecionados neste dia: {slots.filter((slot) => slot.date === pendingDate).length}
+            </p>
+            <div className="rounded-xl border border-[#1a2341]/10 bg-[#1a2341]/[0.02] px-3 py-2 mb-3">
+              <p className="text-[11px] text-[#1a2341]/70 font-medium">
+                Pode escolher mais de um período no mesmo dia. Clique novamente para remover.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
               {periods.map(p => {
                 const isFullyBooked = fullyBookedPeriods.get(pendingDate)?.has(p.label) ?? false;
+                const isSelected = slots.some(slot => slot.date === pendingDate && slot.periodLabel === p.label);
                 return (
                   <button
                     key={p.label}
                     type="button"
-                    disabled={isFullyBooked}
-                    onClick={() => !isFullyBooked && handlePickPeriod(p.label)}
-                    className={`flex flex-col items-center p-3 rounded-xl border transition-all text-left ${
-                      isFullyBooked
-                        ? 'opacity-40 cursor-not-allowed bg-gray-50 border-gray-200'
-                        : 'hover:border-[#1a2341]/40 hover:bg-[#1a2341]/[0.03]'
+                    disabled={isFullyBooked && !isSelected}
+                    onClick={() => handlePickPeriod(p.label)}
+                    className={`group relative overflow-hidden w-full flex flex-col items-start p-4 rounded-2xl border transition-all text-left ${
+                      isSelected
+                        ? 'bg-[#1a2341]/[0.07] border-[#1a2341]/40 shadow-sm'
+                        : isFullyBooked
+                        ? 'cursor-not-allowed bg-gray-50 border-gray-200'
+                        : 'bg-white border-[#1a2341]/20 hover:border-[#1a2341]/45 hover:shadow-sm hover:-translate-y-0.5'
                     }`}
                   >
-                    <span className="font-semibold text-sm text-[#1a2341]">{p.label}</span>
-                    <span className="text-xs text-gray-500 mt-0.5">{p.start} – {p.end}</span>
-                    {isFullyBooked && (
-                      <span className="text-[10px] text-red-400 font-semibold mt-1">Esgotado</span>
+                    {!isFullyBooked && !isSelected && (
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-gradient-to-br from-[#1a2341]/[0.06] via-transparent to-[#c9a96e]/[0.10]" />
+                    )}
+                    <div className="relative z-10 w-full">
+                      <div className="flex flex-wrap items-center justify-between gap-2 w-full mb-1.5">
+                        <span className="font-semibold text-sm text-[#1a2341] leading-tight">{p.label}</span>
+                        <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
+                          isSelected
+                            ? 'text-[#1a2341] border-[#1a2341]/25 bg-[#1a2341]/10'
+                            : isFullyBooked
+                            ? 'text-red-500 border-red-200 bg-red-50'
+                            : 'text-emerald-700 border-emerald-200 bg-emerald-50'
+                        }`}>
+                          {isSelected ? 'Selecionado' : isFullyBooked ? 'Esgotado' : 'Disponível'}
+                        </span>
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-white/80 border border-gray-200 rounded-lg px-2 py-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{p.start} - {p.end}</span>
+                      </div>
+                    </div>
+                    {isFullyBooked && !isSelected && (
+                      <span className="relative z-10 text-[10px] text-red-400 font-semibold mt-2">Sem horários livres</span>
                     )}
                   </button>
                 );
