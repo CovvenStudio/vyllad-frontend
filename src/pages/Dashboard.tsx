@@ -554,7 +554,8 @@ const CANDIDATES_PAGE_SIZE = 10;
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { currentAgencyId, user, status: authStatus } = useAuth();
+  const { currentAgencyId, user, status: authStatus, memberships } = useAuth();
+  const isOwner = (memberships.find(m => m.agencyId === currentAgencyId)?.role ?? '') === 'OWNER';
   const { toast } = useToast();
   const location = useLocation();
   const [addOpen, setAddOpen] = useState(false);
@@ -804,6 +805,7 @@ export default function Dashboard() {
                         </span>
                       )}
                       {atLimit ? (
+                        isOwner ? (
                         <Button
                           size="sm"
                           onClick={() => navigate('/onboarding/upgrade')}
@@ -812,6 +814,9 @@ export default function Dashboard() {
                           <ArrowUpRight className="w-3.5 h-3.5" />
                           Fazer upgrade
                         </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Contacte o proprietário para fazer upgrade.</span>
+                        )
                       ) : (
                         <Button
                           onClick={() => setAddOpen(true)}
@@ -1111,7 +1116,7 @@ export default function Dashboard() {
                           )}
                         </div>
                         <div className="shrink-0 flex items-center gap-2">
-                          {extraLeadPrice !== null && (
+                          {extraLeadPrice !== null && isOwner && (
                             <button
                               onClick={() => setBuyLeadsOpen(true)}
                               className="text-xs font-semibold bg-accent text-accent-foreground hover:bg-accent/85 rounded-xl px-3.5 py-2 transition-all"
@@ -1119,12 +1124,16 @@ export default function Dashboard() {
                               Comprar leads
                             </button>
                           )}
+                          {isOwner ? (
                           <button
                             onClick={() => navigate('/onboarding/upgrade')}
                             className="text-xs font-medium text-muted-foreground hover:text-foreground border border-border bg-background hover:bg-muted rounded-xl px-3.5 py-2 transition-all"
                           >
                             Fazer upgrade
                           </button>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Contacte o proprietário para aumentar o limite.</span>
+                          )}
                         </div>
                       </div>
                     </div>

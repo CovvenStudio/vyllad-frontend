@@ -19,6 +19,8 @@ export interface SubmitLeadInput {
   stayDuration: string;
   hasVisited: string;
   motivation: string;
+  nationality: string;
+  residencyDuration: string;
   customAnswers: Record<string, string>;
 }
 
@@ -55,6 +57,8 @@ export interface LeadDto {
   stayDuration: string;
   hasVisited: string;
   motivation: string;
+  nationality: string;
+  residencyDuration: string;
   customAnswers: Record<string, string>;
   score: number;
   factorScores: Record<string, number>;

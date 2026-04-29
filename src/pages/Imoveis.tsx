@@ -232,7 +232,8 @@ function SkeletonRow() {
 const PAGE_SIZE = 12;
 
 export default function Imoveis() {
-  const { currentAgencyId, user } = useAuth();
+  const { currentAgencyId, user, memberships } = useAuth();
+  const isOwner = (memberships.find(m => m.agencyId === currentAgencyId)?.role ?? '') === 'OWNER';
   const navigate = useNavigate();
   const { properties, loading, setStatus, refresh: refreshProperties } = useProperties();
   const { plans } = usePlans();
@@ -349,6 +350,7 @@ export default function Imoveis() {
             </p>
           </div>
           {atLimit ? (
+            isOwner ? (
             <Button
               onClick={() => navigate('/onboarding/upgrade')}
               className="gap-1.5 rounded-full font-semibold shrink-0 bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm"
@@ -356,6 +358,9 @@ export default function Imoveis() {
               <Sparkles className="w-3.5 h-3.5" />
               Fazer upgrade
             </Button>
+            ) : (
+              <span className="text-xs text-muted-foreground shrink-0">Contacte o proprietário para fazer upgrade.</span>
+            )
           ) : (
             <Button
               onClick={() => setAddOpen(true)}
@@ -466,10 +471,14 @@ export default function Imoveis() {
                         </div>
                         {!search && statusFilter === 'ALL' && (
                           atLimit ? (
+                            isOwner ? (
                             <Button size="sm" onClick={() => navigate('/onboarding/upgrade')} className="gap-1.5 rounded-full mt-1 font-semibold bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm">
                               <Sparkles className="w-3 h-3" />
                               Fazer upgrade
                             </Button>
+                            ) : (
+                              <p className="text-xs text-muted-foreground mt-1">Contacte o proprietário para fazer upgrade.</p>
+                            )
                           ) : (
                             <Button size="sm" onClick={() => setAddOpen(true)} className="gap-2 rounded-full mt-1">
                               <Plus className="w-3.5 h-3.5" /> Adicionar imóvel

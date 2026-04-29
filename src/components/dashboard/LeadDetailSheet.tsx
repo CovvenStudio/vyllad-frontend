@@ -7,7 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import {
   Phone, Mail, Calendar, Users, PawPrint, Briefcase, Clock,
   TrendingUp, Timer, Target, CheckCircle2, XCircle, CalendarCheck, ScanSearch, Send, Loader2,
+  Globe, MapPin, Eye, MessageSquare,
 } from 'lucide-react';
+import { tScreeningOption } from '@/lib/screening-i18n';
 import { Candidate, Property } from '@/lib/types';
 import { motion } from 'framer-motion';
 import type { ScoringConfigDto } from '@/lib/leads-api';
@@ -23,6 +25,11 @@ interface LeadDetailSheetProps {
   open: boolean;
   onClose: () => void;
   onStatusChange: (id: string, status: Candidate['status']) => void;
+}
+
+function getCountryName(code: string): string {
+  if (!code) return '';
+  try { return new Intl.DisplayNames(['pt'], { type: 'region' }).of(code) ?? code; } catch { return code; }
 }
 
 const employmentLabel: Record<string, string> = {
@@ -217,7 +224,12 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
               { Icon: Briefcase, label: 'Situação', value: employmentLabel[candidate.employmentType] ?? candidate.employmentType },
               { Icon: Clock, label: 'Na função há', value: candidate.employmentDuration >= 12 ? `${Math.floor(candidate.employmentDuration / 12)} ano(s)` : `${candidate.employmentDuration} meses` },
               { Icon: CheckCircle2, label: 'Fiador', value: candidate.hasGuarantor ? 'Sim' : 'Não' },
-              { Icon: CalendarCheck, label: 'Disponibilidade', value: candidate.moveInTimeline ?? '—' },
+              { Icon: CalendarCheck, label: 'Disponibilidade', value: candidate.moveInTimeline ? tScreeningOption(candidate.moveInTimeline) : '—' },
+              ...(candidate.nationality ? [{ Icon: Globe, label: 'Nacionalidade', value: getCountryName(candidate.nationality) }] : []),
+              ...(candidate.residencyDuration ? [{ Icon: MapPin, label: 'Reside há', value: tScreeningOption(candidate.residencyDuration) }] : []),
+              ...(candidate.stayDuration ? [{ Icon: Timer, label: 'Tempo pretendido', value: tScreeningOption(candidate.stayDuration) }] : []),
+              ...(candidate.hasVisited ? [{ Icon: Eye, label: 'Já visitou imóveis?', value: tScreeningOption(candidate.hasVisited) }] : []),
+              ...(candidate.motivation ? [{ Icon: Target, label: 'Motivação', value: tScreeningOption(candidate.motivation) }] : []),
             ].map(({ Icon, label, value }) => (
               <div key={label} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
                 <Icon className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
@@ -228,6 +240,20 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
               </div>
             ))}
           </div>
+          {candidate.customAnswers && Object.keys(candidate.customAnswers).length > 0 && (
+            <div className="mt-3 space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Perguntas personalizadas</p>
+              {Object.entries(candidate.customAnswers).map(([q, a]) => (
+                <div key={q} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
+                  <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[10px] text-muted-foreground">{q}</div>
+                    <div className="text-xs font-semibold mt-0.5">{a || '—'}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {candidate.notes && (
             <div className="mt-3 p-3 rounded-xl bg-muted/40 text-xs text-muted-foreground italic">
               "{candidate.notes}"

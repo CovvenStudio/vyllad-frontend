@@ -43,6 +43,7 @@ export interface ActiveSystemQuestionDto {
 export interface PublicScreeningDto {
   systemQuestions: ActiveSystemQuestionDto[];
   customQuestions: CustomScreeningQuestionDto[];
+  agencyCountryCode?: string;
 }
 
 export interface SaveScreeningConfigDto {

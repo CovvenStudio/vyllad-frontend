@@ -60,6 +60,16 @@ export interface Candidate {
   urgency?: 'immediate' | 'soon' | 'flexible';
   moveInTimeline?: string;
   proposedVisit?: string; // ISO datetime proposed by the candidate (awaiting agent confirmation)
+  // Raw screening answers (carried via spread from LeadDto)
+  stayDuration?: string;
+  hasVisited?: string;
+  motivation?: string;
+  nationality?: string;
+  residencyDuration?: string;
+  customAnswers?: Record<string, string>;
+  visitToken?: string;
+  visitLinkSentAt?: string;
+  contractedAt?: string;
 }
 
 export interface TimeSlot {

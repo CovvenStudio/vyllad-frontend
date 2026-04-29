@@ -12,7 +12,7 @@ import {
   GraduationCap, Search,
   ThumbsUp, ThumbsDown,
   Tag, Plane, MessageCircle,
-  MapPin,
+  MapPin, Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,108 @@ import { useToast } from '@/hooks/use-toast';
 import { submitLead } from '@/lib/leads-api';
 
 // ─── Scoring Engine ──────────────────────────────────────────────────────────
+
+// ── Country list (ISO-2 code → Portuguese name) ───────────────────────────────
+const COUNTRIES: { code: string; name: string }[] = [
+  { code: 'PT', name: 'Portugal' },
+  { code: 'BR', name: 'Brasil' },
+  { code: 'AO', name: 'Angola' },
+  { code: 'MZ', name: 'Moçambique' },
+  { code: 'CV', name: 'Cabo Verde' },
+  { code: 'GW', name: 'Guiné-Bissau' },
+  { code: 'ST', name: 'São Tomé e Príncipe' },
+  { code: 'GB', name: 'Reino Unido' },
+  { code: 'FR', name: 'França' },
+  { code: 'DE', name: 'Alemanha' },
+  { code: 'ES', name: 'Espanha' },
+  { code: 'IT', name: 'Itália' },
+  { code: 'NL', name: 'Países Baixos' },
+  { code: 'BE', name: 'Bélgica' },
+  { code: 'CH', name: 'Suíça' },
+  { code: 'AT', name: 'Áustria' },
+  { code: 'LU', name: 'Luxemburgo' },
+  { code: 'IE', name: 'Irlanda' },
+  { code: 'SE', name: 'Suécia' },
+  { code: 'NO', name: 'Noruega' },
+  { code: 'DK', name: 'Dinamarca' },
+  { code: 'FI', name: 'Finlândia' },
+  { code: 'IS', name: 'Islândia' },
+  { code: 'PL', name: 'Polónia' },
+  { code: 'RO', name: 'Roménia' },
+  { code: 'UA', name: 'Ucrânia' },
+  { code: 'RU', name: 'Rússia' },
+  { code: 'BY', name: 'Bielorrússia' },
+  { code: 'MD', name: 'Moldávia' },
+  { code: 'CZ', name: 'República Checa' },
+  { code: 'SK', name: 'Eslováquia' },
+  { code: 'HU', name: 'Hungria' },
+  { code: 'HR', name: 'Croácia' },
+  { code: 'RS', name: 'Sérvia' },
+  { code: 'BG', name: 'Bulgária' },
+  { code: 'GR', name: 'Grécia' },
+  { code: 'TR', name: 'Turquia' },
+  { code: 'LT', name: 'Lituânia' },
+  { code: 'LV', name: 'Letónia' },
+  { code: 'EE', name: 'Estónia' },
+  { code: 'AL', name: 'Albânia' },
+  { code: 'BA', name: 'Bósnia e Herzegovina' },
+  { code: 'MK', name: 'Macedónia do Norte' },
+  { code: 'MT', name: 'Malta' },
+  { code: 'CY', name: 'Chipre' },
+  { code: 'US', name: 'Estados Unidos' },
+  { code: 'CA', name: 'Canadá' },
+  { code: 'MX', name: 'México' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'CO', name: 'Colômbia' },
+  { code: 'VE', name: 'Venezuela' },
+  { code: 'CL', name: 'Chile' },
+  { code: 'PE', name: 'Peru' },
+  { code: 'EC', name: 'Equador' },
+  { code: 'UY', name: 'Uruguai' },
+  { code: 'BO', name: 'Bolívia' },
+  { code: 'PY', name: 'Paraguai' },
+  { code: 'CU', name: 'Cuba' },
+  { code: 'DO', name: 'República Dominicana' },
+  { code: 'NG', name: 'Nigéria' },
+  { code: 'GH', name: 'Gana' },
+  { code: 'SN', name: 'Senegal' },
+  { code: 'CI', name: 'Costa do Marfim' },
+  { code: 'CM', name: 'Camarões' },
+  { code: 'MA', name: 'Marrocos' },
+  { code: 'DZ', name: 'Argélia' },
+  { code: 'TN', name: 'Tunísia' },
+  { code: 'EG', name: 'Egipto' },
+  { code: 'ZA', name: 'África do Sul' },
+  { code: 'KE', name: 'Quénia' },
+  { code: 'ET', name: 'Etiópia' },
+  { code: 'TZ', name: 'Tanzânia' },
+  { code: 'UG', name: 'Uganda' },
+  { code: 'IN', name: 'Índia' },
+  { code: 'PK', name: 'Paquistão' },
+  { code: 'BD', name: 'Bangladesh' },
+  { code: 'NP', name: 'Nepal' },
+  { code: 'LK', name: 'Sri Lanka' },
+  { code: 'CN', name: 'China' },
+  { code: 'JP', name: 'Japão' },
+  { code: 'KR', name: 'Coreia do Sul' },
+  { code: 'TH', name: 'Tailândia' },
+  { code: 'VN', name: 'Vietname' },
+  { code: 'PH', name: 'Filipinas' },
+  { code: 'ID', name: 'Indonésia' },
+  { code: 'MY', name: 'Malásia' },
+  { code: 'SG', name: 'Singapura' },
+  { code: 'AU', name: 'Austrália' },
+  { code: 'NZ', name: 'Nova Zelândia' },
+  { code: 'IL', name: 'Israel' },
+  { code: 'SA', name: 'Arábia Saudita' },
+  { code: 'AE', name: 'Emirados Árabes Unidos' },
+  { code: 'IR', name: 'Irão' },
+  { code: 'GE', name: 'Geórgia' },
+  { code: 'AM', name: 'Arménia' },
+  { code: 'AZ', name: 'Azerbaijão' },
+  { code: 'KZ', name: 'Cazaquistão' },
+  { code: 'MU', name: 'Maurícias' },
+];
 
 interface LeadData {
   urgency: string;
@@ -37,6 +139,8 @@ interface LeadData {
   hasVisited: string;
   stayDuration: string;        // new D4
   motivation: string;
+  nationality: string;
+  residencyDuration: string;
   name: string;
   phone: string;
   email: string;
@@ -149,8 +253,8 @@ const OptionBtn = ({
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
 
-const BASE_STEPS = ['disclaimer', 'urgency', 'household', 'pets', 'income', 'commitments', 'job', 'employmentDuration', 'intent', 'stayDuration', 'motivation', 'contact'];
-const STEPS_WITH_GUARANTOR = ['disclaimer', 'urgency', 'household', 'pets', 'income', 'commitments', 'job', 'employmentDuration', 'guarantor', 'intent', 'stayDuration', 'motivation', 'contact'];
+const BASE_STEPS = ['disclaimer', 'urgency', 'nationality', 'residencyDuration', 'household', 'pets', 'income', 'commitments', 'job', 'employmentDuration', 'intent', 'stayDuration', 'motivation', 'contact'];
+const STEPS_WITH_GUARANTOR = ['disclaimer', 'urgency', 'nationality', 'residencyDuration', 'household', 'pets', 'income', 'commitments', 'job', 'employmentDuration', 'guarantor', 'intent', 'stayDuration', 'motivation', 'contact'];
 
 function computeSteps(
   screeningConfig: PublicScreeningDto | null,
@@ -168,8 +272,13 @@ function computeSteps(
   for (const key of ordered) {
     // guarantor is conditional on employment type — skip if not applicable
     if (key === 'guarantor' && !includeGuarantor) continue;
+    // residencyDuration is always inserted right after nationality (handled below)
+    if (key === 'residencyDuration') continue;
     result.push(key);
+    // always pair residencyDuration immediately after nationality
+    if (key === 'nationality') result.push('residencyDuration');
   }
+  // if nationality wasn't in system questions at all, still ensure both are absent (no half-pair)
 
   const customSteps = screeningConfig.customQuestions
     .sort((a, b) => a.order - b.order)
@@ -334,8 +443,10 @@ const LeadForm = ({
     income: '', monthlyCommitments: '',
     job: '', employmentDuration: '',
     hasGuarantor: '', hasVisited: '', stayDuration: '', motivation: '',
+    nationality: '', residencyDuration: '',
     name: '', phone: '', email: '', notes: '',
   });
+  const [nationalitySearch, setNationalitySearch] = useState('');
   const [customAnswers, setCustomAnswers] = useState<Record<string, string | string[]>>({});
 
   // Freeze step list at mount so the total never changes mid-flow.
@@ -364,6 +475,15 @@ const LeadForm = ({
     return needsGuarantorStep(data.job, property.criteria)
       ? nextAfter('employmentDuration') // → 'guarantor'
       : nextAfter('guarantor');          // skip to 'intent'
+  }
+
+  // After nationality → skip residencyDuration if candidate is a national.
+  function destAfterNationality(nationalityCode: string): string {
+    const agencyCountry = screeningConfig?.agencyCountryCode ?? '';
+    const isNational = agencyCountry && nationalityCode.toUpperCase() === agencyCountry.toUpperCase();
+    return isNational
+      ? nextAfter('residencyDuration') // skip residencyDuration → contact
+      : nextAfter('nationality');       // → residencyDuration
   }
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ score: number; classification: string } | null>(null);
@@ -407,6 +527,8 @@ const LeadForm = ({
         stayDuration: data.stayDuration,
         hasVisited: data.hasVisited,
         motivation: data.motivation,
+        nationality: data.nationality,
+        residencyDuration: data.residencyDuration,
         customAnswers: Object.fromEntries(
           Object.entries(customAnswers).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : v])
         ),
@@ -867,6 +989,74 @@ const LeadForm = ({
         )}
       </div>
     ),
+
+    nationality: (() => {
+      const filtered = nationalitySearch.trim()
+        ? COUNTRIES.filter(c =>
+            c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+            c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
+          )
+        : COUNTRIES;
+      return (
+        <div className="space-y-3">
+          <h3 className="font-display text-xl font-bold mb-1">Qual é a sua nacionalidade?</h3>
+          <p className="text-sm text-muted-foreground mb-3">Esta informação é confidencial e apenas utilizada para a qualificação da candidatura.</p>
+          <div className="relative">
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar país..."
+              value={nationalitySearch}
+              onChange={e => setNationalitySearch(e.target.value)}
+              className="h-11 rounded-xl pl-9"
+              autoFocus
+            />
+          </div>
+          <div className="max-h-52 overflow-y-auto space-y-1 pr-1">
+            {filtered.map(c => (
+              <button
+                key={c.code}
+                type="button"
+                onClick={() => {
+                  set('nationality', c.code);
+                  setNationalitySearch(c.name);
+                  setTimeout(() => next(destAfterNationality(c.code)), 200);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border text-left text-sm font-medium transition-all ${
+                  data.nationality === c.code
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-border hover:border-primary/40 hover:bg-muted/50'
+                }`}
+              >
+                <span className="flex-1">{c.name}</span>
+                {data.nationality === c.code && <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    })(),
+
+    residencyDuration: (() => {
+      const agencyCountryCode = screeningConfig?.agencyCountryCode ?? '';
+      const agencyCountryName = COUNTRIES.find(c => c.code === agencyCountryCode)?.name ?? 'Portugal';
+      return (
+        <div className="space-y-3">
+          <h3 className="font-display text-xl font-bold mb-1">Há quanto tempo reside em {agencyCountryName}?</h3>
+          <p className="text-sm text-muted-foreground mb-4">Ajuda-nos a avaliar a estabilidade da sua situação de residência.</p>
+          {[
+            { label: 'Menos de 1 ano', value: 'under_1_year' },
+            { label: '1 a 3 anos', value: '1_to_3_years' },
+            { label: '3 a 5 anos', value: '3_to_5_years' },
+            { label: 'Mais de 5 anos', value: 'over_5_years' },
+          ].map(o => (
+            <OptionBtn key={o.value} label={o.label}
+              selected={data.residencyDuration === o.value}
+              onClick={() => { set('residencyDuration', o.value); setTimeout(() => next(nextAfter('residencyDuration')), 200); }}
+            />
+          ))}
+        </div>
+      );
+    })(),
 
     contact: (
       <div className="space-y-4">

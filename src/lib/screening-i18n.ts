@@ -17,6 +17,7 @@ const CATEGORIES: Record<string, string> = {
   financial:    'Financeiro',
   guarantees:   'Garantias',
   intention:    'Intenção',
+  profile:      'Perfil de Residência',
 };
 
 export function tScreeningCategory(key: string): string {
@@ -37,6 +38,8 @@ const QUESTION_LABELS: Record<string, string> = {
   intent:             'Já visitou algum imóvel recentemente?',
   stayDuration:       'Quanto tempo pretende ficar no imóvel?',
   motivation:         'O que procura principalmente?',
+  nationality:        'Qual é a sua nacionalidade?',
+  residencyDuration:  'Há quanto tempo reside em Portugal?',
 };
 
 export function tQuestionLabel(key: string, fallback: string): string {
@@ -57,6 +60,8 @@ const QUESTION_DESCRIPTIONS: Record<string, string> = {
   intent:             'Indica se o candidato está numa fase avançada de tomada de decisão.',
   stayDuration:       'Candidatos com intenção de permanência mais longa são geralmente preferidos.',
   motivation:         'Contexto sobre a principal motivação da procura.',
+  nationality:        'Permite avaliar a estabilidade de residência do candidato. Maiores períodos de residência estão associados a menor risco.',
+  residencyDuration:  'Apenas perguntado quando a nacionalidade do candidato difere do país da agência. Maior duração resulta em pontução mais elevada.',
 };
 
 export function tQuestionDescription(key: string, fallback?: string): string {
@@ -101,6 +106,11 @@ const OPTION_VALUES: Record<string, string> = {
   work_relocation:  'Relocalização por trabalho',
   better_price:     'Melhor preço',
   better_location:  'Melhor localização',
+  // residencyDuration
+  over_5_years:   'Há mais de 5 anos',
+  '3_to_5_years': '3 a 5 anos',
+  // '1_to_3_years' already defined above under employment duration
+  // 'under_1_year' already defined above under stay duration
 };
 
 export function tScreeningOption(value: string): string {
