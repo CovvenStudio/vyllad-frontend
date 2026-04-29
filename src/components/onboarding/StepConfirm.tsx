@@ -1,4 +1,4 @@
-import { ChevronLeft, Loader2, Building2, FileText, Users } from 'lucide-react';
+import { ChevronLeft, Loader2, Building2, FileText, Home, Users, UserCheck, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePlans } from '@/plans';
 import type { PlanId } from '@/plans';
@@ -110,24 +110,52 @@ export function StepConfirm({
 
         {/* Limits */}
         {!isScale && (
-          <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center gap-0.5">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-              <p className="font-semibold text-sm">{plan.limits.properties ?? '∞'}</p>
-              <p className="text-[10px] text-muted-foreground">imóveis</p>
+          <div className="grid grid-cols-3 divide-x divide-border/60">
+            <div className="flex flex-col items-center gap-1.5 py-1 px-3">
+              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                <Home className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <p className="font-display text-base font-700 leading-none">{plan.limits.properties ?? '∞'}</p>
+              <p className="text-[10px] text-muted-foreground text-center leading-tight">imóveis</p>
             </div>
-            <div className="flex flex-col items-center gap-0.5 border-x border-border/60">
-              <Users className="w-3.5 h-3.5 text-muted-foreground" />
-              <p className="font-semibold text-sm">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-              <p className="text-[10px] text-muted-foreground">cand./mês</p>
+            <div className="flex flex-col items-center gap-1.5 py-1 px-3">
+              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                <UserCheck className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <p className="font-display text-base font-700 leading-none">{plan.limits.candidatesPerProperty ?? '∞'}</p>
+              <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./imóvel</p>
             </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <Users className="w-3.5 h-3.5 text-muted-foreground" />
-              <p className="font-semibold text-sm">{plan.limits.agents ?? '∞'}</p>
-              <p className="text-[10px] text-muted-foreground">agentes</p>
+            <div className="flex flex-col items-center gap-1.5 py-1 px-3">
+              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                <Users className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <p className="font-display text-base font-700 leading-none">{plan.limits.agents ?? '∞'}</p>
+              <p className="text-[10px] text-muted-foreground text-center leading-tight">agentes</p>
             </div>
           </div>
         )}
+
+        {/* Extra lead pricing */}
+        {!isScale && !isTrial && (() => {
+          const extraPrice = marketEntry?.extraLeadPrice ?? null;
+          if (!extraPrice) return null;
+          const sym = billingCountry?.currency === 'BRL' ? 'R$' : '€';
+          return (
+            <>
+              <div className="border-t border-border/60" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                  <Zap className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Leads extra</p>
+                  <p className="text-sm font-medium">{sym}{extraPrice} por lead adicional</p>
+                  <p className="text-[11px] text-muted-foreground">Disponível após atingir o limite do plano</p>
+                </div>
+              </div>
+            </>
+          );
+        })()}
       </div>
 
       <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">

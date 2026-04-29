@@ -94,6 +94,9 @@ export function useLeads(propertyId: string | null) {
   const { currentAgencyId } = useAuth();
   const [leads, setLeads]         = useState<LeadDto[]>([]);
   const [scoringConfig, setScoringConfig] = useState<ScoringConfigDto | null>(null);
+  const [planLimit, setPlanLimit]   = useState<number | null>(null);
+  const [leadsTotal, setLeadsTotal] = useState(0);
+  const [hiddenCount, setHiddenCount] = useState(0);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
 
@@ -107,6 +110,9 @@ export function useLeads(propertyId: string | null) {
         getScoringConfig(currentAgencyId).catch(() => null),
       ]);
       setLeads(data.leads);
+      setPlanLimit(data.planLimit);
+      setLeadsTotal(data.total);
+      setHiddenCount(data.hiddenCount);
       setScoringConfig(cfg);
     } catch {
       setError('Erro ao carregar candidatos.');
@@ -134,5 +140,5 @@ export function useLeads(propertyId: string | null) {
     return c;
   });
 
-  return { leads, candidates, scoringConfig, loading, error, refresh: load, setStatus };
+  return { leads, candidates, scoringConfig, loading, error, refresh: load, setStatus, planLimit, leadsTotal, hiddenCount };
 }

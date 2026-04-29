@@ -71,6 +71,10 @@ export interface LeadDto {
 export interface LeadListResponse {
   leads: LeadDto[];
   total: number;
+  /** Plan-based candidate cap for this property. null = unlimited */
+  planLimit: number | null;
+  /** Number of leads hidden due to plan limit (total - planLimit when over cap) */
+  hiddenCount: number;
 }
 
 // ── Scoring config ────────────────────────────────────────────────────────────

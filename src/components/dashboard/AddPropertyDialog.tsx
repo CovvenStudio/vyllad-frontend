@@ -86,7 +86,6 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
         },
       });
       setStep('done');
-      onCreated?.();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao criar imóvel.';
       toast({ title: 'Erro', description: msg, variant: 'destructive' });
@@ -96,12 +95,14 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
   };
 
   const handleClose = () => {
+    const wasCreated = step === 'done';
     setStep('info');
     setPropertyInfo({ title: '', referenceId: '', announcementLink: '', rentalPrice: '', location: '', description: '' });
     setAvailableFrom(undefined);
     setSelectedAgents([]);
     setCriteria({ minIncome: '', maxPeople: '', petsAllowed: false, allowedPetTypes: [], advanceMonths: '2', depositMonths: '2', guarantorRequired: true, advanceWithoutGuarantor: '4', depositWithoutGuarantor: '3' });
     onOpenChange(false);
+    if (wasCreated) onCreated?.();
   };
 
   const toggleAgent = (id: string) => {

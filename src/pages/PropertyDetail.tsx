@@ -5,7 +5,7 @@ import placeholderImg from '@/assets/details/img1.jpg';
 import {
   ArrowLeft, MapPin, Users, Trophy, Eye, Pencil, ExternalLink,
   LayoutDashboard, CalendarCheck, CheckCircle2, XCircle, PawPrint,
-  BedDouble, Bath, Ruler, Building2, Car, Timer, Star,
+  BedDouble, Bath, Ruler, Building2, Car, Timer, Star, Lock,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -130,6 +130,8 @@ export default function PropertyDetail() {
 
   const [property, setProperty] = useState<PropertyDto | null>(null);
   const [leads, setLeads] = useState<LeadDto[]>([]);
+  const [hiddenCount, setHiddenCount] = useState(0);
+  const [planLimit, setPlanLimit] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
@@ -141,7 +143,12 @@ export default function PropertyDetail() {
       getProperty(currentAgencyId, id),
       listLeads(currentAgencyId, id, 0, 200),
     ])
-      .then(([prop, lr]) => { setProperty(prop); setLeads(lr.leads); })
+      .then(([prop, lr]) => {
+        setProperty(prop);
+        setLeads(lr.leads);
+        setHiddenCount(lr.hiddenCount ?? 0);
+        setPlanLimit(lr.planLimit ?? null);
+      })
       .catch(() => navigate('/properties'))
       .finally(() => setLoading(false));
   }, [currentAgencyId, id, navigate]);
@@ -512,6 +519,27 @@ export default function PropertyDetail() {
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
                     {leads.filter(l => l.classification === 'low').length} abaixo
+                  </div>
+                </div>
+              )}
+
+              {/* ── Plan upsell banner ── */}
+              {!loading && hiddenCount > 0 && (
+                <div className="mx-4 mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
+                  <Lock className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-amber-800 leading-snug">
+                      {hiddenCount} candidato{hiddenCount !== 1 ? 's' : ''} oculto{hiddenCount !== 1 ? 's' : ''} pelo limite do plano
+                    </p>
+                    <p className="text-[11px] text-amber-700 mt-0.5">
+                      O teu plano mostra até {planLimit} candidatos por imóvel. Faz upgrade para ver todos.
+                    </p>
+                    <button
+                      onClick={() => navigate('/billing')}
+                      className="mt-2 text-[11px] font-bold text-amber-800 underline underline-offset-2 hover:text-amber-900 transition-colors"
+                    >
+                      Ver planos →
+                    </button>
                   </div>
                 </div>
               )}

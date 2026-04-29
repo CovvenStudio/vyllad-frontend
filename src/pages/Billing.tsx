@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, CheckCircle2, Clock, AlertTriangle, ExternalLink, Loader2, Receipt, Download, FileText, Crown, Calendar, Info } from 'lucide-react';
+import { CreditCard, CheckCircle2, Clock, AlertTriangle, ExternalLink, Loader2, Receipt, Download, FileText, Crown, Calendar, Info, Gauge, Minus, Plus, Check, Users, Building2, UserCheck } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiFetch } from '@/lib/api-client';
@@ -17,6 +17,14 @@ interface SubscriptionStatus {
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   planName: string | null;
+  planMaxProperties: number | null;
+  planMaxLeadsPerProperty: number | null;
+  planMaxAgents: number | null;
+  extraLeads: number;
+  extraLeadsPerUnit: number | null;
+  extraLeadPricePerUnit: number | null;
+  extraLeadCurrency: string | null;
+  supportsExtraLeads: boolean;
 }
 
 interface Invoice {
@@ -43,7 +51,11 @@ interface UpcomingInvoice {
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
+  // Force UTC so Stripe billing timestamps (e.g. 2026-05-28T23:00:00Z) don't
+  // shift to the next calendar day in UTC+1 (Portugal summer time).
+  return new Intl.DateTimeFormat('pt-PT', {
+    day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC',
+  }).format(new Date(iso));
 }
 
 function formatMoney(amountCents: number, currency: string): string {
@@ -106,6 +118,12 @@ export default function Billing() {
   const [invoicesLoading, setInvoicesLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
+  // Extra leads state
+  const [extraLeadsQty, setExtraLeadsQty] = useState(0);
+  const [savingLeads, setSavingLeads] = useState(false);
+  const [savedLeads, setSavedLeads] = useState(false);
+  const [leadsError, setLeadsError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!isOwner) {
       navigate('/dashboard', { replace: true });
@@ -114,6 +132,7 @@ export default function Billing() {
     apiFetch<SubscriptionStatus>('/subscriptions/status')
       .then((data) => {
         setSubStatus(data);
+        setExtraLeadsQty(data.extraLeads ?? 0);
         // Only fetch invoices if there's an active-ish subscription
         if (data.status && data.status !== 'trialing') {
           setInvoicesLoading(true);
@@ -130,6 +149,26 @@ export default function Billing() {
   }, [isOwner]);
 
   const handleUpgrade = () => navigate('/onboarding/upgrade');
+
+  const handleSaveExtraLeads = async () => {
+    setSavingLeads(true);
+    setSavedLeads(false);
+    setLeadsError(null);
+    try {
+      await apiFetch('/subscriptions/extra-leads', {
+        method: 'PATCH',
+        body: JSON.stringify({ quantity: extraLeadsQty }),
+      });
+      const updated = await apiFetch<SubscriptionStatus>('/subscriptions/status');
+      setSubStatus(updated);
+      setExtraLeadsQty(updated.extraLeads ?? 0);
+      setSavedLeads(true);
+    } catch (e) {
+      setLeadsError(e instanceof Error ? e.message : 'Erro ao guardar leads extra.');
+    } finally {
+      setSavingLeads(false);
+    }
+  };
 
   const handleManagePortal = async () => {
     setPortalLoading(true);
@@ -154,6 +193,10 @@ export default function Billing() {
 
   const statusCfg = subStatus?.status ? STATUS_CONFIG[subStatus.status] : null;
   const isTrial = subStatus?.status === 'trialing';
+  const leadsPerUnit = subStatus?.extraLeadsPerUnit ?? 1;
+  const pricePerLeadUnit = subStatus?.extraLeadPricePerUnit ?? 0;
+  const leadCurrency = subStatus?.extraLeadCurrency ?? 'eur';
+  const extraLeadsChanged = extraLeadsQty !== (subStatus?.extraLeads ?? 0);
   const trialDaysLeft = (() => {
     if (!subStatus?.trialEndsAt) return null;
     const diff = new Date(subStatus.trialEndsAt).getTime() - Date.now();
@@ -229,6 +272,115 @@ export default function Billing() {
                     </div>
                   )}
                 </div>
+
+                {/* ── Plan limits ──────────────────────────────────── */}
+                {(subStatus.planMaxProperties != null || subStatus.planMaxLeadsPerProperty != null || subStatus.planMaxAgents != null) && (
+                  <div className="border-t pt-3 flex flex-wrap gap-x-6 gap-y-2">
+                    {subStatus.planMaxAgents != null && (
+                      <div className="flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-semibold">{subStatus.planMaxAgents}</span>
+                        <span className="text-xs text-muted-foreground">agentes</span>
+                      </div>
+                    )}
+                    {subStatus.planMaxProperties != null && (
+                      <div className="flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-semibold">{subStatus.planMaxProperties}</span>
+                        <span className="text-xs text-muted-foreground">imóveis ativos</span>
+                      </div>
+                    )}
+                    {subStatus.planMaxLeadsPerProperty != null && (
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-semibold">
+                          {subStatus.planMaxLeadsPerProperty}
+                          {subStatus.extraLeads > 0 && (
+                            <span className="text-accent"> +{subStatus.extraLeads * (subStatus.extraLeadsPerUnit ?? 1)}</span>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground">leads/imóvel{subStatus.extraLeads > 0 ? ' (+ extra)' : ''}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Extra leads stepper ───────────────────────────── */}
+                {subStatus.supportsExtraLeads && subStatus.status === 'active' && (
+                  <>
+                    <div className="border-t pt-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Gauge className="w-3.5 h-3.5 text-muted-foreground" />
+                        <p className="text-sm font-medium">Leads extra por imóvel</p>
+                        <span className="ml-auto text-[11px] text-muted-foreground">
+                          máx. 50 · {formatMoney(Math.round(pricePerLeadUnit * 100), leadCurrency)}/pacote
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between rounded-xl border bg-muted/30 px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => { setExtraLeadsQty(q => Math.max(0, q - 1)); setSavedLeads(false); }}
+                          disabled={extraLeadsQty === 0}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+
+                        <div className="text-center">
+                          <span className="text-2xl font-bold">{extraLeadsQty}</span>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {extraLeadsQty === 0
+                              ? 'Sem leads extra'
+                              : `${extraLeadsQty * leadsPerUnit} leads · ${formatMoney(Math.round(extraLeadsQty * pricePerLeadUnit * 100), leadCurrency)}/mês`}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => { setExtraLeadsQty(q => Math.min(50, q + 1)); setSavedLeads(false); }}
+                          disabled={extraLeadsQty >= 50}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {leadsError && (
+                        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          {leadsError}
+                        </div>
+                      )}
+
+                      {savedLeads && !extraLeadsChanged && (
+                        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 font-medium">
+                          <Check className="w-3.5 h-3.5 shrink-0" />
+                          Leads extra guardados com sucesso.
+                        </div>
+                      )}
+
+                      {extraLeadsChanged && (
+                        <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                          <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span>A alteração é imediata. O valor será ajustado ao tempo restante do mês atual.</span>
+                        </div>
+                      )}
+
+                      <div className="flex justify-end">
+                        <Button
+                          size="sm"
+                          onClick={handleSaveExtraLeads}
+                          disabled={!extraLeadsChanged || savingLeads}
+                          className="flex items-center gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+                        >
+                          {savingLeads ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Gauge className="w-3.5 h-3.5" />}
+                          {savingLeads ? 'A guardar...' : 'Guardar alterações'}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             ) : (
               <p className="text-sm text-muted-foreground">Nenhuma subscrição encontrada.</p>
@@ -298,7 +450,7 @@ export default function Billing() {
                   <Info className="w-4 h-4 mt-0.5 shrink-0" />
                   <p>
                     Fizeste uma alteração de plano a meio do período de faturação. O valor abaixo já inclui o
-                    <strong> ajuste proporcional (rateio)</strong> pelos dias restantes do ciclo atual.
+                    <strong> ajuste ao tempo restante do ciclo atual</strong>.
                     Este montante será cobrado na próxima data de renovação.
                   </p>
                 </div>

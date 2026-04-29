@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Plus, Search, Home, MoreHorizontal, Pencil, PauseCircle, PlayCircle,
   Archive, KeyRound, MapPin, BedDouble, Ruler,
-  ChevronLeft, ChevronRight, Users,
+  ChevronLeft, ChevronRight, Users, Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +25,9 @@ import { useProperties } from '@/hooks/useProperties';
 import type { PropertyDto } from '@/lib/properties-api';
 import { listLeadsByAgency } from '@/lib/leads-api';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePlans } from '@/plans';
+import { useToast } from '@/hooks/use-toast';
+import { ApiError } from '@/lib/api-client';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<PropertyDto['status'], { label: string; className: string }> = {
@@ -229,8 +232,31 @@ function SkeletonRow() {
 const PAGE_SIZE = 12;
 
 export default function Imoveis() {
-  const { currentAgencyId } = useAuth();
-  const { properties, loading, setStatus } = useProperties();
+  const { currentAgencyId, user } = useAuth();
+  const navigate = useNavigate();
+  const { properties, loading, setStatus, refresh: refreshProperties } = useProperties();
+  const { plans } = usePlans();
+  const userPlan = plans.find(p => p.backendPlanId === user?.planId);
+  const maxProperties = userPlan?.limits.properties ?? null;
+  const activeCount = properties.filter(p => p.status === 'ACTIVE').length;
+  const atLimit = maxProperties !== null && activeCount >= maxProperties;
+  const { toast } = useToast();
+
+  async function handleSetStatus(id: string, status: PropertyDto['status']) {
+    try {
+      await setStatus(id, status);
+    } catch (err) {
+      if (err instanceof ApiError && err.errorCode === 'PLAN_PROPERTY_LIMIT_REACHED') {
+        toast({
+          variant: 'destructive',
+          title: 'Limite de imóveis ativos atingido',
+          description: `O teu plano permite no máximo ${maxProperties} imóve${maxProperties === 1 ? 'l' : 'is'} ativo${maxProperties === 1 ? '' : 's'}. Faz upgrade para retomar mais imóveis.`,
+        });
+      } else {
+        toast({ variant: 'destructive', title: 'Erro', description: err instanceof Error ? err.message : 'Não foi possível alterar o estado do imóvel.' });
+      }
+    }
+  }
   const [candidateCounts, setCandidateCounts] = useState<Record<string, number>>({});
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -306,17 +332,39 @@ export default function Imoveis() {
         >
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-700 tracking-tight text-foreground">Imóveis</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">
+            <p className="text-muted-foreground text-sm mt-0.5 flex items-center gap-2 flex-wrap">
               {properties.length} imóve{properties.length === 1 ? 'l' : 'is'} na agência
+              {maxProperties !== null && (
+                <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                  activeCount >= maxProperties
+                    ? 'bg-destructive/10 text-destructive border-destructive/20'
+                    : activeCount / maxProperties >= 0.8
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-muted text-muted-foreground border-border/60'
+                }`}>
+                  <Home className="w-2.5 h-2.5" />
+                  {activeCount} / {maxProperties} ativos
+                </span>
+              )}
             </p>
           </div>
-          <Button
-            onClick={() => setAddOpen(true)}
-            className="gap-2 rounded-full font-semibold shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Adicionar imóvel</span>
-          </Button>
+          {atLimit ? (
+            <Button
+              onClick={() => navigate('/onboarding/upgrade')}
+              className="gap-1.5 rounded-full font-semibold shrink-0 bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Fazer upgrade
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setAddOpen(true)}
+              className="gap-2 rounded-full font-semibold shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Adicionar imóvel</span>
+            </Button>
+          )}
         </motion.div>
 
         {/* ── Filters ────────────────────────────────────────────────────── */}
@@ -417,9 +465,16 @@ export default function Imoveis() {
                           </p>
                         </div>
                         {!search && statusFilter === 'ALL' && (
-                          <Button size="sm" onClick={() => setAddOpen(true)} className="gap-2 rounded-full mt-1">
-                            <Plus className="w-3.5 h-3.5" /> Adicionar imóvel
-                          </Button>
+                          atLimit ? (
+                            <Button size="sm" onClick={() => navigate('/onboarding/upgrade')} className="gap-1.5 rounded-full mt-1 font-semibold bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm">
+                              <Sparkles className="w-3 h-3" />
+                              Fazer upgrade
+                            </Button>
+                          ) : (
+                            <Button size="sm" onClick={() => setAddOpen(true)} className="gap-2 rounded-full mt-1">
+                              <Plus className="w-3.5 h-3.5" /> Adicionar imóvel
+                            </Button>
+                          )
                         )}
                       </div>
                     </td>
@@ -433,7 +488,7 @@ export default function Imoveis() {
                       candidateCount={candidateCounts[p.id] ?? 0}
                       leadsLoading={leadsLoading}
                       onEdit={openEdit}
-                      onSetStatus={setStatus}
+                      onSetStatus={handleSetStatus}
                     />
                   ))
                 )}
@@ -497,7 +552,7 @@ export default function Imoveis() {
       </div>
 
       {/* ── Dialogs ──────────────────────────────────────────────────────── */}
-      <AddPropertyDialog open={addOpen} onOpenChange={setAddOpen} />
+      <AddPropertyDialog open={addOpen} onOpenChange={setAddOpen} onCreated={refreshProperties} />
       {editingProperty && (
         <EditPropertyDialog
           open={editOpen}

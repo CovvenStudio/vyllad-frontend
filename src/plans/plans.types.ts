@@ -20,6 +20,8 @@ export interface MarketPrice {
   market: string;
   currency: string;
   price: number;
+  /** Price per extra-lead unit in this currency. null = extras not available */
+  extraLeadPrice: number | null;
 }
 
 export interface Plan {
@@ -36,6 +38,8 @@ export interface Plan {
   features: string[];
   /** Per-market pricing from the backend */
   marketPrices: MarketPrice[] | null;
+  /** How many extra leads are unlocked per purchase unit. null = not available */
+  extraLeadsPerUnit: number | null;
   /** Whether this plan is visually highlighted (e.g. "Mais popular") */
   highlighted: boolean;
   /** Optional badge text shown on the card */
@@ -63,7 +67,6 @@ export interface RawPlan {
   price_cents: number | null;
   billing: string;
   limits: RawPlanLimits;
-  features: string[];
   highlighted: boolean;
   badge: string | null;
   cta: string;

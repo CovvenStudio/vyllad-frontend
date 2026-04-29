@@ -93,16 +93,16 @@ function PlanCard({
       </div>
 
       {plan.id !== 'scale' && (
-        <div className="grid grid-cols-3 gap-1 py-3 border-y border-border/60">
-          <div className="flex flex-col items-center gap-1 px-1">
+        <div className="grid grid-cols-3 divide-x divide-border/60 py-3 border-y border-border/60">
+          <div className="flex flex-col items-center gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.properties ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground text-center leading-tight">imóveis</p>
           </div>
-          <div className="flex flex-col items-center gap-1 px-1 border-x border-border/60">
+          <div className="flex flex-col items-center gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./mês</p>
+            <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./imóvel</p>
           </div>
-          <div className="flex flex-col items-center gap-1 px-1">
+          <div className="flex flex-col items-center gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.agents ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground text-center leading-tight">agentes</p>
           </div>
@@ -117,6 +117,23 @@ function PlanCard({
           </li>
         ))}
       </ul>
+
+      {/* Extra lead pricing */}
+      {plan.id !== 'trial' && plan.id !== 'scale' && (() => {
+        const extraPrice = marketEntry?.extraLeadPrice ?? null;
+        if (!extraPrice) return null;
+        const sym = currency === 'BRL' ? 'R$' : '€';
+        const units = plan.extraLeadsPerUnit ?? 1;
+        return (
+          <div className="rounded-lg bg-muted/50 border border-border/50 px-3 py-2 flex items-center gap-2 text-[11px] text-muted-foreground">
+            <Zap className="w-3 h-3 text-accent shrink-0" />
+            <span>
+              Leads extra: <span className="font-semibold text-foreground">{sym}{extraPrice}</span>
+              {units > 1 ? ` por ${units} leads` : ' /lead'}
+            </span>
+          </div>
+        );
+      })()}
 
       <div className={cn(
         'h-9 rounded-lg flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200',

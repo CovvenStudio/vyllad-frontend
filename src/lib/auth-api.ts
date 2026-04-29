@@ -1,7 +1,7 @@
 // ─── Auth API ─────────────────────────────────────────────────────────────────
 // Thin wrapper over the /api/auth endpoints.
 
-import { apiFetch, tokenStore, BASE_URL } from './api-client';
+import { apiFetch, tokenStore, BASE_URL, getOrStartRefresh } from './api-client';
 
 // ── Shape returned by POST /auth/google and GET /auth/me ──────────────────────
 export interface AuthUser {
@@ -85,27 +85,29 @@ export function persistSession(session: AuthSession) {
 }
 
 /** Explicitly refresh the access token using the stored refresh token.
- *  Returns true if successful (access token is now set in tokenStore). */
+ *  Deduplicated — concurrent calls share the same in-flight promise. */
 export async function refreshTokens(): Promise<boolean> {
-  const refreshToken = localStorage.getItem('vyllad_refresh_token');
-  if (!refreshToken) return false;
-  try {
-    const res = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-    if (!res.ok) {
-      clearSession();
+  return getOrStartRefresh(async () => {
+    const refreshToken = localStorage.getItem('vyllad_refresh_token');
+    if (!refreshToken) return false;
+    try {
+      const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) {
+        clearSession();
+        return false;
+      }
+      const data = await res.json() as { accessToken: string; refreshToken: string };
+      tokenStore.set(data.accessToken);
+      localStorage.setItem('vyllad_refresh_token', data.refreshToken);
+      return true;
+    } catch {
       return false;
     }
-    const data = await res.json() as { accessToken: string; refreshToken: string };
-    tokenStore.set(data.accessToken);
-    localStorage.setItem('vyllad_refresh_token', data.refreshToken);
-    return true;
-  } catch {
-    return false;
-  }
+  });
 }
 
 export function clearSession() {

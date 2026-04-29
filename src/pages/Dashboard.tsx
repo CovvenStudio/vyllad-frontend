@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Calendar, CheckCircle, XCircle, Clock, Eye, Filter,
   Flame, BanIcon, ChevronRight, ChevronDown, Users, TrendingUp,
-  Timer,
+  Timer, Gauge,
   ArrowUpRight, CalendarCheck, MoreHorizontal, Pencil, PauseCircle, PlayCircle, Archive, KeyRound, RotateCcw, Trophy, Home,
 } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -24,6 +24,8 @@ import AddPropertyDialog from '@/components/dashboard/AddPropertyDialog';
 import EditPropertyDialog from '@/components/dashboard/EditPropertyDialog';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import LeadDetailSheet from '@/components/dashboard/LeadDetailSheet';
+import BuyLeadsDialog from '@/components/dashboard/BuyLeadsDialog';
+import { usePlans } from '@/plans';
 // Adapts PropertyDto (API) to the Property shape expected by internal components
 function toProperty(dto: PropertyDto): Property {
   return {
@@ -113,6 +115,7 @@ function quickInsight(c: Candidate): string {
 // ─── Smart Insights Panel ─────────────────────────────────────────────────────
 function SmartInsightsPanel({
   allCandidates,
+  planLimit,
   properties,
   onSelectCandidate,
   onApprove,
@@ -124,6 +127,7 @@ function SmartInsightsPanel({
   onRevertContract,
 }: {
   allCandidates: Candidate[];
+  planLimit: number | null;
   properties: Property[];
   onSelectCandidate: (c: Candidate) => void;
   onApprove: (id: string) => void;
@@ -134,7 +138,14 @@ function SmartInsightsPanel({
   onContract: (c: Candidate) => void;
   onRevertContract: (c: Candidate) => void;
 }) {
-  const topLeads = [...allCandidates]
+  // Candidates within the plan limit = first N by arrival date (oldest first)
+  const withinLimitCandidates = planLimit !== null
+    ? [...allCandidates]
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .slice(0, planLimit)
+    : allCandidates;
+
+  const topLeads = [...withinLimitCandidates]
     .filter(c => c.status !== 'rejected')
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
@@ -538,10 +549,12 @@ function DashboardSplash() {
   );
 }
 
+const CANDIDATES_PAGE_SIZE = 10;
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { currentAgencyId } = useAuth();
+  const { currentAgencyId, user, status: authStatus } = useAuth();
   const { toast } = useToast();
   const location = useLocation();
   const [addOpen, setAddOpen] = useState(false);
@@ -556,9 +569,19 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
   const [propertyStatusFilter, setPropertyStatusFilter] = useState<'active' | 'closed'>('active');
+  const [candidatesPage, setCandidatesPage] = useState(1);
 
   const { properties: propertyDtos, loading: propertiesLoading, setStatus: setPropertyStatus, refresh: refreshProperties } = useProperties();
   const { agents: realAgents } = useAgents();
+  const { plans } = usePlans();
+  const userPlan = plans.find(p => p.backendPlanId === user?.planId);
+  const maxProperties = userPlan?.limits.properties ?? null;
+  // Extra lead support (button visibility only — dialog fetches live state)
+  const extraLeadMarket = userPlan?.marketPrices?.find(mp => mp.market === 'EUROPE') ?? userPlan?.marketPrices?.[0] ?? null;
+  const extraLeadPrice = extraLeadMarket?.extraLeadPrice ?? null;
+  const [buyLeadsOpen, setBuyLeadsOpen] = useState(false);
+  const activeCount = propertyDtos.filter(p => p.status === 'ACTIVE').length;
+  const atLimit = maxProperties !== null && activeCount >= maxProperties;
   const filteredProperties = propertyDtos
     .filter(p => propertyStatusFilter === 'active'
       ? (p.status === 'ACTIVE' || p.status === 'PAUSED')
@@ -568,7 +591,10 @@ export default function Dashboard() {
   const selectedPropertyDto = propertyDtos.find(p => p.id === effectiveSelected) ?? null;
   const property = filteredProperties.find(p => p.id === effectiveSelected) ?? null;
 
-  const { candidates, scoringConfig, loading: leadsLoading, setStatus: setLeadStatus, refresh: refreshLeads } = useLeads(effectiveSelected);
+  const { candidates, scoringConfig, loading: leadsLoading, setStatus: setLeadStatus, refresh: refreshLeads, planLimit: leadPlanLimit, leadsTotal, hiddenCount: leadsHiddenCount } = useLeads(effectiveSelected);
+  const remainingLeads = leadPlanLimit !== null ? Math.max(0, leadPlanLimit - leadsTotal) : null;
+  const atLeadLimit = leadPlanLimit !== null && leadsTotal >= leadPlanLimit;
+  const nearLeadLimit = !atLeadLimit && leadPlanLimit !== null && leadsTotal / leadPlanLimit >= 0.80;
   const [propertyAppointments, setPropertyAppointments] = useState<AppointmentDto[]>([]);
   const [hasBootstrapped, setHasBootstrapped] = useState(false);
 
@@ -593,6 +619,15 @@ export default function Dashboard() {
       .filter(c => urgencyFilter === 'all' || c.urgency === urgencyFilter)
       .sort((a, b) => b.score - a.score);
   }, [candidates, scoreFilter, statusFilter, urgencyFilter]);
+
+  // Reset to page 1 whenever filters or selected property changes
+  useEffect(() => { setCandidatesPage(1); }, [scoreFilter, statusFilter, urgencyFilter, effectiveSelected]);
+
+  const candidatesTotalPages = Math.max(1, Math.ceil(propertyCandidates.length / CANDIDATES_PAGE_SIZE));
+  const paginatedCandidates = propertyCandidates.slice(
+    (candidatesPage - 1) * CANDIDATES_PAGE_SIZE,
+    candidatesPage * CANDIDATES_PAGE_SIZE
+  );
 
   const allAgentCandidates = useMemo(() =>
     candidates,
@@ -659,7 +694,7 @@ export default function Dashboard() {
   }
 
   const propertyAgents = realAgents.filter(a => property?.agentIds.includes(a.id));
-  const isDataReady = !propertiesLoading && (!effectiveSelected || !leadsLoading);
+  const isDataReady = authStatus !== 'loading' && !propertiesLoading && (!effectiveSelected || !leadsLoading);
   const showInitialSplash = !hasBootstrapped;
 
   useEffect(() => {
@@ -755,14 +790,39 @@ export default function Dashboard() {
                         </p>
                       )}
                     </div>
-                    <Button
-                      onClick={() => setAddOpen(true)}
-                      size="sm"
-                      className="shrink-0 gap-2 rounded-full font-semibold"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span className="hidden sm:inline">Novo imóvel</span>
-                    </Button>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {maxProperties !== null && (
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
+                          activeCount >= maxProperties
+                            ? 'bg-destructive/10 text-destructive border-destructive/20'
+                            : activeCount / maxProperties >= 0.8
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-muted text-muted-foreground border-border/60'
+                        }`}>
+                          <Home className="w-2.5 h-2.5" />
+                          {activeCount} / {maxProperties} imóveis ativos
+                        </span>
+                      )}
+                      {atLimit ? (
+                        <Button
+                          size="sm"
+                          onClick={() => navigate('/onboarding/upgrade')}
+                          className="gap-1.5 rounded-full font-semibold bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm"
+                        >
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                          Fazer upgrade
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => setAddOpen(true)}
+                          size="sm"
+                          className="gap-2 rounded-full font-semibold"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span className="hidden sm:inline">Novo imóvel</span>
+                        </Button>
+                      )}
+                    </div>
                   </motion.div>
 
           {propertyDtos.length === 0 ? (
@@ -913,6 +973,7 @@ export default function Dashboard() {
                   {/* Smart Insights */}
                   <SmartInsightsPanel
                     allCandidates={allAgentCandidates}
+                    planLimit={leadPlanLimit}
                     properties={filteredProperties}
                     onSelectCandidate={openCandidate}
                     onApprove={id => handleStatusChange(id, 'approved')}
@@ -1002,30 +1063,156 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* ── Lead limit banner ───────────────────────────────── */}
+                  {(atLeadLimit || nearLeadLimit || leadsHiddenCount > 0) && (
+                    <div className={`mb-4 relative overflow-hidden rounded-2xl border px-5 py-4 ${
+                      atLeadLimit || leadsHiddenCount > 0
+                        ? 'bg-destructive/[0.04] border-destructive/15'
+                        : 'bg-accent/[0.06] border-accent/20'
+                    }`}>
+                      {/* left accent stripe */}
+                      <div className={`pointer-events-none absolute inset-y-0 left-0 w-0.5 ${
+                        atLeadLimit || leadsHiddenCount > 0 ? 'bg-destructive/40' : 'bg-accent/60'
+                      }`} />
+                      <div className="flex items-center gap-4">
+                        <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
+                          atLeadLimit || leadsHiddenCount > 0 ? 'bg-destructive/10' : 'bg-accent/15'
+                        }`}>
+                          <Gauge className={`w-4 h-4 ${
+                            atLeadLimit || leadsHiddenCount > 0 ? 'text-destructive' : 'text-accent-foreground'
+                          }`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {leadsHiddenCount > 0 ? (
+                            <>
+                              <p className="text-sm font-semibold tracking-tight">
+                                {leadsHiddenCount} candidato{leadsHiddenCount !== 1 ? 's' : ''} oculto{leadsHiddenCount !== 1 ? 's' : ''} por limite de leads
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                O teu plano está no limite de {leadPlanLimit} leads para este imóvel.
+                              </p>
+                            </>
+                          ) : atLeadLimit ? (
+                            <>
+                              <p className="text-sm font-semibold tracking-tight">Limite de leads atingido</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Novos candidatos não serão recebidos até aumentares a capacidade.
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-sm font-semibold tracking-tight">
+                                {remainingLeads === 1 ? 'Apenas 1 lead' : `${remainingLeads} leads`} até ao limite deste imóvel
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Aumenta a capacidade antes de perderes candidatos.
+                              </p>
+                            </>
+                          )}
+                        </div>
+                        <div className="shrink-0 flex items-center gap-2">
+                          {extraLeadPrice !== null && (
+                            <button
+                              onClick={() => setBuyLeadsOpen(true)}
+                              className="text-xs font-semibold bg-accent text-accent-foreground hover:bg-accent/85 rounded-xl px-3.5 py-2 transition-all"
+                            >
+                              Comprar leads
+                            </button>
+                          )}
+                          <button
+                            onClick={() => navigate('/onboarding/upgrade')}
+                            className="text-xs font-medium text-muted-foreground hover:text-foreground border border-border bg-background hover:bg-muted rounded-xl px-3.5 py-2 transition-all"
+                          >
+                            Fazer upgrade
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {propertyCandidates.length === 0 ? (
                     <div className="rounded-2xl border bg-card p-12 text-center">
                       <p className="text-sm text-muted-foreground">Nenhum candidato encontrado com os filtros actuais.</p>
                     </div>
                   ) : (
-                    <motion.div layout className="space-y-2.5 pb-10">
-                      <AnimatePresence>
-                        {propertyCandidates.map(c => (
-                          <LeadCard
-                            key={c.id}
-                            candidate={c}
-                            property={filteredProperties.find(p => p.id === c.propertyId)}
-                            onClick={() => openCandidate(c)}
-                            onApprove={c.status === 'new' ? () => handleStatusChange(c.id, 'approved') : undefined}
-                            onReject={c.status === 'new' ? () => handleStatusChange(c.id, 'rejected') : undefined}
-                            onSchedule={c.status === 'approved' ? () => navigate('/appointments', { state: { preSelectLeadId: c.id } }) : undefined}
-                            onReschedule={c.status === 'visit_cancelled' ? () => navigate('/appointments', { state: { preSelectLeadId: c.id } }) : undefined}
-                            onComplete={c.status === 'visit_scheduled' ? () => handleComplete(c.id) : undefined}
-                            onContract={c.status === 'visit_finished' ? () => handleContract(c.id) : undefined}
-                            onRevertContract={c.status === 'contracted' ? () => handleRevertContract(c.id) : undefined}
-                          />
-                        ))}
-                      </AnimatePresence>
-                    </motion.div>
+                    <>
+                      <motion.div layout className="space-y-2.5">
+                        <AnimatePresence>
+                          {paginatedCandidates.map(c => (
+                            <LeadCard
+                              key={c.id}
+                              candidate={c}
+                              property={filteredProperties.find(p => p.id === c.propertyId)}
+                              onClick={() => openCandidate(c)}
+                              onApprove={c.status === 'new' ? () => handleStatusChange(c.id, 'approved') : undefined}
+                              onReject={c.status === 'new' ? () => handleStatusChange(c.id, 'rejected') : undefined}
+                              onSchedule={c.status === 'approved' ? () => navigate('/appointments', { state: { preSelectLeadId: c.id } }) : undefined}
+                              onReschedule={c.status === 'visit_cancelled' ? () => navigate('/appointments', { state: { preSelectLeadId: c.id } }) : undefined}
+                              onComplete={c.status === 'visit_scheduled' ? () => handleComplete(c.id) : undefined}
+                              onContract={c.status === 'visit_finished' ? () => handleContract(c.id) : undefined}
+                              onRevertContract={c.status === 'contracted' ? () => handleRevertContract(c.id) : undefined}
+                            />
+                          ))}
+                        </AnimatePresence>
+                      </motion.div>
+
+                      {/* Pagination */}
+                      {candidatesTotalPages > 1 && (
+                        <div className="flex items-center justify-between pt-4 pb-10">
+                          <p className="text-xs text-muted-foreground">
+                            {(candidatesPage - 1) * CANDIDATES_PAGE_SIZE + 1}–{Math.min(candidatesPage * CANDIDATES_PAGE_SIZE, propertyCandidates.length)} de {propertyCandidates.length} candidatos
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setCandidatesPage(p => Math.max(1, p - 1))}
+                              disabled={candidatesPage === 1}
+                              className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm"
+                              aria-label="Página anterior"
+                            >
+                              ‹
+                            </button>
+                            {Array.from({ length: candidatesTotalPages }, (_, i) => i + 1)
+                              .filter(pg =>
+                                pg === 1 ||
+                                pg === candidatesTotalPages ||
+                                Math.abs(pg - candidatesPage) <= 1
+                              )
+                              .reduce<(number | '…')[]>((acc, pg, idx, arr) => {
+                                if (idx > 0 && pg - (arr[idx - 1] as number) > 1) acc.push('…');
+                                acc.push(pg);
+                                return acc;
+                              }, [])
+                              .map((pg, idx) =>
+                                pg === '…' ? (
+                                  <span key={`ellipsis-${idx}`} className="h-8 w-8 flex items-center justify-center text-xs text-muted-foreground select-none">…</span>
+                                ) : (
+                                  <button
+                                    key={pg}
+                                    onClick={() => setCandidatesPage(pg as number)}
+                                    className={`h-8 w-8 flex items-center justify-center rounded-xl text-xs font-medium transition-all ${
+                                      candidatesPage === pg
+                                        ? 'bg-accent text-accent-foreground shadow-sm'
+                                        : 'border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground'
+                                    }`}
+                                  >
+                                    {pg}
+                                  </button>
+                                )
+                              )
+                            }
+                            <button
+                              onClick={() => setCandidatesPage(p => Math.min(candidatesTotalPages, p + 1))}
+                              disabled={candidatesPage === candidatesTotalPages}
+                              className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm"
+                              aria-label="Próxima página"
+                            >
+                              ›
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {candidatesTotalPages <= 1 && <div className="pb-10" />}
+                    </>
                   )}
                 </>
               )}
@@ -1053,6 +1240,14 @@ export default function Dashboard() {
         onClose={() => setSheetOpen(false)}
         onStatusChange={handleStatusChange}
       />
+
+      {extraLeadPrice !== null && (
+        <BuyLeadsDialog
+          open={buyLeadsOpen}
+          onOpenChange={setBuyLeadsOpen}
+          onUpdated={refreshLeads}
+        />
+      )}
       </div>{/* end relative wrapper */}
           </motion.div>
         )}

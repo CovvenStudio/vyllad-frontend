@@ -19,17 +19,25 @@ export default function CheckoutReturn() {
       method: 'POST',
       body: JSON.stringify({ sessionId: sessionId ?? undefined }),
     })
-      .then(async () => {
+      .then(async (result) => {
+        const returnTo = searchParams.get('return') ?? '/dashboard';
+        if (result.status !== 'active') {
+          // Backend couldn't activate yet (e.g. webhook still processing)
+          setSyncStatus('error');
+          setTimeout(() => navigate(returnTo, { replace: true }), 3000);
+          return;
+        }
         // Refresh auth context so SubscriptionGuard sees the new active status
         await refreshSession();
         setSyncStatus('success');
-        setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
+        setTimeout(() => navigate(returnTo, { replace: true }), 1500);
       })
       .catch(async () => {
+        const returnTo = searchParams.get('return') ?? '/dashboard';
         // Try to refresh anyway — webhook may have already activated it
         try { await refreshSession(); } catch { /* ignore */ }
         setSyncStatus('error');
-        setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
+        setTimeout(() => navigate(returnTo, { replace: true }), 3000);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

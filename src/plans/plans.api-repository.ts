@@ -17,6 +17,7 @@ interface BackendMarketPrice {
   market: string;
   currency: string;
   price: number;
+  extraLeadPrice?: number | null;
 }
 
 interface BackendPlan {
@@ -28,21 +29,22 @@ interface BackendPlan {
   maxCandidatesPerProperty: number | null;
   maxAgents: number | null;
   stripeProductId: string | null;
+  stripeExtraLeadProductId: string | null;
+  extraLeadsPerUnit: number | null;
   marketPrices: BackendMarketPrice[] | null;
   features: BackendPlanFeature[];
 }
 
-// Feature key → marketing string map (marketing copy stays on the frontend)
-const FEATURE_LABELS: Record<string, string> = {
-  property_listings:  'Gestão e listagem de imóveis',
-  candidate_matching: 'Triagem automática de candidatos',
-  visit_scheduling:   'Agendamento de visitas online',
-  team_management:    'Gestão de agentes e equipa',
-  candidate_insights: 'Score detalhado e insights por candidato',
-  custom_branding:    'Página pública personalizada',
-  priority_support:   'Suporte prioritário',
-  api_access:         'Acesso à API',
-};
+// Unified feature list shown on every plan card (same order, same copy)
+const UNIFIED_FEATURES = [
+  'Gestão e listagem de imóveis',
+  'Triagem automática de candidatos',
+  'Score e classificação de candidatos',
+  'Agendamento de visitas online',
+  'Página pública de candidatura',
+  'Gestão de agentes e equipa',
+  'Insights detalhados por candidato',
+];
 
 const PLAN_META: Record<string, { tagline: string; billing: Plan['billing']; highlighted: boolean; badge: string | null; cta: string }> = {
   Trial:  { tagline: 'Experimente sem compromisso',        billing: 'monthly',  highlighted: false, badge: '30 dias grátis', cta: 'Experimentar grátis' },
@@ -52,10 +54,6 @@ const PLAN_META: Record<string, { tagline: string; billing: Plan['billing']; hig
 };
 
 function mapBackendPlan(raw: BackendPlan): Plan {
-  const enabledFeatures = raw.features
-    .filter((f) => f.enabled)
-    .map((f) => FEATURE_LABELS[f.featureKey] ?? f.featureKey);
-
   const planId = raw.name.toLowerCase() as PlanId;
   const meta = PLAN_META[raw.name] ?? { tagline: '', billing: 'monthly' as const, highlighted: false, badge: null, cta: 'Começar' };
 
@@ -72,8 +70,16 @@ function mapBackendPlan(raw: BackendPlan): Plan {
       agents: raw.maxAgents,
       trialDays: raw.trialDays,
     },
-    features: enabledFeatures,
-    marketPrices: raw.marketPrices,
+    features: UNIFIED_FEATURES,
+    marketPrices: raw.marketPrices
+      ? raw.marketPrices.map((mp) => ({
+          market: mp.market,
+          currency: mp.currency,
+          price: mp.price,
+          extraLeadPrice: mp.extraLeadPrice ?? null,
+        }))
+      : null,
+    extraLeadsPerUnit: raw.extraLeadsPerUnit ?? null,
     highlighted: meta.highlighted,
     badge: meta.badge,
     cta: meta.cta,

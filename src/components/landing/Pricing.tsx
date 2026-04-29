@@ -76,16 +76,16 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
 
       {/* Limits chips */}
       {!isScale && (
-        <div className="grid grid-cols-3 gap-2 mb-6 pb-6 border-b border-border/60">
-          <div className="text-center">
+        <div className="grid grid-cols-3 divide-x divide-border/60 mb-6 pb-6 border-b border-border/60">
+          <div className="text-center px-6">
             <p className="font-display text-xl font-700">{plan.limits.properties ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground leading-tight">imóveis</p>
           </div>
-          <div className="text-center border-x border-border/60">
+          <div className="text-center px-6">
             <p className="font-display text-xl font-700">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">cand./mês</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">cand./imóvel</p>
           </div>
-          <div className="text-center">
+          <div className="text-center px-6">
             <p className="font-display text-xl font-700">{plan.limits.agents ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground leading-tight">agentes</p>
           </div>

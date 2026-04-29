@@ -192,16 +192,16 @@ function PlanCard({
 
       {/* Limits summary */}
       {!isScale && (
-        <div className="grid grid-cols-3 gap-1 py-3 border-y border-border/60">
-          <div className="flex flex-col items-center justify-between gap-1 px-1">
+        <div className="grid grid-cols-3 divide-x divide-border/60 py-3 border-y border-border/60">
+          <div className="flex flex-col items-center justify-between gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.properties ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground text-center leading-tight">imóveis</p>
           </div>
-          <div className="flex flex-col items-center justify-between gap-1 px-1 border-x border-border/60">
+          <div className="flex flex-col items-center justify-between gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./mês</p>
+            <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./imóvel</p>
           </div>
-          <div className="flex flex-col items-center justify-between gap-1 px-1">
+          <div className="flex flex-col items-center justify-between gap-1 px-6">
             <p className="font-display text-lg font-700 leading-none">{plan.limits.agents ?? '∞'}</p>
             <p className="text-[10px] text-muted-foreground text-center leading-tight">agentes</p>
           </div>
