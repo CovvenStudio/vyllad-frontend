@@ -1,0 +1,166 @@
+{
+  "title": "Facturación",
+  "subtitle": "Detalles de tu plan y suscripción",
+  "subscription": {
+    "title": "Suscripción actual",
+    "plan": "Plan",
+    "noSubscription": "No se encontró ninguna suscripción.",
+    "nextRenewal": "Próxima renovación",
+    "accessUntil": "Acceso hasta",
+    "trialEndsAt": "La prueba termina el",
+    "cancelledWarning": "La suscripción está programada para cancelarse al final del período actual.",
+    "agents": "agentes",
+    "activeProperties": "propiedades activas",
+    "leadsPerProperty": "leads/propiedad",
+    "leadsPerPropertyExtra": "leads/propiedad (+ extra)"
+  },
+  "extraLeads": {
+    "title": "Leads extra por propiedad",
+    "max": "máx. 50",
+    "noExtra": "Sin leads extra",
+    "perPackage": "paquete",
+    "perMonth": "/mes",
+    "saveButton": "Guardar cambios",
+    "saving": "Guardando...",
+    "savedSuccess": "Leads extra guardados correctamente.",
+    "changeInfo": "El cambio es inmediato. El importe se ajustará al tiempo restante del mes actual.",
+    "errorSave": "Error al guardar leads extra.",
+    "leadsExtra": "+{{count}} leads extra"
+  },
+  "trialCta": {
+    "lastDay": "¡Último día de prueba!",
+    "expiredToday": "Tu prueba ha expirado hoy",
+    "daysLeft_one": "Solo {{count}} día restante en la prueba",
+    "daysLeft_other": "Solo {{count}} días restantes en la prueba",
+    "inTrial": "Estás en el período de prueba",
+    "urgentMessage": "Suscríbete ahora para no perder el acceso a la plataforma y mantener todos tus datos.",
+    "normalMessage": "Suscríbete para seguir usando vyllad sin interrupciones.",
+    "normalMessageDate": "Tu prueba termina el {{date}}. Suscríbete para seguir usando vyllad sin interrupciones.",
+    "subscribe": "Suscribirse ahora"
+  },
+  "invoices": {
+    "title": "Historial de facturas",
+    "history": "Historial de facturas",
+    "manageStripe": "Gestionar en Stripe",
+    "upcoming": "Próxima factura",
+    "upcomingCard": "Próxima factura",
+    "chargeDate": "Fecha de cargo",
+    "amount": "Importe",
+    "prorateNote": "Cambiaste de plan a mitad del período de facturación. El importe a continuación ya incluye el ajuste por los días restantes del ciclo actual. Se cobrará en la próxima fecha de renovación.",
+    "empty": "No hay facturas disponibles.",
+    "noUpcoming": "Sin factura prevista."
+  },
+  "status": {
+    "active": "Activa",
+    "trialing": "En Período de Prueba",
+    "past_due": "Pago Atrasado",
+    "cancelled": "Cancelada",
+    "unpaid": "Pendiente",
+    "incomplete": "Incompleta",
+    "incomplete_expired": "Incompleta (expirada)",
+    "paused": "Pausada",
+    "uncollectible": "Incobrable",
+    "draft": "Borrador"
+  },
+  "invoiceStatus": {
+    "paid": "Pagada",
+    "open": "Pendiente",
+    "draft": "Borrador",
+    "uncollectible": "Incobrable"
+  },
+  "errors": {
+    "loadSubscription": "Error al cargar datos de suscripción",
+    "openPortal": "Error al abrir el portal de facturación"
+  },
+  "plan": {
+    "contact": "Contactar",
+    "perMonth": "/mes",
+    "properties": "inmuebles",
+    "candidatesPerProperty": "candidatos/inmueble",
+    "agents": "agentes",
+    "extraLeadsLabel": "Leads extra:",
+    "perLeads": "por {{count}} leads",
+    "perLead": "/lead"
+  },
+  "upgrade": {
+    "title": "Elige tu plan",
+    "subtitle": "Todos los planes incluyen cribado automático de candidatos. Puedes cambiar o cancelar en cualquier momento.",
+    "billingCountry": "País de facturación:",
+    "loading": "Cargando planes…",
+    "changePlan": "Cambiar plan",
+    "back": "Volver",
+    "trialExpiredTitle": "Tu período de prueba ha terminado",
+    "trialExpiredDesc": "Para seguir usando Vyllad elige un plan a continuación. Tu cuenta y datos están preservados.",
+    "errorCheckout": "Error al iniciar el checkout"
+  },
+  "plans": {
+    "trial": {
+      "name": "Trial",
+      "tagline": "Pruébalo sin compromiso",
+      "badge": "30 días gratis",
+      "cta": "Probar gratis",
+      "features": [
+        "Gestión y listado de propiedades",
+        "Cribado automático de candidatos",
+        "Puntuación y clasificación de candidatos",
+        "Programación de visitas online",
+        "Página pública de solicitud",
+        "Gestión de agentes y equipo",
+        "Análisis detallados por candidato"
+      ]
+    },
+    "basic": {
+      "name": "Basic",
+      "tagline": "Para inmobiliarias en crecimiento",
+      "badge": null,
+      "cta": "Empezar ahora",
+      "features": [
+        "Gestión y listado de propiedades",
+        "Cribado automático de candidatos",
+        "Puntuación y clasificación de candidatos",
+        "Programación de visitas online",
+        "Página pública de solicitud",
+        "Gestión de agentes y equipo",
+        "Análisis detallados por candidato"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "Para equipos con alto volumen",
+      "badge": "Más popular",
+      "cta": "Empezar con Pro",
+      "features": [
+        "Gestión y listado de propiedades",
+        "Cribado automático de candidatos",
+        "Puntuación y clasificación de candidatos",
+        "Programación de visitas online",
+        "Página pública de solicitud",
+        "Gestión de agentes y equipo",
+        "Análisis detallados por candidato"
+      ]
+    },
+    "scale": {
+      "name": "Scale",
+      "tagline": "Solución empresarial a medida",
+      "badge": "Empresarial",
+      "cta": "Hablar con el equipo",
+      "features": [
+        "Gestión y listado de propiedades",
+        "Cribado automático de candidatos",
+        "Puntuación y clasificación de candidatos",
+        "Programación de visitas online",
+        "Página pública de solicitud",
+        "Gestión de agentes y equipo",
+        "Análisis detallados por candidato"
+      ]
+    }
+  },
+  "checkoutReturn": {
+    "syncing": "Activando suscripción…",
+    "syncingSubtitle": "Solo un momento.",
+    "success": "¡Suscripción activada!",
+    "successSubtitle": "Redirigiendo al panel…",
+    "error": "Casi listo…",
+    "errorSubtitle": "El pago fue procesado. Redirigiendo…"
+  }
+}

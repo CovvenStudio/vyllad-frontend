@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -10,6 +11,7 @@ export default function CheckoutReturn() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { refreshSession } = useAuth();
+  const { t } = useTranslation('billing');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('syncing');
 
   useEffect(() => {
@@ -49,8 +51,8 @@ export default function CheckoutReturn() {
           <>
             <Loader2 className="w-10 h-10 animate-spin text-muted-foreground mx-auto" />
             <div>
-              <p className="font-display text-base font-600 tracking-tight">A ativar subscrição…</p>
-              <p className="text-sm text-muted-foreground mt-1">Só um momento.</p>
+              <p className="font-display text-base font-600 tracking-tight">{t('checkoutReturn.syncing')}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('checkoutReturn.syncingSubtitle')}</p>
             </div>
           </>
         )}
@@ -58,8 +60,8 @@ export default function CheckoutReturn() {
           <>
             <CheckCircle className="w-10 h-10 text-emerald-500 mx-auto" />
             <div>
-              <p className="font-display text-base font-600 tracking-tight">Subscrição ativada!</p>
-              <p className="text-sm text-muted-foreground mt-1">A redirecionar para o painel…</p>
+              <p className="font-display text-base font-600 tracking-tight">{t('checkoutReturn.success')}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('checkoutReturn.successSubtitle')}</p>
             </div>
           </>
         )}
@@ -67,8 +69,8 @@ export default function CheckoutReturn() {
           <>
             <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
             <div>
-              <p className="font-display text-base font-600 tracking-tight">Quase lá…</p>
-              <p className="text-sm text-muted-foreground mt-1">O pagamento foi processado. A redirecionar…</p>
+              <p className="font-display text-base font-600 tracking-tight">{t('checkoutReturn.error')}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('checkoutReturn.errorSubtitle')}</p>
             </div>
           </>
         )}

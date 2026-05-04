@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 const Footer = () => {
+  const { t } = useTranslation('landing');
   return (
     <footer className="border-t py-12">
       <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -7,7 +10,7 @@ const Footer = () => {
           <span className="text-accent text-sm">.</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          © 2026 Vyllad. Todos os direitos reservados.
+          {t('footer.rights')}
         </p>
       </div>
     </footer>

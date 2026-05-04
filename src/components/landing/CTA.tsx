@@ -2,10 +2,12 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import heroVilla from '@/assets/hero-villa.jpg';
 
 const CTA = () => {
+  const { t } = useTranslation('landing');
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
@@ -43,7 +45,7 @@ const CTA = () => {
               transition={{ delay: 0.1 }}
               className="text-xs font-medium tracking-[0.2em] uppercase text-accent mb-7"
             >
-              Sem cartão. Sem compromisso.
+              {t('cta.tag')}
             </motion.p>
 
             <motion.h2
@@ -53,8 +55,8 @@ const CTA = () => {
               transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="font-display text-3xl md:text-5xl lg:text-6xl font-700 text-primary-foreground mb-6 tracking-tight leading-[1.05]"
             >
-              O próximo inquilino perfeito<br className="hidden md:block" />
-              está a um clique.
+              {t('cta.headline1')}<br className="hidden md:block" />
+              {t('cta.headline2')}
             </motion.h2>
 
             <motion.p
@@ -64,7 +66,7 @@ const CTA = () => {
               transition={{ delay: 0.4 }}
               className="text-primary-foreground/55 text-base md:text-lg max-w-md mx-auto mb-12 leading-relaxed"
             >
-              Cada dia sem o vyllad é mais uma hora perdida com candidatos que nunca iriam fechar.
+              {t('cta.sub')}
             </motion.p>
 
             <motion.div
@@ -79,7 +81,7 @@ const CTA = () => {
                   size="lg"
                   className="h-12 px-8 text-sm font-semibold rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 gap-2 shadow-xl shadow-accent/30"
                 >
-                  Comece de graça
+                  {t('cta.ctaStart')}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -89,7 +91,7 @@ const CTA = () => {
                   variant="ghost"
                   className="h-12 px-8 text-sm font-semibold rounded-2xl text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10"
                 >
-                  Ver demonstração
+                  {t('cta.ctaDemo')}
                 </Button>
               </Link>
             </motion.div>
@@ -102,7 +104,7 @@ const CTA = () => {
               transition={{ delay: 0.7 }}
               className="text-primary-foreground/30 text-xs mt-8 tracking-wide"
             >
-              Trial gratuito · Sem cartão · Cancele quando quiser
+              {t('cta.trust')}
             </motion.p>
           </div>
         </motion.div>

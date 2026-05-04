@@ -1,0 +1,103 @@
+{
+  "title": "Agendamentos",
+  "periods": {
+    "upcoming": "Próximas",
+    "today": "Hoje",
+    "history": "Histórico",
+    "pendingSchedule": "Aguardam agendamento",
+    "completed": "Concluídas",
+    "scheduled": "Próximas visitas"
+  },
+  "filters": {
+    "allProperties": "Todos os imóveis",
+    "allAgents": "Todos os agentes"
+  },
+  "actions": {
+    "copySchedulingLink": "Copiar link de agendamento",
+    "sendVisitLink": "Enviar link de visita por email",
+    "sendNewVisitLink": "Enviar novo link de visita",
+    "schedule": "Agendar",
+    "confirm": "Confirmar",
+    "reschedule": "Reagendar",
+    "cancel": "Cancelar visita",
+    "complete": "Finalizar visita",
+    "finalize": "Finalizar",
+    "closeContract": "Fechar contrato",
+    "send": "Enviar",
+    "sendLink": "Enviar link"
+  },
+  "status": {
+    "confirmed": "Confirmada",
+    "completed": "Concluída",
+    "cancelled": "Cancelada",
+    "blocked": "Bloqueado"
+  },
+  "notesPlaceholder": "Ex: trazer documentos de rendimento, visita guiada ao exterior…",
+  "candidate": "Candidato",
+  "toast": {
+    "contracted": "Contrato fechado! 🎉",
+    "contractedDesc": "{{name}} foi marcado como arrendatário de {{property}}.",
+    "scheduled": "Visita agendada!",
+    "scheduledDesc": "{{date}} às {{time}}",
+    "rescheduled": "Reagendamento iniciado",
+    "linkCopied": "Link copiado!",
+    "shareLinkDesc": "Partilhe com {{name}}.",
+    "emailSent": "Email enviado!",
+    "emailSentDesc": "Link de visita enviado para {{name}}.",
+    "newEmailSentDesc": "Novo link de visita enviado para {{name}}.",
+    "slotBlocked": "Horário {{slot}} bloqueado",
+    "slotUnblocked": "Horário {{slot}} desbloqueado",
+    "visitFinalized": "Visita finalizada",
+    "visitFinalizedDesc": "{{name}} — {{date}}",
+    "visitCancelled": "Visita cancelada",
+    "visitCancelledDesc": "{{date}} às {{time}}",
+    "errorCancel": "Erro ao cancelar",
+    "errorFinish": "Erro ao finalizar visita",
+    "errorReschedule": "Erro ao reagendar",
+    "errorContract": "Erro ao fechar contrato.",
+    "errorEmail": "Erro ao enviar email",
+    "errorBlockUpdate": "Não foi possível atualizar o bloqueio",
+    "errorSchedule": "Erro ao agendar visita.",
+    "noToken": "Este candidato ainda não tem token de visita. Aprova-o primeiro.",
+    "contractReverted": "O candidato voltou para a lista de aprovados para agendar nova visita."
+  },
+  "attention": "Atenção",
+  "modal": {
+    "title": "Agendar visita",
+    "candidatePrefs": "Preferências do candidato",
+    "clickToUse": "(clica para usar)",
+    "showingPeriod": "Mostrando horários do período \"{{label}}\" ({{start}}–{{end}})",
+    "visitDate": "Data da visita",
+    "timeLabel": "Horário",
+    "noSlots": "Não há horários disponíveis para esta data/período.",
+    "blockTitle": "Bloqueio manual por horário",
+    "blockHint": "Use quando quiser fechar um horário antes de atingir o limite de visitas.",
+    "updating": "A atualizar...",
+    "blocked": "Bloqueado",
+    "occupancy": "Ocupação {{current}}/{{max}}",
+    "agentLabel": "Agente responsável",
+    "notesLabel": "Notas",
+    "optional": "(opcional)",
+    "confirmButton": "Agendar visita"
+  },
+  "relTime": {
+    "mins": "há {{count}}min",
+    "hours": "há {{count}}h",
+    "day": "há 1 dia",
+    "days": "há {{count}} dias"
+  },
+  "card": {
+    "noAppointments": "Sem agendamentos",
+    "candidateSlots": "Preferências do candidato recebidas",
+    "linkSent": "Link enviado {{time}}",
+    "visitCancelled": "Visita cancelada",
+    "agentRole": "Agente",
+    "proposes": "Propõe {{date}} às {{time}}",
+    "contracted": "Contrato fechado"
+  },
+  "page": {
+    "subtitle": "Visitas confirmadas e histórico",
+    "loading": "A carregar agendamentos…",
+    "pendingSection": "Candidatos aprovados — aguardam agendamento"
+  }
+}

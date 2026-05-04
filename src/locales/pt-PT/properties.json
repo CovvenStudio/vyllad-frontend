@@ -1,0 +1,178 @@
+{
+  "title": "Imóveis",
+  "subtitle": "Gestão de imóveis",
+  "loading": "A carregar imóveis",
+  "totalCount_one": "{{count}} imóvel na agência",
+  "totalCount_other": "{{count}} imóveis na agência",
+  "addProperty": "Adicionar imóvel",
+  "newProperty": "Novo imóvel",
+  "upgrade": "Fazer upgrade",
+  "contactOwnerUpgrade": "Contacte o proprietário para fazer upgrade.",
+  "searchPlaceholder": "Pesquisar imóvel, localização…",
+  "noProperties": "Nenhum imóvel encontrado",
+  "noPropertiesHint": "Adiciona o teu primeiro imóvel para começar.",
+  "noPropertiesFilter": "Tenta ajustar os filtros de pesquisa.",
+  "search": "Pesquisar",
+  "table": {
+    "property": "Imóvel",
+    "reference": "Referência",
+    "status": "Estado",
+    "price": "Preço",
+    "details": "Detalhes",
+    "candidates": "Candidatos"
+  },
+  "actions": {
+    "edit": "Editar",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "close": "Encerrar",
+    "rented": "Imóvel arrendado",
+    "archived": "Retirar imóvel"
+  },
+  "pagination": {
+    "showing": "{{from}}–{{to}} de {{total}} imóveis"
+  },
+  "limitReached": {
+    "title": "Limite de imóveis ativos atingido",
+    "desc_one": "O teu plano permite no máximo {{count}} imóvel ativo. Faz upgrade para retomar mais.",
+    "desc_other": "O teu plano permite no máximo {{count}} imóveis ativos. Faz upgrade para retomar mais."
+  },
+  "filter": {
+    "all": "Todos",
+    "active": "Ativos",
+    "paused": "Pausados",
+    "rented": "Arrendados",
+    "archived": "Arquivados"
+  },
+  "status": {
+    "ACTIVE": "Activo",
+    "PAUSED": "Pausado",
+    "RENTED": "Arrendado",
+    "ARCHIVED": "Arquivado"
+  },
+  "metrics": {
+    "activeCount": "{{count}} / {{max}} ativos",
+    "capturedSince": "Em captação há",
+    "avgToClose": "Média até fechar",
+    "completedVisits": "Visitas realizadas",
+    "candidates": "Candidatos"
+  },
+  "criteria": {
+    "title": "Critérios de candidatura",
+    "minIncome": "Renda mínima (€)",
+    "maxPeople": "Máx. pessoas",
+    "advance": "Adiantamento (meses)",
+    "deposit": "Caução (meses)",
+    "pets": "Animais de estimação",
+    "petTypesLabel": "Que tipos são permitidos?",
+    "petTypesNone": "Nenhum selecionado = todos permitidos",
+    "guarantorRequired": "Fiador necessário",
+    "noGuarantorValues": "Valores sem fiador",
+    "advanceNoGuarantor": "Adiantamento s/ fiador (meses)",
+    "depositNoGuarantor": "Caução s/ fiador (meses)",
+    "noAgents": "Nenhum agente disponível.",
+    "agentsHint": "Selecione um ou mais agentes responsáveis por este imóvel."
+  },
+  "dialog": {
+    "add": {
+      "title": "Novo imóvel",
+      "submit": "Criar imóvel",
+      "success": "Imóvel criado!",
+      "successTitle": "Imóvel criado com sucesso!",
+      "successDesc": "O imóvel está ativo e pronto para receber candidaturas.",
+      "error": "Erro ao criar imóvel."
+    },
+    "edit": {
+      "title": "Editar imóvel",
+      "submit": "Guardar alterações",
+      "success": "Imóvel actualizado!",
+      "error": "Erro ao actualizar imóvel."
+    },
+    "fields": {
+      "title": "Título",
+      "titlePlaceholder": "Ex: T2 renovado em Campo de Ourique",
+      "reference": "Referência interna",
+      "referencePlaceholder": "Ex: IMV-2024-001",
+      "location": "Localização",
+      "locationPlaceholder": "Ex: Campo de Ourique, Lisboa",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva características especiais do imóvel...",
+      "agents": "Agentes responsáveis",
+      "availableFrom": "Disponível a partir de",
+      "selectDate": "Selecionar data",
+      "petsAllowed": "Permitido",
+      "petsNotAllowed": "Não permitido",
+      "announcementLink": "Link do anúncio",
+      "rentalValue": "Valor do arrendamento",
+      "rentalHint": "Serve de base para cálculo dos adiantamentos e cauções",
+      "announcementLinkPlaceholder": "https://idealista.pt/..."
+    },
+    "errors": {
+      "generic": "Erro"
+    }
+  },
+  "detail": {
+    "tabs": {
+      "candidates": "Candidatos",
+      "visits": "Visitas",
+      "contract": "Contrato"
+    },
+    "loading": "A carregar imóvel",
+    "illustrative": "Imagem ilustrativa",
+    "immediateAccess": "Imediatamente",
+    "floorRC": "R/C",
+    "visitCompleted": "Visitas realizadas",
+    "info": "Informação do Imóvel",
+    "back": "Imóveis",
+    "viewPage": "Ver página",
+    "edit": "Editar",
+    "dashboard": "Dashboard",
+    "location": "Localização",
+    "available": "Disponível",
+    "reference": "Referência",
+    "pets": "Animais",
+    "createdAt": "Criado em",
+    "announcementLink": "Link do anúncio",
+    "description": "Descrição",
+    "petsAllowed": "Permitidos",
+    "petsNotAllowed": "Não permitidos",
+    "criteriaTitle": "Critérios de arrendamento",
+    "minIncome": "Rendimento mínimo",
+    "maxPeople": "Máx. pessoas",
+    "advance": "Adiantamento",
+    "deposit": "Caução",
+    "guarantorRequired": "Obrigatório",
+    "guarantorNotRequired": "Não exigido",
+    "advanceNoGuarantor": "Adiant. s/ fiador",
+    "depositNoGuarantor": "Caução s/ fiador",
+    "minContract": "Duração mínima",
+    "months": "meses",
+    "activeCandidates": "Candidatos activos",
+    "manage": "Gerir",
+    "noCandidates": "Sem candidatos activos",
+    "price": "Preço mensal",
+    "closed": "Fechado",
+    "open": "Em aberto",
+    "accepting": "A aceitar candidaturas"
+  },
+  "candidates": {
+    "excellent_one": "{{count}} excelente",
+    "excellent_other": "{{count}} excelentes",
+    "potential_one": "{{count}} potencial",
+    "potential_other": "{{count}} potenciais",
+    "low_one": "{{count}} abaixo",
+    "low_other": "{{count}} abaixo"
+  },
+  "upsell": {
+    "title_one": "{{count}} candidato oculto pelo limite do plano",
+    "title_other": "{{count}} candidatos ocultos pelo limite do plano",
+    "desc": "O teu plano mostra até {{limit}} candidatos por imóvel. Faz upgrade para ver todos.",
+    "link": "Ver planos →"
+  },
+  "badge": {
+    "urgent": "Urgente"
+  },
+  "public": {
+    "illustrative": "Imagem ilustrativa"
+  }
+}

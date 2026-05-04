@@ -1,0 +1,180 @@
+{
+  "visit": {
+    "title": "Programar visita",
+    "subtitle": "Elige una fecha y hora que te convenga",
+    "noSlots": "Sin disponibilidad",
+    "noSlotsDesc": "No hay horarios disponibles para esta propiedad.",
+    "slotSelected": "Seleccionado",
+    "slotAvailable": "Disponible",
+    "slotFull": "Completo",
+    "submitPreferences": "Enviar preferencias",
+    "submitSuccess": "¡Solicitud de visita enviada!",
+    "submitSubtitle": "El agente confirmará en breve.",
+    "errorSend": "Error al enviar preferencias. Inténtalo de nuevo.",
+    "errorReschedule": "Error al reprogramar. Inténtalo de nuevo.",
+    "errorCancel": "Error al cancelar. Inténtalo de nuevo."
+  },
+  "booking": {
+    "title": "Visita confirmada",
+    "description": "Tu solicitud de visita se ha registrado correctamente."
+  },
+  "form": {
+    "disclaimer": {
+      "title": "Solicitud de propiedad",
+      "description": "Antes de continuar, confirma que has leído los detalles de la propiedad y que cumples los criterios de solicitud.",
+      "responsibilityTitle": "Responsabilidad sobre la veracidad de los datos",
+      "body1": "Al rellenar este formulario, declaras que toda la información proporcionada es verdadera y está actualizada. Cualquier inconsistencia o falsedad en los datos indicados podrá perjudicar tu solicitud o resultar en tu eliminación del proceso.",
+      "body2": "Si tienes información adicional que consideres relevante para tu solicitud, podrás compartirla en el último paso del formulario.",
+      "guarantorNote": "Sin avalista, los valores de entrada se ajustan según los criterios de la propiedad."
+    },
+    "pets": {
+      "dog": "Perro",
+      "cat": "Gato",
+      "bird": "Pájaro",
+      "rabbit": "Conejo",
+      "fish": "Pez",
+      "reptile": "Reptil",
+      "hamster": "Hámster"
+    },
+    "guarantorSection": {
+      "title": "Valores estimados de entrada",
+      "advance": "Adelanto ({{count}} meses)",
+      "deposit": "Depósito ({{count}} meses)",
+      "total": "Total estimado"
+    },
+    "contact": {
+      "title": "Datos de contacto",
+      "name": "Nombre completo",
+      "namePlaceholder": "María García",
+      "email": "Email",
+      "phone": "Teléfono móvil",
+      "notes": "Notas adicionales (opcional)",
+      "notesPlaceholder": "Ej: Estoy disponible para visitas los fines de semana. Tengo carta de recomendación del anterior arrendador...",
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando...",
+      "errorSubmit": "Error al enviar la solicitud. Inténtalo de nuevo."
+    },
+    "steps": {
+      "skip": "Omitir (opcional) →",
+      "next": "Continuar",
+      "back": "Volver",
+      "urgency": {
+        "title": "¿Cuándo planeas mudarte?",
+        "immediately": "Inmediatamente",
+        "within15": "En 15 días",
+        "within1month": "En 1 mes",
+        "justBrowsing": "Solo explorando"
+      },
+      "household": {
+        "title": "¿Quién vivirá en la propiedad?",
+        "onlyMe": "Solo yo",
+        "2people": "2 personas",
+        "3people": "3 personas",
+        "4orMore": "4 o más"
+      },
+      "pets": {
+        "title": "¿Vas a traer mascotas?",
+        "yes": "Sí, tengo",
+        "no": "No tengo",
+        "count": "¿Cuántas?",
+        "types": "Tipos de animales"
+      },
+      "income": {
+        "title": "Ingresos mensuales netos del hogar (€)?",
+        "placeholder": "Ej: 2500"
+      },
+      "commitments": {
+        "title": "Suma de cuotas mensuales fijas (€)?",
+        "placeholder": "Ej: 300"
+      },
+      "job": {
+        "title": "¿Situación laboral?",
+        "permanent": "Contrato indefinido",
+        "fixedTerm": "Contrato temporal",
+        "selfEmployed": "Autónomo",
+        "student": "Estudiante",
+        "betweenJobs": "Entre empleos",
+        "other": "Otro",
+        "descPlaceholder": "Describe tu situación laboral..."
+      },
+      "employmentDuration": {
+        "title": "¿Cuánto tiempo llevas en esta situación?",
+        "under6": "Menos de 6 meses",
+        "6to12": "6 a 12 meses",
+        "1to3years": "1 a 3 años",
+        "over3years": "Más de 3 años"
+      },
+      "guarantor": {
+        "title": "¿Tienes avalista disponible?",
+        "yes": "Sí, tengo",
+        "no": "Sin avalista"
+      },
+      "hasVisited": {
+        "title": "¿Ya has visitado alguna propiedad recientemente?",
+        "yes": "Sí",
+        "no": "No"
+      },
+      "stayDuration": {
+        "title": "¿Cuánto tiempo pretendes quedarte?",
+        "under1year": "Menos de 1 año",
+        "1to2years": "1 a 2 años",
+        "2to3years": "2 a 3 años",
+        "3plus": "3 o más años"
+      },
+      "motivation": {
+        "title": "¿Qué buscas principalmente?",
+        "workRelocation": "Traslado por trabajo",
+        "betterPrice": "Mejor precio",
+        "betterLocation": "Mejor ubicación",
+        "other": "Otro motivo",
+        "answer": "¿Cuál es tu principal motivo?",
+        "placeholder": "Tu respuesta..."
+      },
+      "nationality": {
+        "title": "¿Cuál es tu nacionalidad?",
+        "search": "Buscar país..."
+      },
+      "residencyDuration": {
+        "under1year": "Menos de 1 año",
+        "1to3years": "1 a 3 años",
+        "3to5years": "3 a 5 años",
+        "over5years": "Más de 5 años"
+      }
+    }
+  },
+  "property": {
+    "notFound": "Inmueble no encontrado",
+    "backToHome": "Volver al inicio",
+    "back": "Volver",
+    "perMonth": "/mes",
+    "availableFrom": "Disponible desde",
+    "viewListing": "Ver anuncio",
+    "description": "Descripción",
+    "conditionsTitle": "Condiciones de arrendamiento",
+    "apply": "Solicitar visita",
+    "applyHint": "Proceso rápido — menos de 60 segundos",
+    "applicationTitle": "Solicitud",
+    "garage": "🅿️ Garaje",
+    "elevator": "🛗 Ascensor",
+    "criteria": {
+      "minIncome": "Renta mínima",
+      "maxPeople": "Máx. personas",
+      "pets": "Mascotas",
+      "petTypes": "Tipos de mascotas",
+      "petsAllowed": "✅ Permitidas",
+      "petsNotAllowed": "❌ No permitidas",
+      "guarantor": "Avalista",
+      "guarantorRequired": "Necesario",
+      "guarantorNotRequired": "No necesario",
+      "advance": "Adelanto",
+      "deposit": "Depósito",
+      "advanceNoGuarantor": "Adelanto s/ avalista",
+      "depositNoGuarantor": "Depósito s/ avalista",
+      "minContract": "Contrato mínimo",
+      "smoking": "Fumar",
+      "smokingAllowed": "✅ Permitido",
+      "smokingNotAllowed": "❌ No permitido",
+      "months": "{{count}} meses"
+    }
+  }
+}

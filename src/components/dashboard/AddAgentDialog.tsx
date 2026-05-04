@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,12 +18,12 @@ interface Props {
   agencyCountryCode: string | null;
 }
 
-const ROLES = [
-  { value: 'MANAGER', label: 'Gerente', description: 'Pode gerir propriedades e agendamentos' },
-  { value: 'AGENT', label: 'Colaborador', description: 'Acesso básico de consulta' },
-];
-
 const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props) => {
+  const { t } = useTranslation('common');
+  const ROLES = [
+    { value: 'MANAGER', label: t('agents.roles.MANAGER'), description: t('agents.roles.managerDesc') },
+    { value: 'AGENT', label: t('agents.roles.AGENT'), description: t('agents.roles.agentDesc') },
+  ];
   const [form, setForm] = useState({ email: '', phone: getPhonePrefix(agencyCountryCode), role: 'AGENT' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,7 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
       setForm({ email: '', phone: getPhonePrefix(agencyCountryCode), role: 'AGENT' });
       onOpenChange(false);
     } catch (e: unknown) {
-      setError((e as { message?: string })?.message ?? 'Erro ao convidar agente.');
+      setError((e as { message?: string })?.message ?? t('agents.errorInvite'));
     } finally {
       setLoading(false);
     }
@@ -56,11 +57,11 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">Convidar agente</DialogTitle>
+          <DialogTitle className="font-display">{t('agents.invite')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div>
-            <Label className="text-xs font-medium">Email Gmail <span className="text-destructive">*</span></Label>
+            <Label className="text-xs font-medium">{t('agents.emailGmail')} <span className="text-destructive">*</span></Label>
             <Input
               type="email"
               value={form.email}
@@ -70,12 +71,12 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
               autoFocus
             />
             {form.email && !isGmail && (
-              <p className="text-xs text-destructive mt-1">Apenas endereços @gmail.com são aceites.</p>
+              <p className="text-xs text-destructive mt-1">{t('agents.gmailOnly')}</p>
             )}
           </div>
 
           <div>
-            <Label className="text-xs font-medium mb-2 block">Função <span className="text-destructive">*</span></Label>
+            <Label className="text-xs font-medium mb-2 block">{t('agents.role')} <span className="text-destructive">*</span></Label>
             <div className="grid grid-cols-2 gap-2">
               {ROLES.map((r) => (
                 <button
@@ -96,7 +97,7 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
           </div>
 
           <div>
-            <Label className="text-xs font-medium">Telefone <span className="text-muted-foreground">(opcional)</span></Label>
+            <Label className="text-xs font-medium">{t('agents.phone')} <span className="text-muted-foreground">{t('common:optional')}</span></Label>
             <Input
               value={form.phone}
               onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
@@ -123,7 +124,7 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
           )}
 
           <Button onClick={submit} disabled={!canSubmit} className="w-full rounded-lg font-semibold">
-            {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />A enviar convite…</> : 'Enviar convite'}
+            {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('agents.sendingInvite')}</> : t('agents.sendInvite')}
           </Button>
         </div>
       </DialogContent>

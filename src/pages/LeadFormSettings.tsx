@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Plus, Trash2, Edit2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -16,16 +17,10 @@ import {
 import { tScreeningCategory, tQuestionLabel, tQuestionDescription, tScreeningOption } from '@/lib/screening-i18n';
 import { toast } from 'sonner';
 
-const TYPE_LABEL: Record<string, string> = {
-  single_choice: 'Escolha única',
-  multi_choice: 'Escolha múltipla',
-  boolean: 'Sim / Não',
-  text: 'Texto livre',
-};
-
 export default function LeadFormSettings() {
   const { currentAgencyId, memberships } = useAuth();
   const { isEnabled } = useFeatureFlags();
+  const { t } = useTranslation(['settings', 'common']);
   const [config, setConfig] = useState<AgencyScreeningConfigDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,7 +36,7 @@ export default function LeadFormSettings() {
     setLoading(true);
     getAgencyScreeningConfig(currentAgencyId)
       .then(setConfig)
-      .catch(() => toast.error('Erro ao carregar configuração'))
+      .catch(() => toast.error(t('settings:leadForm.errorLoad')))
       .finally(() => setLoading(false));
   }, [currentAgencyId]);
 
@@ -95,9 +90,9 @@ export default function LeadFormSettings() {
           order: q.order,
         })),
       });
-      toast.success('Configuração guardada!');
+      toast.success(t('settings:leadForm.saved'));
     } catch {
-      toast.error('Erro ao guardar configuração');
+      toast.error(t('settings:leadForm.errorSave'));
     } finally {
       setSaving(false);
     }
@@ -110,9 +105,9 @@ export default function LeadFormSettings() {
     <DashboardLayout>
       <div className="p-6 md:p-8 max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="font-display text-2xl font-700 tracking-tight">Formulário de Triagem</h1>
+          <h1 className="font-display text-2xl font-700 tracking-tight">{t('settings:leadForm.title')}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Configure quais perguntas são apresentadas aos candidatos. Aplica-se a todos os imóveis desta agência.
+            {t('settings:leadForm.subtitle')}
           </p>
         </motion.div>
 
@@ -126,7 +121,7 @@ export default function LeadFormSettings() {
             {/* System questions */}
             <section>
               <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">
-                Perguntas padrão do sistema
+                {t('settings:leadForm.systemSection')}
               </p>
               <div className="space-y-3">
                 {categories.map(cat => (
@@ -154,7 +149,7 @@ export default function LeadFormSettings() {
                           </div>
                           {q.alwaysEnabled ? (
                             <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 py-1 bg-muted rounded-full">
-                              Sempre activo
+                              {t('settings:leadForm.alwaysActive')}
                             </span>
                           ) : (
                             <Switch checked={q.enabled} onCheckedChange={() => !isReadOnly && toggleSystem(q.key)} disabled={isReadOnly} />
@@ -171,20 +166,20 @@ export default function LeadFormSettings() {
             <section>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Perguntas personalizadas
+                  {t('settings:leadForm.customSection')}
                 </p>
                 {!isReadOnly && (
                   <Button size="sm" variant="outline" className="gap-2 rounded-xl h-8" onClick={() => setAddOpen(true)}>
                     <Plus className="w-3.5 h-3.5" />
-                    Adicionar
+                    {t('common:actions.add')}
                   </Button>
                 )}
               </div>
 
               {config.customQuestions.length === 0 ? (
                 <div className="rounded-2xl border bg-card p-10 text-center">
-                  <p className="text-sm text-muted-foreground">Nenhuma pergunta personalizada.</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Clique em "Adicionar" para criar perguntas exclusivas da sua agência.</p>
+                  <p className="text-sm text-muted-foreground">{t('settings:leadForm.noCustom')}</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">{t('settings:leadForm.noCustomHint')}</p>
                 </div>
               ) : (
                 <div className="rounded-2xl border bg-card divide-y overflow-hidden">
@@ -194,11 +189,11 @@ export default function LeadFormSettings() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-medium">{q.label}</p>
                           <span className="text-[10px] font-medium px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
-                            {TYPE_LABEL[q.type] ?? q.type}
+                            {t(`settings:leadForm.questionTypes.${q.type}`, q.type)}
                           </span>
                           {q.required && (
                             <span className="text-[10px] font-medium px-2 py-0.5 bg-primary/10 text-primary rounded-full">
-                              Obrigatória
+                              {t('settings:leadForm.required')}
                             </span>
                           )}
                         </div>
@@ -232,7 +227,7 @@ export default function LeadFormSettings() {
               <div className="flex justify-end pt-2 border-t">
                 <Button onClick={handleSave} disabled={saving} className="gap-2 rounded-xl px-6">
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Guardar alterações
+                  {t('settings:leadForm.saveChanges')}
                 </Button>
               </div>
             )}

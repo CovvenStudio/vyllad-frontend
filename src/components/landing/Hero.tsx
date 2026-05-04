@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, CheckCircle2, CalendarCheck, TrendingUp, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import heroVilla from '@/assets/hero-villa.jpg';
 
@@ -38,6 +39,7 @@ function DataCard({
 }
 
 const Hero = () => {
+  const { t } = useTranslation('landing');
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
 
@@ -75,7 +77,7 @@ const Hero = () => {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md text-xs tracking-[0.18em] uppercase text-white/75 mb-10"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-          Plataforma de arrendamento inteligente
+          {t('hero.badge')}
         </motion.div>
 
         {/* Headline */}
@@ -85,9 +87,9 @@ const Hero = () => {
           transition={{ duration: 1.1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="font-display text-[3.2rem] md:text-[5.5rem] lg:text-[7rem] font-700 text-white leading-[0.93] tracking-tight mb-8"
         >
-          O próximo<br />
-          <span className="text-gradient-light">inquilino ideal</span><br />
-          já existe.
+          {t('hero.headline1')}<br />
+          <span className="text-gradient-light">{t('hero.headline2')}</span><br />
+          {t('hero.headline3')}
         </motion.h1>
 
         {/* Tagline */}
@@ -97,8 +99,8 @@ const Hero = () => {
           transition={{ delay: 0.6, duration: 0.7 }}
           className="font-display text-xl md:text-2xl text-white font-600 tracking-tight mb-3"
         >
-          Do lead a visita,{' '}
-          <span className="text-gradient-light">sem esforço.</span>
+          {t('hero.tagline1')}{' '}
+          <span className="text-gradient-light">{t('hero.tagline2')}</span>
         </motion.p>
 
         {/* Sub */}
@@ -108,7 +110,7 @@ const Hero = () => {
           transition={{ delay: 0.75, duration: 0.8 }}
           className="text-white/55 text-base md:text-lg max-w-md mx-auto mb-12 leading-relaxed"
         >
-          Qualificação automática, scoring por candidato e visitas agendadas.
+          {t('hero.sub')}
         </motion.p>
 
         {/* CTAs */}
@@ -123,7 +125,7 @@ const Hero = () => {
               size="lg"
               className="h-12 px-8 text-sm font-semibold rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 group gap-2 shadow-xl shadow-accent/30"
             >
-              Comece de graça
+              {t('hero.ctaStart')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
@@ -133,7 +135,7 @@ const Hero = () => {
               className="h-12 px-8 text-sm font-semibold rounded-2xl bg-white/10 border border-white/25 text-white hover:bg-white/20 backdrop-blur-sm shadow-none"
               variant="ghost"
             >
-              Ver demonstração
+              {t('hero.ctaDemo')}
             </Button>
           </Link>
         </motion.div>
@@ -153,8 +155,8 @@ const Hero = () => {
             <CheckCircle2 className="w-4 h-4 text-green-400" />
           </div>
           <div>
-            <p className="text-white text-xs font-semibold">Ana Ferreira</p>
-            <p className="text-white/50 text-[10px]">Candidata aprovada</p>
+            <p className="text-white text-xs font-semibold">{t('hero.scoreCard.name')}</p>
+            <p className="text-white/50 text-[10px]">{t('hero.scoreCard.label')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -174,10 +176,10 @@ const Hero = () => {
       >
         <div className="flex items-center gap-2 mb-2">
           <CalendarCheck className="w-4 h-4 text-accent shrink-0" />
-          <p className="text-white text-xs font-semibold">Visita marcada</p>
+          <p className="text-white text-xs font-semibold">{t('hero.visitCard.label')}</p>
         </div>
-        <p className="text-white/75 text-xs font-medium">Amanhã · 10:00</p>
-        <p className="text-white/45 text-[10px] mt-0.5">T2 · Campo de Ourique</p>
+        <p className="text-white/75 text-xs font-medium">{t('hero.visitCard.time')}</p>
+        <p className="text-white/45 text-[10px] mt-0.5">{t('hero.visitCard.location')}</p>
       </DataCard>
 
       {/* Stats card — bottom left */}
@@ -189,10 +191,10 @@ const Hero = () => {
       >
         <div className="flex items-center gap-2 mb-1.5">
           <TrendingUp className="w-3.5 h-3.5 text-accent" />
-          <p className="text-white/55 text-[10px] uppercase tracking-widest">Hoje</p>
+          <p className="text-white/55 text-[10px] uppercase tracking-widest">{t('hero.statsCard.period')}</p>
         </div>
-        <p className="text-white font-display text-3xl font-700 leading-none">12</p>
-        <p className="text-white/55 text-[10px] mt-1">candidatos qualificados</p>
+        <p className="text-white font-display text-3xl font-700 leading-none">{t('hero.statsCard.value')}</p>
+        <p className="text-white/55 text-[10px] mt-1">{t('hero.statsCard.label')}</p>
       </DataCard>
 
       {/* Property card — bottom right */}
@@ -204,10 +206,10 @@ const Hero = () => {
       >
         <div className="flex items-center gap-1.5 mb-2">
           <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
-          <p className="text-white text-xs font-semibold">Lisboa, Chiado</p>
+          <p className="text-white text-xs font-semibold">{t('hero.propertyCard.location')}</p>
         </div>
-        <p className="text-white font-display font-700 text-sm">€3.200 / mês</p>
-        <p className="text-white/45 text-[10px] mt-1">T3 · 8 candidatos · 3 aprovados</p>
+        <p className="text-white font-display font-700 text-sm">{t('hero.propertyCard.price')}</p>
+        <p className="text-white/45 text-[10px] mt-1">{t('hero.propertyCard.stats')}</p>
       </DataCard>
 
       {/* ── Scroll indicator ─────────────────────────────────────────── */}

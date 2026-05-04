@@ -1,0 +1,178 @@
+{
+  "title": "Imóveis",
+  "subtitle": "Gestão de imóveis",
+  "loading": "Carregando imóveis",
+  "totalCount_one": "{{count}} imóvel na agência",
+  "totalCount_other": "{{count}} imóveis na agência",
+  "addProperty": "Adicionar imóvel",
+  "newProperty": "Novo imóvel",
+  "upgrade": "Fazer upgrade",
+  "contactOwnerUpgrade": "Contate o proprietário para fazer upgrade.",
+  "searchPlaceholder": "Pesquisar imóvel, localização…",
+  "noProperties": "Nenhum imóvel encontrado",
+  "noPropertiesHint": "Adicione o seu primeiro imóvel para começar.",
+  "noPropertiesFilter": "Tente ajustar os filtros de pesquisa.",
+  "search": "Pesquisar",
+  "table": {
+    "property": "Imóvel",
+    "reference": "Referência",
+    "status": "Estado",
+    "price": "Preço",
+    "details": "Detalhes",
+    "candidates": "Candidatos"
+  },
+  "actions": {
+    "edit": "Editar",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "close": "Encerrar",
+    "rented": "Imóvel alugado",
+    "archived": "Retirar imóvel"
+  },
+  "pagination": {
+    "showing": "{{from}}–{{to}} de {{total}} imóveis"
+  },
+  "limitReached": {
+    "title": "Limite de imóveis ativos atingido",
+    "desc_one": "Seu plano permite no máximo {{count}} imóvel ativo. Faça upgrade para retomar mais.",
+    "desc_other": "Seu plano permite no máximo {{count}} imóveis ativos. Faça upgrade para retomar mais."
+  },
+  "filter": {
+    "all": "Todos",
+    "active": "Ativos",
+    "paused": "Pausados",
+    "rented": "Alugados",
+    "archived": "Arquivados"
+  },
+  "status": {
+    "ACTIVE": "Ativo",
+    "PAUSED": "Pausado",
+    "RENTED": "Alugado",
+    "ARCHIVED": "Arquivado"
+  },
+  "metrics": {
+    "activeCount": "{{count}} / {{max}} ativos",
+    "capturedSince": "Em captação há",
+    "avgToClose": "Média até fechar",
+    "completedVisits": "Visitas realizadas",
+    "candidates": "Candidatos"
+  },
+  "criteria": {
+    "title": "Critérios de candidatura",
+    "minIncome": "Aluguel mínimo (R$)",
+    "maxPeople": "Máx. pessoas",
+    "advance": "Adiantamento (meses)",
+    "deposit": "Caução (meses)",
+    "pets": "Animais de estimação",
+    "petTypesLabel": "Quais tipos são permitidos?",
+    "petTypesNone": "Nenhum selecionado = todos permitidos",
+    "guarantorRequired": "Fiador necessário",
+    "noGuarantorValues": "Valores sem fiador",
+    "advanceNoGuarantor": "Adiantamento s/ fiador (meses)",
+    "depositNoGuarantor": "Caução s/ fiador (meses)",
+    "noAgents": "Nenhum agente disponível.",
+    "agentsHint": "Selecione um ou mais agentes responsáveis por este imóvel."
+  },
+  "dialog": {
+    "add": {
+      "title": "Novo imóvel",
+      "submit": "Criar imóvel",
+      "success": "Imóvel criado!",
+      "successTitle": "Imóvel criado com sucesso!",
+      "successDesc": "O imóvel está ativo e pronto para receber candidaturas.",
+      "error": "Erro ao criar imóvel."
+    },
+    "edit": {
+      "title": "Editar imóvel",
+      "submit": "Salvar alterações",
+      "success": "Imóvel atualizado!",
+      "error": "Erro ao atualizar imóvel."
+    },
+    "fields": {
+      "title": "Título",
+      "titlePlaceholder": "Ex: Apto 2 quartos reformado no Ipanema",
+      "reference": "Referência interna",
+      "referencePlaceholder": "Ex: IMV-2024-001",
+      "location": "Localização",
+      "locationPlaceholder": "Ex: Ipanema, Rio de Janeiro",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva características especiais do imóvel...",
+      "agents": "Agentes responsáveis",
+      "availableFrom": "Disponível a partir de",
+      "selectDate": "Selecionar data",
+      "petsAllowed": "Permitido",
+      "petsNotAllowed": "Não permitido",
+      "announcementLink": "Link do anúncio",
+      "rentalValue": "Valor do aluguel",
+      "rentalHint": "Serve de base para cálculo dos adiantamentos e cauções",
+      "announcementLinkPlaceholder": "https://zapimoveis.com.br/..."
+    },
+    "errors": {
+      "generic": "Erro"
+    }
+  },
+  "detail": {
+    "tabs": {
+      "candidates": "Candidatos",
+      "visits": "Visitas",
+      "contract": "Contrato"
+    },
+    "loading": "Carregando imóvel",
+    "illustrative": "Imagem ilustrativa",
+    "immediateAccess": "Imediatamente",
+    "floorRC": "Térreo",
+    "visitCompleted": "Visitas realizadas",
+    "info": "Informações do Imóvel",
+    "back": "Imóveis",
+    "viewPage": "Ver página",
+    "edit": "Editar",
+    "dashboard": "Painel",
+    "location": "Localização",
+    "available": "Disponível",
+    "reference": "Referência",
+    "pets": "Animais",
+    "createdAt": "Criado em",
+    "announcementLink": "Link do anúncio",
+    "description": "Descrição",
+    "petsAllowed": "Permitidos",
+    "petsNotAllowed": "Não permitidos",
+    "criteriaTitle": "Critérios de locação",
+    "minIncome": "Renda mínima",
+    "maxPeople": "Máx. pessoas",
+    "advance": "Adiantamento",
+    "deposit": "Caução",
+    "guarantorRequired": "Obrigatório",
+    "guarantorNotRequired": "Não exigido",
+    "advanceNoGuarantor": "Adiant. s/ fiador",
+    "depositNoGuarantor": "Caução s/ fiador",
+    "minContract": "Duração mínima",
+    "months": "meses",
+    "activeCandidates": "Candidatos ativos",
+    "manage": "Gerenciar",
+    "noCandidates": "Sem candidatos ativos",
+    "price": "Preço mensal",
+    "closed": "Fechado",
+    "open": "Em aberto",
+    "accepting": "Aceitando candidaturas"
+  },
+  "candidates": {
+    "excellent_one": "{{count}} excelente",
+    "excellent_other": "{{count}} excelentes",
+    "potential_one": "{{count}} potencial",
+    "potential_other": "{{count}} potenciais",
+    "low_one": "{{count}} abaixo",
+    "low_other": "{{count}} abaixo"
+  },
+  "upsell": {
+    "title_one": "{{count}} candidato oculto pelo limite do plano",
+    "title_other": "{{count}} candidatos ocultos pelo limite do plano",
+    "desc": "Seu plano mostra até {{limit}} candidatos por imóvel. Faça upgrade para ver todos.",
+    "link": "Ver planos →"
+  },
+  "badge": {
+    "urgent": "Urgente"
+  },
+  "public": {
+    "illustrative": "Imagem ilustrativa"
+  }
+}

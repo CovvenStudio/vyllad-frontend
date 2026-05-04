@@ -1,4 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Candidate, Property } from '@/lib/types';
 import type { ScoringConfigDto, ScoringFactorLevelDto, ScoringFactorDefinitionDto, NumericFactorThresholds } from '@/lib/leads-api';
 import { DEFAULT_NUMERIC_THRESHOLDS } from '@/lib/leads-api';
@@ -88,6 +90,7 @@ function factorNote(
   p: Property,
   def: ScoringFactorDefinitionDto,
   numThr: NumericFactorThresholds = DEFAULT_NUMERIC_THRESHOLDS,
+  t: TFunction,
 ): string | null {
   const raw = c as unknown as Record<string, unknown>;
   const rent = p.rentalPrice ?? (p as any).price ?? 0;
@@ -97,18 +100,18 @@ function factorNote(
   if (key === 'incomeRatio') {
     if (rent <= 0) return null;
     const ratio = income / rent;
-    return `Rendimento €${income.toLocaleString('pt-PT')}/mês ÷ renda €${rent.toLocaleString('pt-PT')} = ${ratio.toFixed(1)}× — ${incomeRatioVerdict(ratio, numThr.incomeRatio)}`;
+    return t('dashboard:xray.incomeNote', { income: income.toLocaleString('pt-PT'), rent: rent.toLocaleString('pt-PT'), ratio: ratio.toFixed(1), verdict: incomeRatioVerdict(ratio, numThr.incomeRatio) });
   }
 
   if (key === 'commitments') {
     const commitStr = String(raw.monthlyCommitments ?? '');
-    if (!commitStr || commitStr === '0') return 'Sem encargos mensais declarados';
+    if (!commitStr || commitStr === '0') return t('dashboard:xray.noCommitments');
     const commitAmt = parseFloat(commitStr) || 0;
     if (commitAmt > 0 && income > 0) {
       const pct = Math.round(commitAmt / income * 100);
-      return `Encargos €${commitAmt.toLocaleString('pt-PT')}/mês = ${pct}% do rendimento — ${commitmentsVerdict(pct, numThr.commitmentsPercent)}`;
+      return t('dashboard:xray.commitmentsNote', { amount: commitAmt.toLocaleString('pt-PT'), pct, verdict: commitmentsVerdict(pct, numThr.commitmentsPercent) });
     }
-    return `Encargos declarados: ${commitStr}`;
+    return t('dashboard:xray.commitmentsDeclared', { amount: commitStr });
   }
 
   // ── Guarantor: context-dependent logic ────────────────────────────────────
@@ -116,12 +119,12 @@ function factorNote(
     const job = String(raw.job ?? '');
     const hasGuarantor = String(raw.hasGuarantor ?? '');
     const required = p.criteria.guarantorRequired;
-    if (!required) return 'Fiador não exigido para este imóvel';
-    if (job === 'permanent_contract') return 'Isento — contrato sem termo dispensa fiador';
+    if (!required) return t('dashboard:xray.noGuarantorRequired');
+    if (job === 'permanent_contract') return t('dashboard:xray.exemptPermanent');
     if (hasGuarantor === 'yes') return tVerdict(def.optionVerdicts['yes'] ?? 'guarantor available');
     if (hasGuarantor === 'no' && p.criteria.advanceWithoutGuarantor)
-      return 'Sem fiador — alternativa (adiantamento) aceite pelo imóvel';
-    return 'Sem fiador — exigido pelo imóvel e não apresentou alternativa';
+      return t('dashboard:xray.noGuarantorAlternative');
+    return t('dashboard:xray.noGuarantorRequired2');
   }
 
   // ── Household: compare against property max ────────────────────────────────
@@ -131,9 +134,9 @@ function factorNote(
     const peopleMap: Record<string, number> = { only_me: 1, '2_people': 2, '3_people': 3, '4_or_more': 4 };
     const people = peopleMap[household] ?? c.numberOfPeople;
     const displayHousehold = tOptionValue(household);
-    if (people <= maxP) return `${displayHousehold} — dentro do limite (máx. ${maxP} pessoas)`;
-    if (people === maxP + 1) return `${displayHousehold} — ligeiramente acima do limite (máx. ${maxP})`;
-    return `${displayHousehold} — excede o máximo permitido (${maxP} pessoas)`;
+    if (people <= maxP) return `${displayHousehold} — ${t('dashboard:xray.withinLimit', { max: maxP })}`;
+    if (people === maxP + 1) return `${displayHousehold} — ${t('dashboard:xray.slightlyAbove', { max: maxP })}`;
+    return `${displayHousehold} — ${t('dashboard:xray.exceeds', { max: maxP })}`;
   }
 
   // ── Pets: check property policy ────────────────────────────────────────────
@@ -142,8 +145,8 @@ function factorNote(
     const allowed = p.criteria.petsAllowed;
     const types = c.petDetails ? ` (${c.petDetails})` : '';
     return allowed
-      ? `Tem animais${types} — permitidos neste imóvel`
-      : `Tem animais${types} — não permitidos neste imóvel`;
+      ? `${t('common:yesNo.yes')}${types} — ${t('dashboard:xray.petsAllowed')}`
+      : `${t('common:yesNo.yes')}${types} — ${t('dashboard:xray.petsNotAllowed')}`;
   }
 
   // ── All other option-based factors: data-driven from MongoDB ───────────────
@@ -162,6 +165,7 @@ function factorNote(
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function LeadXRayDialog({ open, onClose, candidate, property, scoringConfig }: Props) {
+  const { t } = useTranslation(['dashboard', 'common']);
   const cfg = scoringConfig;
   const thr = cfg.thresholds ?? { excellent: 70, potential: 45 };
   const numThr = cfg.numericThresholds ?? DEFAULT_NUMERIC_THRESHOLDS;
@@ -193,7 +197,7 @@ export default function LeadXRayDialog({ open, onClose, candidate, property, sco
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-baseline gap-2">
-            Raio-X · {candidate.name}
+            {t('dashboard:xray.title')} · {candidate.name}
             <span className="text-sm font-normal text-muted-foreground">score {candidate.score}/100</span>
           </DialogTitle>
         </DialogHeader>
@@ -210,7 +214,7 @@ export default function LeadXRayDialog({ open, onClose, candidate, property, sco
                   const raw = factorScores[def.key] ?? 0;
                   const level = factors[def.key] ?? 2;
                   const w = levelWeightMap[level] ?? 2;
-                  const note = factorNote(def.key, candidate, property, def, numThr);
+                  const note = factorNote(def.key, candidate, property, def, numThr, t);
                   return (
                     <div key={def.key} className="space-y-1.5">
                       <div className="flex items-center justify-between gap-2">
@@ -226,7 +230,7 @@ export default function LeadXRayDialog({ open, onClose, candidate, property, sco
                         }`}>{note}</p>
                       )}
                       {w === 0 ? (
-                        <p className="text-[10px] text-muted-foreground italic">Factor ignorado — não conta para o score</p>
+                        <p className="text-[10px] text-muted-foreground italic">{t('dashboard:xray.ignored')}</p>
                       ) : (
                         <Bar value={raw} />
                       )}
@@ -239,7 +243,7 @@ export default function LeadXRayDialog({ open, onClose, candidate, property, sco
 
           {/* Final score */}
           <div className="rounded-xl border p-4 bg-muted/30 space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Score final composto</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('dashboard:xray.finalScore')}</p>
             <p className="text-xs text-muted-foreground font-mono">
               Σ(score × peso) ÷ Σ(peso) ≈ <strong className="text-foreground">{computedScore}</strong>
             </p>
@@ -257,7 +261,7 @@ export default function LeadXRayDialog({ open, onClose, candidate, property, sco
               <span className="text-sm font-bold font-mono w-8 text-right">{candidate.score}</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Limiares: Excelente ≥{thr.excellent} · Potencial ≥{thr.potential} · Baixo &lt;{thr.potential}
+              {t('dashboard:xray.thresholds', { excellent: thr.excellent, potential: thr.potential })}
             </p>
           </div>
 

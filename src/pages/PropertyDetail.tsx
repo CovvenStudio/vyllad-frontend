@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import placeholderImg from '@/assets/details/img1.jpg';
 import {
   ArrowLeft, MapPin, Users, Trophy, Eye, Pencil, ExternalLink,
@@ -18,18 +19,11 @@ import { listLeads } from '@/lib/leads-api';
 import type { LeadDto } from '@/lib/leads-api';
 
 // ─────────────────────────────────────────────────────────────────────────────
-const STATUS_CONFIG: Record<PropertyDto['status'], { label: string; dot: string; cls: string }> = {
-  ACTIVE:   { label: 'Activo',    dot: 'bg-emerald-400', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  PAUSED:   { label: 'Pausado',   dot: 'bg-amber-400',   cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-  RENTED:   { label: 'Arrendado', dot: 'bg-blue-400',    cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-  ARCHIVED: { label: 'Arquivado', dot: 'bg-slate-400',   cls: 'bg-slate-100 text-slate-600 border-slate-200' },
-};
-
-const LEAD_STATUS_LABEL: Record<LeadDto['status'], string> = {
-  new: 'Novo', contacted: 'Contactado', qualified: 'Qualificado',
-  rejected: 'Rejeitado', approved: 'Aprovado', visit_scheduled: 'Visita marcada',
-  visit_cancelled: 'Visita cancelada', visit_finished: 'Visita realizada',
-  contracted: 'Contrato fechado',
+const STATUS_CONFIG: Record<PropertyDto['status'], { dot: string; cls: string }> = {
+  ACTIVE:   { dot: 'bg-emerald-400', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  PAUSED:   { dot: 'bg-amber-400',   cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+  RENTED:   { dot: 'bg-blue-400',    cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+  ARCHIVED: { dot: 'bg-slate-400',   cls: 'bg-slate-100 text-slate-600 border-slate-200' },
 };
 
 const CLASS_CONFIG = {
@@ -96,7 +90,9 @@ function MetricStrip({
 
 // ── Candidate row ──────────────────────────────────────────────────────────────
 function CandidateRow({ lead, i }: { lead: LeadDto; i: number }) {
+  const { t } = useTranslation('common');
   const cls = CLASS_CONFIG[lead.classification];
+  const statusKey = lead.status.replace(/_([a-z])/g, (_: string, c: string) => c.toUpperCase());
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
@@ -109,11 +105,11 @@ function CandidateRow({ lead, i }: { lead: LeadDto; i: number }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground truncate">{lead.name}</p>
-        <p className="text-xs text-muted-foreground">{LEAD_STATUS_LABEL[lead.status]}</p>
+        <p className="text-xs text-muted-foreground">{t(`common:status.${statusKey}`, lead.status)}</p>
       </div>
       <div className="shrink-0 flex items-center gap-1">
         {lead.urgency === 'immediate' && (
-          <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">Urgente</span>
+          <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">{t('properties:badge.urgent')}</span>
         )}
         {lead.status === 'contracted' && <Trophy className="w-3.5 h-3.5 text-violet-500" />}
         {lead.status === 'visit_scheduled' && <CalendarCheck className="w-3.5 h-3.5 text-blue-500" />}
@@ -127,6 +123,7 @@ export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentAgencyId } = useAuth();
+  const { t } = useTranslation(['properties', 'common']);
 
   const [property, setProperty] = useState<PropertyDto | null>(null);
   const [leads, setLeads] = useState<LeadDto[]>([]);
@@ -177,7 +174,7 @@ export default function PropertyDetail() {
   const isActive = property?.status === 'ACTIVE' || property?.status === 'PAUSED';
   const hero     = property?.images?.[imgIdx] ?? property?.images?.[0];
 
-  if (loading) return <DashboardLayout><PageSplash label="A carregar imóvel" /></DashboardLayout>;
+  if (loading) return <DashboardLayout><PageSplash label={t('properties:detail.loading')} /></DashboardLayout>;
 
   return (
     <DashboardLayout>
@@ -190,7 +187,7 @@ export default function PropertyDetail() {
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Imóveis</span>
+            <span className="hidden sm:inline">{t('properties:detail.back')}</span>
           </button>
 
           {!loading && property && (
@@ -205,21 +202,21 @@ export default function PropertyDetail() {
                 rel="noreferrer"
                 className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/60 bg-white text-muted-foreground hover:text-foreground hover:border-border transition-all"
               >
-                <Eye className="w-3.5 h-3.5" /> Ver página
+                <Eye className="w-3.5 h-3.5" /> {t('properties:detail.viewPage')}
               </a>
             )}
             <button
               onClick={() => setEditOpen(true)}
               className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/60 bg-white text-muted-foreground hover:text-foreground hover:border-border transition-all"
             >
-              <Pencil className="w-3.5 h-3.5" /> Editar
+              <Pencil className="w-3.5 h-3.5" /> {t('properties:detail.edit')}
             </button>
             {isActive && (
               <button
                 onClick={() => navigate('/dashboard', { state: { propertyId: property?.id } })}
                 className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors"
               >
-                <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                <LayoutDashboard className="w-3.5 h-3.5" /> {t('properties:detail.dashboard')}
               </button>
             )}
           </div>
@@ -242,12 +239,12 @@ export default function PropertyDetail() {
               ) : property ? (
                 <>
                   <h1 className="text-xl font-display font-700 tracking-tight text-foreground mb-1">
-                    Informação do Imóvel
+                    {t('properties:detail.info')}
                   </h1>
                   {scfg && (
                     <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full border ${scfg.cls}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${scfg.dot}`} />
-                      {scfg.label}
+                      {t(`properties:status.${property.status}`)}
                     </span>
                   )}
                 </>
@@ -266,7 +263,7 @@ export default function PropertyDetail() {
                   <MapPin className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Localização</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.location')}</p>
                   <p className="text-sm font-semibold text-foreground leading-snug">{property.location}</p>
                 </div>
               </div>
@@ -278,31 +275,31 @@ export default function PropertyDetail() {
                   <div className="bg-white rounded-2xl border border-border/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] space-y-4">
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Disponível</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.available')}</p>
                         <p className="text-sm font-semibold text-foreground">
                           {property.availableFrom ? new Date(property.availableFrom).toLocaleDateString('pt-PT') : 'Imediatamente'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Referência</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.reference')}</p>
                         <p className="text-sm font-semibold text-foreground font-mono">{property.referenceId ?? '—'}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Animais</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.pets')}</p>
                         <span className={`inline-flex items-center gap-1 text-sm font-semibold ${property.criteria.petsAllowed ? 'text-emerald-600' : 'text-muted-foreground/50'}`}>
                           {property.criteria.petsAllowed
-                            ? <><PawPrint className="w-3.5 h-3.5" />{property.criteria.allowedPetTypes.length > 0 ? property.criteria.allowedPetTypes.join(', ') : 'Permitidos'}</>
-                            : <><XCircle className="w-3.5 h-3.5" />Não permitidos</>}
+                            ? <><PawPrint className="w-3.5 h-3.5" />{property.criteria.allowedPetTypes.length > 0 ? property.criteria.allowedPetTypes.join(', ') : t('properties:detail.petsAllowed')}</>
+                            : <><XCircle className="w-3.5 h-3.5" />{t('properties:detail.petsNotAllowed')}</>}
                         </span>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Criado em</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.createdAt')}</p>
                         <p className="text-sm font-semibold text-foreground">{new Date(property.createdAt).toLocaleDateString('pt-PT')}</p>
                       </div>
                     </div>
                     {property.announcementLink && (
                       <div className="pt-3 border-t border-border/40">
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-1">Link do anúncio</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-1">{t('properties:detail.announcementLink')}</p>
                         <a href={property.announcementLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline truncate max-w-full">
                           <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                           <span className="truncate">{property.announcementLink}</span>
@@ -311,7 +308,7 @@ export default function PropertyDetail() {
                     )}
                     {property.description && (
                       <div className="pt-3 border-t border-border/40">
-                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-1.5">Descrição</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-1.5">{t('properties:detail.description')}</p>
                         <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
                       </div>
                     )}
@@ -324,47 +321,47 @@ export default function PropertyDetail() {
               <div className="bg-white rounded-2xl border border-border/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Star className="w-3.5 h-3.5 text-muted-foreground/50" />
-                  Critérios de arrendamento
+                  {t('properties:detail.criteriaTitle')}
                 </h3>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                   <div>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Rendimento mínimo</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.minIncome')}</p>
                     <p className="text-sm font-bold text-foreground">€{property.criteria.minIncome.toLocaleString('pt-PT')}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Máx. pessoas</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.maxPeople')}</p>
                     <p className="text-sm font-bold text-foreground">{property.criteria.maxPeople}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Adiantamento</p>
-                    <p className="text-sm font-bold text-foreground">{property.criteria.advanceMonths} meses</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.advance')}</p>
+                    <p className="text-sm font-bold text-foreground">{property.criteria.advanceMonths} {t('properties:detail.months')}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Caução</p>
-                    <p className="text-sm font-bold text-foreground">{property.criteria.depositMonths} meses</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.deposit')}</p>
+                    <p className="text-sm font-bold text-foreground">{property.criteria.depositMonths} {t('properties:detail.months')}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Fiador</p>
+                    <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:criteria.guarantor')}</p>
                     <span className={`text-sm font-bold ${property.criteria.guarantorRequired ? 'text-foreground' : 'text-muted-foreground/50'}`}>
-                      {property.criteria.guarantorRequired ? 'Obrigatório' : 'Não exigido'}
+                      {property.criteria.guarantorRequired ? t('properties:detail.guarantorRequired') : t('properties:detail.guarantorNotRequired')}
                     </span>
                   </div>
                   {property.criteria.advanceWithoutGuarantor != null && (
                     <div>
-                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Adiant. s/ fiador</p>
-                      <p className="text-sm font-bold text-foreground">{property.criteria.advanceWithoutGuarantor} meses</p>
+                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.advanceNoGuarantor')}</p>
+                      <p className="text-sm font-bold text-foreground">{property.criteria.advanceWithoutGuarantor} {t('properties:detail.months')}</p>
                     </div>
                   )}
                   {property.criteria.depositWithoutGuarantor != null && (
                     <div>
-                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Caução s/ fiador</p>
-                      <p className="text-sm font-bold text-foreground">{property.criteria.depositWithoutGuarantor} meses</p>
+                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.depositNoGuarantor')}</p>
+                      <p className="text-sm font-bold text-foreground">{property.criteria.depositWithoutGuarantor} {t('properties:detail.months')}</p>
                     </div>
                   )}
                   {property.criteria.minContractMonths && (
                     <div>
-                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">Duração mínima</p>
-                      <p className="text-sm font-bold text-foreground">{property.criteria.minContractMonths} meses</p>
+                      <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5">{t('properties:detail.minContract')}</p>
+                      <p className="text-sm font-bold text-foreground">{property.criteria.minContractMonths} {t('properties:detail.months')}</p>
                     </div>
                   )}
                 </div>
@@ -394,7 +391,7 @@ export default function PropertyDetail() {
                   {/* Placeholder background photo */}
                   <img
                     src={placeholderImg}
-                    alt="Imagem ilustrativa"
+                    alt=""
                     className="w-full h-full object-cover"
                   />
                   {/* Dark overlay */}
@@ -405,7 +402,7 @@ export default function PropertyDetail() {
                       <span className="font-display text-4xl font-700 tracking-tight text-white drop-shadow-lg">vyllad</span>
                       <span className="text-4xl font-700 drop-shadow-lg" style={{ color: '#c9a96e' }}>.</span>
                     </div>
-                    <p className="text-xs font-semibold text-white/50 uppercase tracking-[0.18em]">Imagem ilustrativa</p>
+                    <p className="text-xs font-semibold text-white/50 uppercase tracking-[0.18em]">{t('properties:detail.illustrative')}</p>
                   </div>
                 </div>
               )}
@@ -419,14 +416,14 @@ export default function PropertyDetail() {
                   className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.18)] border border-white/80 p-4 w-52"
                 >
                   <div className="mb-2.5">
-                    <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-0.5">Localização</p>
+                      <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-0.5">{t('properties:detail.location')}</p>
                     <p className="text-xs font-semibold text-foreground leading-snug line-clamp-2">
                       {property.location ?? property.title}
                       {property.referenceId && <span className="font-mono text-[10px] text-muted-foreground/50 ml-1">{property.referenceId}</span>}
                     </p>
                   </div>
                   <div className="border-t border-border/50 pt-2.5">
-                    <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-0.5">Preço mensal</p>
+                      <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-0.5">{t('properties:detail.price')}</p>
                     <p className="text-xl font-display font-700 text-foreground leading-none">
                       €{property.rentalPrice.toLocaleString('pt-PT')}
                     </p>
@@ -434,7 +431,7 @@ export default function PropertyDetail() {
                   {scfg && (
                     <div className="mt-2.5 pt-2.5 border-t border-border/50 flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${scfg.dot}`} />
-                      <span className={`text-[11px] font-bold ${STATUS_CONFIG[property.status].cls.split(' ')[2]}`}>{scfg.label}</span>
+                      <span className={`text-[11px] font-bold ${STATUS_CONFIG[property.status].cls.split(' ')[2]}`}>{t(`properties:status.${property.status}`)}</span>
                     </div>
                   )}
                 </motion.div>
@@ -468,7 +465,7 @@ export default function PropertyDetail() {
               <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
                 <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Users className="w-4 h-4 text-muted-foreground/50" />
-                  Candidatos activos
+                  {t('properties:detail.activeCandidates')}
                   {!loading && (
                     <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{activeLeads.length}</span>
                   )}
@@ -478,7 +475,7 @@ export default function PropertyDetail() {
                     onClick={() => navigate('/dashboard', { state: { propertyId: property?.id } })}
                     className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors"
                   >
-                    <LayoutDashboard className="w-3 h-3" /> Gerir
+                    <LayoutDashboard className="w-3 h-3" /> {t('properties:detail.manage')}
                   </button>
                 )}
               </div>
@@ -499,7 +496,7 @@ export default function PropertyDetail() {
                 ) : topLeads.length === 0 ? (
                   <div className="py-8 text-center">
                     <Users className="w-8 h-8 text-muted-foreground/20 mx-auto mb-2" />
-                    <p className="text-xs text-muted-foreground">Sem candidatos activos</p>
+                    <p className="text-xs text-muted-foreground">{t('properties:detail.noCandidates')}</p>
                   </div>
                 ) : (
                   topLeads.slice(0, 8).map((l, i) => <CandidateRow key={l.id} lead={l} i={i} />)
@@ -510,15 +507,15 @@ export default function PropertyDetail() {
                 <div className="px-5 py-3 border-t border-border/40 flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-                    {leads.filter(l => l.classification === 'excellent').length} excelentes
+                    {leads.filter(l => l.classification === 'excellent').length} {t('properties:candidates.excellent', { count: leads.filter(l => l.classification === 'excellent').length })}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-                    {leads.filter(l => l.classification === 'potential').length} potenciais
+                    {leads.filter(l => l.classification === 'potential').length} {t('properties:candidates.potential', { count: leads.filter(l => l.classification === 'potential').length })}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
-                    {leads.filter(l => l.classification === 'low').length} abaixo
+                    {leads.filter(l => l.classification === 'low').length} {t('properties:candidates.low', { count: leads.filter(l => l.classification === 'low').length })}
                   </div>
                 </div>
               )}
@@ -529,16 +526,16 @@ export default function PropertyDetail() {
                   <Lock className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-amber-800 leading-snug">
-                      {hiddenCount} candidato{hiddenCount !== 1 ? 's' : ''} oculto{hiddenCount !== 1 ? 's' : ''} pelo limite do plano
+                      {t('properties:upsell.title', { count: hiddenCount })}
                     </p>
                     <p className="text-[11px] text-amber-700 mt-0.5">
-                      O teu plano mostra até {planLimit} candidatos por imóvel. Faz upgrade para ver todos.
+                      {t('properties:upsell.desc', { limit: planLimit })}
                     </p>
                     <button
                       onClick={() => navigate('/billing')}
                       className="mt-2 text-[11px] font-bold text-amber-800 underline underline-offset-2 hover:text-amber-900 transition-colors"
                     >
-                      Ver planos →
+                    {t('properties:upsell.link')}
                     </button>
                   </div>
                 </div>
@@ -564,28 +561,28 @@ export default function PropertyDetail() {
               <>
                 <MetricStrip
                   icon={Users}
-                  label="Candidatos"
+                  label={t('properties:detail.activeCandidates')}
                   value={activeLeads.length}
                   accent={activeLeads.length > 0}
                 />
                 <MetricStrip
                   icon={CalendarCheck}
-                  label="Visitas"
+                  label={t('properties:detail.tabs.visits')}
                   value={visitLeads.length}
                   sub={`${leads.filter(l => l.status === 'visit_scheduled').length} marcadas · ${leads.filter(l => l.status === 'visit_finished').length} realizadas`}
                 />
                 <MetricStrip
                   icon={Trophy}
-                  label="Contrato"
-                  value={hasContract ? 'Fechado' : 'Em aberto'}
+                  label={t('properties:detail.tabs.contract')}
+                  value={hasContract ? t('properties:detail.closed') : t('properties:detail.open')}
                   sub={hasContract && lastContract
                     ? `${lastContract.name}${lastContract.contractedAt ? ' · ' + new Date(lastContract.contractedAt).toLocaleDateString('pt-PT') : ''}`
-                    : leads.filter(l => l.status === 'visit_finished').length > 0 ? 'Visitas realizadas' : 'A aceitar candidaturas'}
+                    : leads.filter(l => l.status === 'visit_finished').length > 0 ? t('properties:detail.visitCompleted') : t('properties:detail.accepting')}
                   accent={hasContract}
                 />
                 <MetricStrip
                   icon={Timer}
-                  label={avgDaysToClose !== null ? 'Média até fechar' : 'Em captação há'}
+                  label={avgDaysToClose !== null ? t('properties:metrics.avgToClose') : t('properties:metrics.capturedSince')}
                   value={avgDaysToClose !== null ? fmtDays(avgDaysToClose) : daysSince !== null ? fmtDays(daysSince) : '—'}
                   sub={avgDaysToClose !== null
                     ? `média de ${contracted.length} contrato${contracted.length === 1 ? '' : 's'}`

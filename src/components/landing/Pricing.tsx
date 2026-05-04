@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -11,9 +12,13 @@ import type { Plan } from '@/plans';
 import type { BillingCountry } from '@/billing-countries/useBillingCountries';
 
 function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: number; billingCountry: BillingCountry | null }) {
+  const { t } = useTranslation(['landing', 'billing']);
   const isTrial = plan.id === 'trial';
   const isScale = plan.id === 'scale';
   const isHighlighted = plan.highlighted;
+
+  const translatedBadge = plan.badge ? t(`billing:plans.${plan.id}.badge`) : null;
+  const translatedFeatures = t(`billing:plans.${plan.id}.features`, { returnObjects: true }) as string[];
 
   const marketEntry = billingCountry && plan.marketPrices
     ? plan.marketPrices.find((mp) => mp.market === billingCountry.market) ?? null
@@ -38,7 +43,7 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
       )}
     >
       {/* Badge */}
-      {plan.badge && (
+      {translatedBadge && (
         <span className={cn(
           'absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-semibold tracking-wide whitespace-nowrap',
           isHighlighted
@@ -47,54 +52,54 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
             ? 'bg-accent/20 text-accent border border-accent/30'
             : 'bg-muted text-muted-foreground',
         )}>
-          {plan.badge}
+          {translatedBadge}
         </span>
       )}
 
       {/* Plan name & tagline */}
       <div className="mb-5">
-        <p className="font-display text-lg font-700 tracking-tight">{plan.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
+        <p className="font-display text-lg font-700 tracking-tight">{t(`billing:plans.${plan.id}.name`)}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{t(`billing:plans.${plan.id}.tagline`)}</p>
       </div>
 
       {/* Price */}
       <div className="flex items-baseline gap-1 mb-6">
         {plan.billing === 'contact' ? (
-          <span className="font-display text-2xl font-700 tracking-tight">Contactar</span>
+          <span className="font-display text-2xl font-700 tracking-tight">{t('pricing.contact')}</span>
         ) : isTrial ? (
           <>
-            <span className="font-display text-4xl font-700 tracking-tight">Grátis</span>
-            <span className="text-xs text-muted-foreground ml-1">/ {plan.limits.trialDays} dias</span>
+            <span className="font-display text-4xl font-700 tracking-tight">{t('pricing.free')}</span>
+            <span className="text-xs text-muted-foreground ml-1">{t('pricing.trialDays', { count: plan.limits.trialDays })}</span>
           </>
         ) : (
           <>
             <span className="font-display text-4xl font-700 tracking-tight">{currencySymbol}{displayPrice}</span>
-            <span className="text-xs text-muted-foreground">/mês</span>
+            <span className="text-xs text-muted-foreground">{t('pricing.perMonth')}</span>
           </>
         )}
       </div>
 
       {/* Limits chips */}
       {!isScale && (
-        <div className="grid grid-cols-3 divide-x divide-border/60 mb-6 pb-6 border-b border-border/60">
-          <div className="text-center px-6">
-            <p className="font-display text-xl font-700">{plan.limits.properties ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">imóveis</p>
+        <div className="flex flex-col divide-y divide-border/60 mb-6 py-2 border-y border-border/60">
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('pricing.properties')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.properties ?? '∞'}</p>
           </div>
-          <div className="text-center px-6">
-            <p className="font-display text-xl font-700">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">cand./imóvel</p>
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('pricing.candidatesPerProperty')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.candidatesPerProperty ?? '∞'}</p>
           </div>
-          <div className="text-center px-6">
-            <p className="font-display text-xl font-700">{plan.limits.agents ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">agentes</p>
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('pricing.agents')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.agents ?? '∞'}</p>
           </div>
         </div>
       )}
 
       {/* Features */}
       <ul className="space-y-2 flex-1 mb-8">
-        {plan.features.map((f) => (
+        {translatedFeatures.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground">
             <Check className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
             {f}
@@ -109,7 +114,7 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
             variant="outline"
             className="w-full h-11 rounded-xl font-medium"
           >
-            {plan.cta}
+            {t(`billing:plans.${plan.id}.cta`)}
           </Button>
         </a>
       ) : (
@@ -118,7 +123,7 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
             variant={isHighlighted ? 'default' : 'outline'}
             className="w-full h-11 rounded-xl font-medium"
           >
-            {plan.cta}
+            {t(`billing:plans.${plan.id}.cta`)}
           </Button>
         </Link>
       )}
@@ -127,6 +132,7 @@ function PricingCard({ plan, index, billingCountry }: { plan: Plan; index: numbe
 }
 
 const Pricing = () => {
+  const { t } = useTranslation('landing');
   const { plans, loading } = usePlans();
   const { countries, loading: countriesLoading } = useBillingCountries();
   const [billingCountry, setBillingCountry] = useState<BillingCountry | null>(null);
@@ -148,17 +154,17 @@ const Pricing = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-accent mb-4">Preços</p>
+          <p className="text-xs font-medium tracking-[0.2em] uppercase text-accent mb-4">{t('pricing.tag')}</p>
           <h2 className="font-display text-3xl md:text-[2.75rem] font-700 tracking-tight mb-5 leading-tight">
-            Simples. Transparente.<br className="hidden md:block" /> Sem surpresas.
+            {t('pricing.headline1')}<br className="hidden md:block" /> {t('pricing.headline2')}
           </h2>
           <p className="text-muted-foreground text-base max-w-md mx-auto leading-relaxed">
-            Comece grátis. Pague apenas quando precisar de mais. Sem contratos, sem taxas escondidas.
+            {t('pricing.sub')}
           </p>
 
           {/* Billing country selector */}
           <div className="flex items-center justify-center gap-3 mt-8">
-            <span className="text-sm text-muted-foreground">País de faturação:</span>
+            <span className="text-sm text-muted-foreground">{t('pricing.billingCountry')}</span>
             <BillingCountrySelect
               countries={countries}
               value={billingCountry}
@@ -171,7 +177,7 @@ const Pricing = () => {
         {loading ? (
           <div className="flex items-center justify-center gap-3 text-muted-foreground py-16">
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span className="text-sm">A carregar planos…</span>
+            <span className="text-sm">{t('pricing.loading')}</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
@@ -188,7 +194,7 @@ const Pricing = () => {
           transition={{ delay: 0.4 }}
           className="text-center text-xs text-muted-foreground mt-10"
         >
-          Pode cancelar ou alterar o plano a qualquer momento.
+          {t('pricing.cancel')}
         </motion.p>
       </div>
     </section>

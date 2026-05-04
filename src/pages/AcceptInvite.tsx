@@ -7,6 +7,8 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/contexts/AuthContext';
 import { getInviteInfo, acceptInvite } from '@/lib/agents-api';
 import { ApiError } from '@/lib/api-client';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -23,6 +25,7 @@ const AcceptInvite = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { user, signIn, refreshSession } = useAuth();
+  const { t } = useTranslation('auth');
 
   const [inviteState, setInviteState] = useState<InviteState>('loading');
   const [inviteInfo, setInviteInfo] = useState<{ agencyName: string; email: string; expiresAt: string } | null>(null);
@@ -60,9 +63,9 @@ const AcceptInvite = () => {
           }
           setErrorMsg(
             e.status === 403
-              ? 'Este convite foi enviado para outro email. Inicia sessão com a conta correcta.'
+              ? t('invite.wrongEmail')
               : e.status === 400
-              ? 'O convite expirou.'
+              ? t('invite.expired')
               : e.message
           );
         } else {
@@ -83,19 +86,20 @@ const AcceptInvite = () => {
         await signIn(tokenResponse.access_token);
         // useEffect above will fire automatically after user state updates
       } catch {
-        setErrorMsg('Erro ao autenticar com o Google.');
+        setErrorMsg(t('invite.errorAuth'));
         setInviteState('error');
       } finally {
         setSigningIn(false);
       }
     },
     onError: () => {
-      setErrorMsg('Autenticação cancelada.');
+      setErrorMsg(t('invite.authCancelled'));
     },
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 relative">
+      <LanguageSwitcher className="absolute top-6 right-6" />
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -105,7 +109,7 @@ const AcceptInvite = () => {
         {inviteState === 'loading' && (
           <div className="flex flex-col items-center gap-4 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin" />
-            <p className="text-sm">A verificar convite…</p>
+            <p className="text-sm">{t('invite.loading')}</p>
           </div>
         )}
 
@@ -113,10 +117,10 @@ const AcceptInvite = () => {
         {inviteState === 'invalid' && (
           <div className="text-center space-y-3">
             <XCircle className="w-12 h-12 text-destructive mx-auto" />
-            <h1 className="font-display text-xl font-700">Convite inválido</h1>
-            <p className="text-sm text-muted-foreground">Este convite não existe ou já expirou.</p>
+            <h1 className="font-display text-xl font-700">{t('invite.invalidTitle')}</h1>
+            <p className="text-sm text-muted-foreground">{t('invite.invalidDesc')}</p>
             <Button variant="outline" className="mt-2 w-full rounded-xl" onClick={() => navigate('/login')}>
-              Ir para o login
+              {t('invite.goToLogin')}
             </Button>
           </div>
         )}
@@ -125,14 +129,13 @@ const AcceptInvite = () => {
         {inviteState === 'valid' && !user && (
           <div className="text-center space-y-5">
             <div className="space-y-1">
-              <h1 className="font-display text-xl font-700">Foste convidado</h1>
-              <p className="text-sm text-muted-foreground">
-                Para te juntares a <span className="font-semibold text-foreground">{inviteInfo?.agencyName}</span>,<br />
-                inicia sessão com a tua conta Google.
-              </p>
+              <h1 className="font-display text-xl font-700">{t('invite.invited')}</h1>
+              <p className="text-sm text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: t('invite.joinPrompt', { name: inviteInfo?.agencyName ?? '' }) }}
+              />
               {inviteInfo?.email && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Convite enviado para <span className="font-medium">{inviteInfo.email}</span>
+                  {t('invite.sentTo', { email: inviteInfo.email })}
                 </p>
               )}
             </div>
@@ -143,7 +146,7 @@ const AcceptInvite = () => {
               className="w-full h-11 rounded-xl font-semibold border-border gap-3"
             >
               {signingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
-              Continuar com o Google
+              {t('login.signInGoogle')}
             </Button>
           </div>
         )}
@@ -152,7 +155,7 @@ const AcceptInvite = () => {
         {inviteState === 'valid' && user && accepting && (
           <div className="flex flex-col items-center gap-4 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin" />
-            <p className="text-sm">A aceitar convite…</p>
+            <p className="text-sm">{t('invite.accepting')}</p>
           </div>
         )}
 
@@ -160,12 +163,12 @@ const AcceptInvite = () => {
         {inviteState === 'accepted' && (
           <div className="text-center space-y-4">
             <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto" />
-            <h1 className="font-display text-xl font-700">Bem-vindo!</h1>
-            <p className="text-sm text-muted-foreground">
-              Juntaste-te a <span className="font-semibold text-foreground">{inviteInfo?.agencyName}</span> com sucesso.
-            </p>
+            <h1 className="font-display text-xl font-700">{t('invite.welcomeTitle')}</h1>
+            <p className="text-sm text-muted-foreground"
+              dangerouslySetInnerHTML={{ __html: t('invite.joinedSuccess', { name: inviteInfo?.agencyName ?? '' }) }}
+            />
             <Button className="w-full rounded-xl font-semibold" onClick={() => navigate('/dashboard', { replace: true })}>
-              Ir para o dashboard
+              {t('invite.goToDashboard')}
             </Button>
           </div>
         )}
@@ -174,10 +177,10 @@ const AcceptInvite = () => {
         {inviteState === 'error' && (
           <div className="text-center space-y-3">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto" />
-            <h1 className="font-display text-xl font-700">Não foi possível aceitar</h1>
+            <h1 className="font-display text-xl font-700">{t('invite.errorTitle')}</h1>
             <p className="text-sm text-muted-foreground">{errorMsg}</p>
             <Button variant="outline" className="mt-2 w-full rounded-xl" onClick={() => navigate('/login')}>
-              Ir para o login
+              {t('invite.goToLogin')}
             </Button>
           </div>
         )}

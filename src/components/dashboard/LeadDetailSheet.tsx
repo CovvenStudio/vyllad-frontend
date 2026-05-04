@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -31,21 +32,6 @@ function getCountryName(code: string): string {
   if (!code) return '';
   try { return new Intl.DisplayNames(['pt'], { type: 'region' }).of(code) ?? code; } catch { return code; }
 }
-
-const employmentLabel: Record<string, string> = {
-  permanent: 'Contrato sem termo',
-  contract: 'Contrato a prazo',
-  freelancer: 'Independente',
-  student: 'Estudante',
-  retired: 'Reformado',
-  other: 'Outro',
-};
-
-const urgencyLabel: Record<string, { label: string; color: string }> = {
-  immediate: { label: 'Urgente', color: 'text-emerald-500' },
-  soon: { label: 'Em breve', color: 'text-amber-500' },
-  flexible: { label: 'Flexível', color: 'text-muted-foreground' },
-};
 
 function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -100,11 +86,18 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
   const navigate = useNavigate();
   const { currentAgencyId } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation(['dashboard', 'common']);
   if (!candidate || !property) return null;
+
+  const URGENCY_COLOR: Record<string, string> = {
+    immediate: 'text-emerald-500',
+    soon: 'text-amber-500',
+    flexible: 'text-muted-foreground',
+  };
 
   const rentalPrice = property.rentalPrice ?? property.price ?? 0;
   const incomeRatio = rentalPrice > 0 ? (candidate.monthlyIncome / rentalPrice).toFixed(1) : '—';
-  const urgency = urgencyLabel[candidate.urgency ?? 'flexible'];
+  const urgencyColor = URGENCY_COLOR[candidate.urgency ?? 'flexible'] ?? 'text-muted-foreground';
 
   const d1 = candidate.factorScores
     ? Math.round(((candidate.factorScores.incomeRatio ?? 0) + (candidate.factorScores.commitments ?? 0)) / 2)
@@ -120,26 +113,26 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
     : 0;
 
   const insight = (() => {
-    if (candidate.score >= 80 && candidate.urgency === 'immediate') return 'Perfil excelente · pronto para fechar';
-    if (candidate.score >= 80) return 'Excelente perfil financeiro e laboral';
-    if (candidate.score >= 60 && candidate.urgency === 'immediate') return 'Bom perfil · alta urgência de mudança';
-    if (d1 < 30) return 'Rendimento abaixo do mínimo recomendado';
-    if (d3 < 40) return 'Garantias insuficientes para este imóvel';
-    if (candidate.score >= 60) return 'Perfil razoável · sem urgência imediata';
-    return 'Baixa compatibilidade com os critérios';
+    if (candidate.score >= 80 && candidate.urgency === 'immediate') return t('dashboard:insights.excellentUrgent');
+    if (candidate.score >= 80) return t('dashboard:insights.excellent');
+    if (candidate.score >= 60 && candidate.urgency === 'immediate') return t('dashboard:insights.goodUrgent');
+    if (d1 < 30) return t('dashboard:insights.incomeLow');
+    if (d3 < 40) return t('dashboard:insights.guaranteeLow');
+    if (candidate.score >= 60) return t('dashboard:insights.reasonable');
+    return t('dashboard:insights.low');
   })();
 
   const whyText = (() => {
     const parts: string[] = [];
-    if (d1 >= 80) parts.push('capacidade financeira sólida');
-    else if (d1 < 40) parts.push('capacidade financeira abaixo do ideal');
-    if (d2 >= 80) parts.push('estabilidade laboral elevada');
-    else if (d2 < 40) parts.push('risco laboral elevado');
-    if (d3 >= 90) parts.push('garantias acima do exigido');
-    else if (d3 < 50) parts.push('garantias insuficientes');
-    if (candidate.urgency === 'immediate') parts.push('pronto para se mudar agora');
-    else if (candidate.urgency === 'flexible') parts.push('sem urgência de mudança');
-    return parts.length ? parts.join(' · ') : 'Perfil com compatibilidade média com este imóvel';
+    if (d1 >= 80) parts.push(t('dashboard:detailSheet.whyText.financeSolid'));
+    else if (d1 < 40) parts.push(t('dashboard:detailSheet.whyText.financeWeak'));
+    if (d2 >= 80) parts.push(t('dashboard:detailSheet.whyText.jobStable'));
+    else if (d2 < 40) parts.push(t('dashboard:detailSheet.whyText.jobRisk'));
+    if (d3 >= 90) parts.push(t('dashboard:detailSheet.whyText.guaranteesAbove'));
+    else if (d3 < 50) parts.push(t('dashboard:detailSheet.whyText.guaranteesInsufficient'));
+    if (candidate.urgency === 'immediate') parts.push(t('dashboard:detailSheet.whyText.moveNow'));
+    else if (candidate.urgency === 'flexible') parts.push(t('dashboard:detailSheet.whyText.noUrgency'));
+    return parts.length ? parts.join(' · ') : t('dashboard:detailSheet.whyText.medium');
   })();
 
   return (
@@ -149,7 +142,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
         {/* Header */}
         <div className="p-6 border-b">
           <SheetHeader>
-            <SheetTitle className="sr-only">Detalhe do candidato</SheetTitle>
+            <SheetTitle className="sr-only">{t('dashboard:detailSheet.title')}</SheetTitle>
           </SheetHeader>
           <div className="flex items-start gap-5">
             <ScoreRing score={candidate.score} classification={candidate.classification} />
@@ -170,14 +163,14 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
                     candidate.classification === 'excellent' ? 'bg-emerald-500' :
                     candidate.classification === 'potential' ? 'bg-amber-400' : 'bg-muted-foreground/40'
                   }`} />
-                  {candidate.status === 'visit_scheduled' ? 'Visita marcada' :
-                   candidate.status === 'approved' ? 'Aprovado' :
-                   candidate.classification === 'excellent' ? 'Contactar agora' :
-                   candidate.classification === 'potential' ? 'Avaliar' : 'Desprioritizar'}
+                  {candidate.status === 'visit_scheduled' ? t('common:status.visitScheduled') :
+                   candidate.status === 'approved' ? t('common:status.approved') :
+                   candidate.classification === 'excellent' ? t('dashboard:priority.contactNow') :
+                   candidate.classification === 'potential' ? t('dashboard:priority.evaluate') : t('dashboard:priority.deprioritize')}
                 </span>
                 {candidate.status !== 'approved' && candidate.status !== 'visit_scheduled' && (
-                  <span className={`text-xs font-medium ${urgency.color}`}>
-                    <Timer className="w-3 h-3 inline mr-0.5" />{urgency.label}
+                  <span className={`text-xs font-medium ${urgencyColor}`}>
+                    <Timer className="w-3 h-3 inline mr-0.5" />{t(`dashboard:detailSheet.urgency.${candidate.urgency ?? 'flexible'}`)}
                   </span>
                 )}
               </div>
@@ -186,7 +179,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
 
           {/* Insight */}
           <div className="mt-4 p-3 rounded-xl bg-muted/50 border border-border/50">
-            <p className="text-xs text-muted-foreground mb-0.5 font-medium uppercase tracking-wider">Diagnóstico</p>
+            <p className="text-xs text-muted-foreground mb-0.5 font-medium uppercase tracking-wider">{t('dashboard:detailSheet.diagnosis')}</p>
             <p className="text-sm font-medium">{insight}</p>
             <p className="text-xs text-muted-foreground mt-1">{whyText}</p>
           </div>
@@ -195,41 +188,41 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
         {/* Score breakdown */}
         <div className="p-6 border-b">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Análise de pontuação</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t('dashboard:detailSheet.scoreSection')}</h3>
             {scoringConfig && (
               <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-lg"
                 onClick={() => setXRayOpen(true)}>
                 <ScanSearch className="w-3.5 h-3.5" />
-                Raio-X
+                {t('dashboard:xray.title')}
               </Button>
             )}
           </div>
           <div className="space-y-4">
-            <ScoreBar label="D1 · Capacidade Financeira" value={d1} color="bg-emerald-500" />
-            <ScoreBar label="D2 · Perfil de Risco" value={d2} color="bg-violet-500" />
-            <ScoreBar label="D3 · Garantias" value={d3} color="bg-blue-500" />
-            <ScoreBar label="D4 · Fit e Intenção" value={d4} color="bg-amber-500" />
+            <ScoreBar label={t('dashboard:detailSheet.scores.d1')} value={d1} color="bg-emerald-500" />
+            <ScoreBar label={t('dashboard:detailSheet.scores.d2')} value={d2} color="bg-violet-500" />
+            <ScoreBar label={t('dashboard:detailSheet.scores.d3')} value={d3} color="bg-blue-500" />
+            <ScoreBar label={t('dashboard:detailSheet.scores.d4')} value={d4} color="bg-amber-500" />
           </div>
         </div>
 
         {/* Profile */}
         <div className="p-6 border-b">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Perfil</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">{t('dashboard:detailSheet.title')}</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { Icon: TrendingUp, label: 'Rendimento', value: `€${candidate.monthlyIncome.toLocaleString('pt-PT')}/mês` },
-              { Icon: Target, label: 'Rácio renda', value: `${incomeRatio}×` },
-              { Icon: Users, label: 'Pessoas', value: `${candidate.numberOfPeople} pessoa${candidate.numberOfPeople > 1 ? 's' : ''}` },
-              { Icon: PawPrint, label: 'Animais', value: candidate.hasPets ? (candidate.petDetails || 'Sim') : 'Não' },
-              { Icon: Briefcase, label: 'Situação', value: employmentLabel[candidate.employmentType] ?? candidate.employmentType },
-              { Icon: Clock, label: 'Na função há', value: candidate.employmentDuration >= 12 ? `${Math.floor(candidate.employmentDuration / 12)} ano(s)` : `${candidate.employmentDuration} meses` },
-              { Icon: CheckCircle2, label: 'Fiador', value: candidate.hasGuarantor ? 'Sim' : 'Não' },
-              { Icon: CalendarCheck, label: 'Disponibilidade', value: candidate.moveInTimeline ? tScreeningOption(candidate.moveInTimeline) : '—' },
-              ...(candidate.nationality ? [{ Icon: Globe, label: 'Nacionalidade', value: getCountryName(candidate.nationality) }] : []),
-              ...(candidate.residencyDuration ? [{ Icon: MapPin, label: 'Reside há', value: tScreeningOption(candidate.residencyDuration) }] : []),
-              ...(candidate.stayDuration ? [{ Icon: Timer, label: 'Tempo pretendido', value: tScreeningOption(candidate.stayDuration) }] : []),
-              ...(candidate.hasVisited ? [{ Icon: Eye, label: 'Já visitou imóveis?', value: tScreeningOption(candidate.hasVisited) }] : []),
-              ...(candidate.motivation ? [{ Icon: Target, label: 'Motivação', value: tScreeningOption(candidate.motivation) }] : []),
+              { Icon: TrendingUp, label: t('dashboard:detailSheet.income'), value: `€${candidate.monthlyIncome.toLocaleString('pt-PT')}/mês` },
+              { Icon: Target, label: t('dashboard:detailSheet.incomeRatio'), value: `${incomeRatio}×` },
+              { Icon: Users, label: t('dashboard:detailSheet.people'), value: t('dashboard:detailSheet.people', { count: candidate.numberOfPeople }) },
+              { Icon: PawPrint, label: t('dashboard:detailSheet.pets'), value: candidate.hasPets ? (candidate.petDetails || t('common:yesNo.yes')) : t('common:yesNo.no') },
+              { Icon: Briefcase, label: t('dashboard:detailSheet.job'), value: t(`dashboard:detailSheet.employment.${candidate.employmentType}`, { defaultValue: candidate.employmentType }) },
+              { Icon: Clock, label: t('dashboard:detailSheet.jobDuration'), value: candidate.employmentDuration >= 12 ? t('dashboard:detailSheet.jobDuration_years', { count: Math.floor(candidate.employmentDuration / 12) }) : t('dashboard:detailSheet.jobDuration_months', { count: candidate.employmentDuration }) },
+              { Icon: CheckCircle2, label: t('dashboard:detailSheet.guarantor'), value: candidate.hasGuarantor ? t('common:yesNo.yes') : t('common:yesNo.no') },
+              { Icon: CalendarCheck, label: t('dashboard:detailSheet.availability'), value: candidate.moveInTimeline ? tScreeningOption(candidate.moveInTimeline) : '—' },
+              ...(candidate.nationality ? [{ Icon: Globe, label: t('dashboard:detailSheet.nationality'), value: getCountryName(candidate.nationality) }] : []),
+              ...(candidate.residencyDuration ? [{ Icon: MapPin, label: t('dashboard:detailSheet.residency'), value: tScreeningOption(candidate.residencyDuration) }] : []),
+              ...(candidate.stayDuration ? [{ Icon: Timer, label: t('dashboard:detailSheet.stayDuration'), value: tScreeningOption(candidate.stayDuration) }] : []),
+              ...(candidate.hasVisited ? [{ Icon: Eye, label: t('dashboard:detailSheet.hasVisited'), value: tScreeningOption(candidate.hasVisited) }] : []),
+              ...(candidate.motivation ? [{ Icon: Target, label: t('dashboard:detailSheet.motivation'), value: tScreeningOption(candidate.motivation) }] : []),
             ].map(({ Icon, label, value }) => (
               <div key={label} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
                 <Icon className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
@@ -242,7 +235,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
           </div>
           {candidate.customAnswers && Object.keys(candidate.customAnswers).length > 0 && (
             <div className="mt-3 space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Perguntas personalizadas</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{t('dashboard:detailSheet.customQuestions')}</p>
               {Object.entries(candidate.customAnswers).map(([q, a]) => (
                 <div key={q} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
                   <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
@@ -263,7 +256,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
 
         {/* Contact */}
         <div className="p-6 border-b">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Contacto</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">{t('dashboard:detailSheet.contact')}</h3>
           <div className="space-y-2.5">
             <a href={`tel:${candidate.phone}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border hover:bg-muted/50 transition-colors group">
               <Phone className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -282,11 +275,11 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
             <>
               <Button className="w-full h-11 font-semibold rounded-xl"
                 onClick={() => { onStatusChange(candidate.id, 'approved'); onClose(); }}>
-                <CheckCircle2 className="w-4 h-4 mr-2" /> Aprovar candidato
+                <CheckCircle2 className="w-4 h-4 mr-2" /> {t('dashboard:detailSheet.actions.approve')}
               </Button>
               <Button variant="outline" className="w-full h-11 font-semibold rounded-xl text-destructive border-destructive/30 hover:bg-destructive/5"
                 onClick={() => { onStatusChange(candidate.id, 'rejected'); onClose(); }}>
-                <XCircle className="w-4 h-4 mr-2" /> Rejeitar
+                <XCircle className="w-4 h-4 mr-2" /> {t('dashboard:detailSheet.actions.reject')}
               </Button>
             </>
           )}
@@ -294,7 +287,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
             <>
               <Button className="w-full h-11 font-semibold rounded-xl"
                 onClick={() => { onClose(); navigate('/appointments', { state: { preSelectLeadId: candidate.id } }); }}>
-                <CalendarCheck className="w-4 h-4 mr-2" /> Agendar visita
+                <CalendarCheck className="w-4 h-4 mr-2" /> {t('dashboard:detailSheet.actions.schedule')}
               </Button>
               <Button variant="outline" className="w-full h-11 rounded-xl"
                 disabled={sendingEmail || !candidate.visitToken}
@@ -303,9 +296,9 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
                   setSendingEmail(true);
                   try {
                     await sendVisitLink(currentAgencyId, candidate.id);
-                    toast({ title: 'Email enviado!', description: `Link de visita enviado para ${candidate.email}.` });
+                    toast({ title: t('dashboard:detailSheet.actions.linkSent'), description: `Link de visita enviado para ${candidate.email}.` });
                   } catch {
-                    toast({ title: 'Erro ao enviar email', variant: 'destructive' });
+                    toast({ title: t('dashboard:detailSheet.actions.linkError'), variant: 'destructive' });
                   } finally {
                     setSendingEmail(false);
                   }
@@ -313,7 +306,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
                 {sendingEmail
                   ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   : <Send className="w-4 h-4 mr-2" />}
-                Enviar link de visita
+                {sendingEmail ? t('dashboard:detailSheet.actions.sendingLink') : t('dashboard:detailSheet.actions.sendLink')}
               </Button>
             </>
           )}
@@ -321,7 +314,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
               <CalendarCheck className="w-4 h-4 text-emerald-500 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Visita confirmada</p>
+                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('dashboard:detailSheet.actions.visitConfirmed')}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {new Date(candidate.scheduledVisit).toLocaleString('pt-PT', { dateStyle: 'long', timeStyle: 'short' })}
                 </p>

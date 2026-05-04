@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, Save, Clock, Users, Calendar, CalendarDays, Loader2, GripVertical } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +55,7 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
 export default function AgencySettings() {
   const { currentAgencyId } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation(['settings', 'common']);
 
   const [config, setConfig] = useState<SchedulingConfigDto>({
     periods: [
@@ -114,9 +116,9 @@ export default function AgencySettings() {
       setConfig(updated);
       setMaxClientChoicesDraft(String(updated.maxClientChoices));
       setMaxVisitsPerTimeDraft(String(updated.maxVisitsPerTime));
-      toast({ title: 'Configuração guardada!', description: 'As definições de agendamento foram actualizadas.' });
+      toast({ title: t('settings:agency.saved'), description: t('settings:agency.savedDesc') });
     } catch {
-      toast({ title: 'Erro ao guardar', variant: 'destructive' });
+      toast({ title: t('settings:agency.error'), variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -132,7 +134,7 @@ export default function AgencySettings() {
   const addPeriod = () => {
     setConfig(c => ({
       ...c,
-      periods: [...c.periods, { label: 'Novo período', start: '08:00', end: '10:00' }],
+      periods: [...c.periods, { label: t('settings:agency.newPeriod'), start: '08:00', end: '10:00' }],
     }));
   };
 
@@ -155,9 +157,9 @@ export default function AgencySettings() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display font-700 text-2xl tracking-tight">Configurações de Agendamento</h1>
+          <h1 className="font-display font-700 text-2xl tracking-tight">{t('settings:agency.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Define os períodos disponíveis para visitas e a granularidade dos horários do agente.
+            {t('settings:agency.subtitle')}
           </p>
         </div>
 
@@ -173,8 +175,8 @@ export default function AgencySettings() {
                 <Calendar className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <h2 className="font-semibold text-sm">Períodos disponíveis</h2>
-                <p className="text-xs text-muted-foreground">Os clientes escolhem um período, não uma hora exacta.</p>
+                <h2 className="font-semibold text-sm">{t('settings:agency.periodsTitle')}</h2>
+                <p className="text-xs text-muted-foreground">{t('settings:agency.periodsSubtitle')}</p>
               </div>
             </div>
 
@@ -184,7 +186,7 @@ export default function AgencySettings() {
                   <GripVertical className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                   <div className="flex-1 grid grid-cols-3 gap-3">
                     <div>
-                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">Nome</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">{t('settings:agency.fieldName')}</Label>
                       <Input
                         value={p.label}
                         onChange={e => updatePeriod(i, 'label', e.target.value)}
@@ -192,11 +194,11 @@ export default function AgencySettings() {
                       />
                     </div>
                     <div>
-                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">Início</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">{t('settings:agency.fieldStart')}</Label>
                       <TimePicker value={p.start} onChange={v => updatePeriod(i, 'start', v)} />
                     </div>
                     <div>
-                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">Fim</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1 block">{t('settings:agency.fieldEnd')}</Label>
                       <TimePicker value={p.end} onChange={v => updatePeriod(i, 'end', v)} />
                     </div>
                   </div>
@@ -215,7 +217,7 @@ export default function AgencySettings() {
               onClick={addPeriod}
               className="mt-3 flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" /> Adicionar período
+              <Plus className="w-3.5 h-3.5" /> {t('settings:agency.addPeriod')}
             </button>
           </motion.div>
 
@@ -231,14 +233,14 @@ export default function AgencySettings() {
                 <CalendarDays className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <Label className="font-semibold text-sm block mb-0.5">Dias disponíveis</Label>
+                <Label className="font-semibold text-sm block mb-0.5">{t('settings:agency.weekdaysTitle')}</Label>
                 <p className="text-xs text-muted-foreground">
-                  Dias da semana em que é possível agendar visitas.
+                  {t('settings:agency.weekdaysSubtitle')}
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] as const).map((label, dow) => {
+              {([t('common:days.sun'), t('common:days.mon'), t('common:days.tue'), t('common:days.wed'), t('common:days.thu'), t('common:days.fri'), t('common:days.sat')] as const).map((label, dow) => {
                 const active = (config.availableWeekdays ?? [1,2,3,4,5]).includes(dow);
                 return (
                   <button
@@ -274,13 +276,13 @@ export default function AgencySettings() {
           >
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-sm font-semibold">Capacidade e granularidade</h3>
+                <h3 className="text-sm font-semibold">{t('settings:agency.capacityTitle')}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Ajuste limites de proposta, intervalo interno e capacidade por horário.
+                  {t('settings:agency.capacitySubtitle')}
                 </p>
               </div>
               <div className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                Configuração global
+                {t('settings:agency.globalConfig')}
               </div>
             </div>
 
@@ -291,12 +293,12 @@ export default function AgencySettings() {
                     <Users className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
-                    {config.maxClientChoices} {config.maxClientChoices > 1 ? 'opções' : 'opção'}
+                    {t('settings:agency.maxChoicesBadge', { count: config.maxClientChoices })}
                   </span>
                 </div>
-                <Label className="font-semibold text-sm block mb-1">Máximo de opções do cliente</Label>
+                <Label className="font-semibold text-sm block mb-1">{t('settings:agency.maxChoicesTitle')}</Label>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Quantos períodos o cliente pode sugerir (1-5).
+                  {t('settings:agency.maxChoicesSubtitle')}
                 </p>
                 <Input
                   type="number"
@@ -318,9 +320,9 @@ export default function AgencySettings() {
                     {config.agentSlotIntervalMinutes} min
                   </span>
                 </div>
-                <Label className="font-semibold text-sm block mb-1">Intervalo do agente (min)</Label>
+                <Label className="font-semibold text-sm block mb-1">{t('settings:agency.intervalTitle')}</Label>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Granularidade dos sub-slots que o agente vê dentro de cada período.
+                  {t('settings:agency.intervalSubtitle')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[15, 30, 45, 60, 90].map(v => (
@@ -346,12 +348,12 @@ export default function AgencySettings() {
                     <CalendarDays className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
-                    {config.maxVisitsPerTime} visita{config.maxVisitsPerTime > 1 ? 's' : ''}
+                    {t('settings:agency.maxVisitsBadge', { count: config.maxVisitsPerTime })}
                   </span>
                 </div>
-                <Label className="font-semibold text-sm block mb-1">Máximo de visitas por horário</Label>
+                <Label className="font-semibold text-sm block mb-1">{t('settings:agency.maxVisitsTitle')}</Label>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Limite de visitas confirmadas no mesmo horário (HH:MM) para o imóvel.
+                  {t('settings:agency.maxVisitsSubtitle')}
                 </p>
                 <Input
                   type="number"
@@ -374,7 +376,7 @@ export default function AgencySettings() {
             className="rounded-2xl border bg-muted/30 p-5"
           >
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-              Pré-visualização — o que o cliente vê
+              {t('settings:agency.previewTitle')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {config.periods.map((p, i) => (
@@ -394,7 +396,7 @@ export default function AgencySettings() {
               className="rounded-xl px-6 font-semibold"
             >
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-              Guardar configuração
+              {t('settings:agency.saveButton')}
             </Button>
           </div>
         </div>

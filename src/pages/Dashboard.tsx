@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -49,37 +51,37 @@ function toProperty(dto: PropertyDto): Property {
 
 
 // ─── Priority config ──────────────────────────────────────────────────────────
-function getPriorityConfig(c: Candidate) {
+function getPriorityConfig(c: Candidate, t: TFunction) {
   if (c.status === 'visit_scheduled') return {
     badge: 'border-blue-200 bg-blue-50 text-blue-600',
     dot: 'bg-blue-500',
-    label: 'Visita marcada',
+    label: t('dashboard:actions.visitBadge'),
   };
   if (c.score >= 80) return {
     badge: 'border-border/60 bg-card text-foreground',
     dot: 'bg-emerald-500',
-    label: 'Contactar agora',
+    label: t('dashboard:priority.contactNow'),
   };
   if (c.score >= 60) return {
     badge: 'border-border/60 bg-card text-foreground',
     dot: 'bg-amber-400',
-    label: 'Avaliar',
+    label: t('dashboard:priority.evaluate'),
   };
   return {
     badge: 'border-border/60 bg-card text-muted-foreground',
     dot: 'bg-muted-foreground/30',
-    label: 'Desprioritizar',
+    label: t('dashboard:priority.deprioritize'),
   };
 }
 
 const statusConfig: Record<Candidate['status'], { label: string; icon: typeof Clock; className: string }> = {
-  new: { label: 'Novo', icon: Clock, className: 'bg-muted text-muted-foreground' },
-  approved: { label: 'Aprovado', icon: CheckCircle, className: 'bg-emerald-500/10 text-emerald-600' },
-  rejected: { label: 'Rejeitado', icon: XCircle, className: 'bg-destructive/10 text-destructive' },
-  visit_scheduled: { label: 'Visita marcada', icon: Calendar, className: 'bg-blue-500/10 text-blue-600' },
-  visit_cancelled: { label: 'Visita cancelada', icon: XCircle, className: 'bg-orange-500/10 text-orange-600' },
-  visit_finished: { label: 'Visita realizada', icon: CheckCircle, className: 'bg-emerald-500/10 text-emerald-600' },
-  contracted: { label: 'Contrato fechado', icon: CheckCircle, className: 'bg-violet-500/10 text-violet-600' },
+  new: { label: 'new', icon: Clock, className: 'bg-muted text-muted-foreground' },
+  approved: { label: 'approved', icon: CheckCircle, className: 'bg-emerald-500/10 text-emerald-600' },
+  rejected: { label: 'rejected', icon: XCircle, className: 'bg-destructive/10 text-destructive' },
+  visit_scheduled: { label: 'visitScheduled', icon: Calendar, className: 'bg-blue-500/10 text-blue-600' },
+  visit_cancelled: { label: 'visitCancelled', icon: XCircle, className: 'bg-orange-500/10 text-orange-600' },
+  visit_finished: { label: 'visitFinished', icon: CheckCircle, className: 'bg-emerald-500/10 text-emerald-600' },
+  contracted: { label: 'contracted', icon: CheckCircle, className: 'bg-violet-500/10 text-violet-600' },
 };
 
 // ─── Score circle ─────────────────────────────────────────────────────────────
@@ -98,18 +100,18 @@ function ScoreCircle({ score, classification, glass = false }: { score: number; 
 }
 
 
-function quickInsight(c: Candidate): string {
+function quickInsight(c: Candidate, t: TFunction): string {
   const incomeScore   = c.factorScores?.incomeRatio ?? 0;
   const guarantorScore = c.factorScores?.guarantor  ?? 0;
-  if (c.hasPets && c.score < 50) return 'Animais · compatibilidade baixa com o imóvel';
-  if (c.score >= 80 && c.urgency === 'immediate') return 'Perfil excelente · pronto para fechar';
-  if (c.score >= 80 && c.urgency === 'soon') return 'Excelente perfil · disponível em breve';
-  if (c.score >= 80) return 'Excelente perfil financeiro e laboral';
-  if (c.score >= 60 && c.urgency === 'immediate') return 'Bom perfil · alta urgência de mudança';
-  if (incomeScore < 30) return 'Rendimento abaixo do mínimo recomendado';
-  if (guarantorScore < 40) return 'Garantias insuficientes para este imóvel';
-  if (c.score >= 60) return 'Perfil razoável · sem urgência imediata';
-  return 'Baixa compatibilidade com os critérios';
+  if (c.hasPets && c.score < 50) return t('dashboard:insights.petsLow');
+  if (c.score >= 80 && c.urgency === 'immediate') return t('dashboard:insights.excellentUrgent');
+  if (c.score >= 80 && c.urgency === 'soon') return t('dashboard:insights.excellentSoon');
+  if (c.score >= 80) return t('dashboard:insights.excellent');
+  if (c.score >= 60 && c.urgency === 'immediate') return t('dashboard:insights.goodUrgent');
+  if (incomeScore < 30) return t('dashboard:insights.incomeLow');
+  if (guarantorScore < 40) return t('dashboard:insights.guaranteeLow');
+  if (c.score >= 60) return t('dashboard:insights.reasonable');
+  return t('dashboard:insights.low');
 }
 
 // ─── Smart Insights Panel ─────────────────────────────────────────────────────
@@ -139,6 +141,7 @@ function SmartInsightsPanel({
   onRevertContract: (c: Candidate) => void;
 }) {
   // Candidates within the plan limit = first N by arrival date (oldest first)
+  const { t } = useTranslation(['dashboard', 'common']);
   const withinLimitCandidates = planLimit !== null
     ? [...allCandidates]
         .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
@@ -159,15 +162,15 @@ function SmartInsightsPanel({
   const displayed = tab === 'top' ? topLeads : tab === 'ready' ? readyNow : ignore;
 
   const tabs = [
-    { key: 'top' as const, icon: Flame, label: 'Top 5 hoje', count: topLeads.length, color: 'text-orange-500' },
-    { key: 'ready' as const, icon: Timer, label: 'Prontos agora', count: readyNow.length, color: 'text-emerald-500' },
-    { key: 'ignore' as const, icon: BanIcon, label: 'Para ignorar', count: ignore.length, color: 'text-muted-foreground' },
+    { key: 'top' as const, icon: Flame, label: t('dashboard:priority.topToday'), count: topLeads.length, color: 'text-orange-500' },
+    { key: 'ready' as const, icon: Timer, label: t('dashboard:priority.readyNow'), count: readyNow.length, color: 'text-emerald-500' },
+    { key: 'ignore' as const, icon: BanIcon, label: t('dashboard:insightsPanel.toIgnore'), count: ignore.length, color: 'text-muted-foreground' },
   ];
 
   const subtitles: Record<typeof tab, string> = {
-    top: 'Maior probabilidade de conversão. Contacta primeiro.',
-    ready: 'Alta urgência de mudança — não percas tempo.',
-    ignore: 'Baixa compatibilidade com os critérios. Poupa energia.',
+    top: t('dashboard:insights.actionExcellent'),
+    ready: t('dashboard:insights.actionUrgent'),
+    ignore: t('dashboard:insights.actionLow'),
   };
 
   return (
@@ -200,13 +203,13 @@ function SmartInsightsPanel({
       <div className="p-4">
         <p className="text-xs text-muted-foreground mb-3 font-medium">{subtitles[tab]}</p>
             {displayed.length === 0 ? (
-              <p className="text-sm text-center text-muted-foreground py-6">Nenhum lead nesta categoria.</p>
+              <p className="text-sm text-center text-muted-foreground py-6">{t('dashboard:insightsPanel.empty')}</p>
             ) : (
               <div className="space-y-1">
                 <AnimatePresence>
                   {displayed.map((c, i) => {
                     const prop = properties.find(p => p.id === c.propertyId);
-                    const insight = quickInsight(c);
+                    const insight = quickInsight(c, t);
                     return (
                       <motion.div
                         key={c.id}
@@ -226,17 +229,17 @@ function SmartInsightsPanel({
                             <span className="font-semibold text-sm">{c.name}</span>
                             {c.status === 'approved' && (
                               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-200 flex items-center gap-1">
-                                <CheckCircle className="w-3 h-3" />Aprovado
+                                <CheckCircle className="w-3 h-3" />{t('dashboard:actions.approvedBadge')}
                               </span>
                             )}
                             {c.status === 'visit_scheduled' && (
                               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />Visita marcada
+                                <Calendar className="w-3 h-3" />{t('dashboard:actions.visitBadge')}
                               </span>
                             )}
                             {c.urgency === 'immediate' && c.status !== 'visit_scheduled' && (
                               <span className="text-[10px] font-semibold text-emerald-500 flex items-center gap-0.5">
-                                <Timer className="w-3 h-3" />Urgente
+                                <Timer className="w-3 h-3" />{t('dashboard:actions.urgentLabel')}
                               </span>
                             )}
                           </div>
@@ -254,13 +257,13 @@ function SmartInsightsPanel({
                                 onClick={e => { e.stopPropagation(); onApprove(c.id); }}
                                 className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 transition-all"
                               >
-                                <CheckCircle className="w-3.5 h-3.5" /> Aprovar
+                                <CheckCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.approve')}
                               </button>
                               <button
                                 onClick={e => { e.stopPropagation(); onReject(c.id); }}
                                 className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 border border-red-200 transition-all"
                               >
-                                <XCircle className="w-3.5 h-3.5" /> Rejeitar
+                                <XCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.reject')}
                               </button>
                             </>
                           )}
@@ -269,7 +272,7 @@ function SmartInsightsPanel({
                               onClick={e => { e.stopPropagation(); onSchedule(c); }}
                               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                             >
-                              <CalendarCheck className="w-3 h-3" /> Agendar
+                              <CalendarCheck className="w-3 h-3" /> {t('dashboard:actions.schedule')}
                             </button>
                           )}
                           {c.status === 'visit_cancelled' && (
@@ -277,7 +280,7 @@ function SmartInsightsPanel({
                               onClick={e => { e.stopPropagation(); onReschedule(c); }}
                               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 transition-colors"
                             >
-                              <RotateCcw className="w-3 h-3" /> Reagendar
+                              <RotateCcw className="w-3 h-3" /> {t('dashboard:actions.reschedule')}
                             </button>
                           )}
                           {c.status === 'visit_scheduled' && (
@@ -285,7 +288,7 @@ function SmartInsightsPanel({
                               onClick={e => { e.stopPropagation(); onComplete(c); }}
                               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 transition-colors"
                             >
-                              <CheckCircle className="w-3.5 h-3.5" /> Finalizar
+                              <CheckCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.complete')}
                             </button>
                           )}
                           {c.status === 'visit_finished' && (
@@ -293,7 +296,7 @@ function SmartInsightsPanel({
                               onClick={e => { e.stopPropagation(); onContract(c); }}
                               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 border border-violet-200 transition-colors"
                             >
-                              <Trophy className="w-3.5 h-3.5" /> Fechar Contrato
+                              <Trophy className="w-3.5 h-3.5" /> {t('dashboard:actions.contract')}
                             </button>
                           )}
                           {c.status === 'contracted' && (
@@ -301,7 +304,7 @@ function SmartInsightsPanel({
                               onClick={e => { e.stopPropagation(); onRevertContract(c); }}
                               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition-colors"
                             >
-                              <RotateCcw className="w-3 h-3" /> Reverter
+                              <RotateCcw className="w-3 h-3" /> {t('dashboard:actions.revert')}
                             </button>
                           )}
                           <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors shrink-0" />
@@ -341,10 +344,12 @@ function LeadCard({
   onContract?: () => void;
   onRevertContract?: () => void;
 }) {
-  const priority = getPriorityConfig(candidate);
+  const { t } = useTranslation(['dashboard', 'common']);
   const sc = statusConfig[candidate.status];
+  const translatedLabel = t(`common:status.${sc.label}`);
+  const priority = getPriorityConfig(candidate, t);
   const StatusIcon = sc.icon;
-  const insight = quickInsight(candidate);
+  const insight = quickInsight(candidate, t);
 
   return (
     <motion.div
@@ -367,7 +372,7 @@ function LeadCard({
           </span>
           {candidate.urgency === 'immediate' && candidate.status === 'new' && (
             <span className="text-[10px] font-semibold text-emerald-500 flex items-center gap-0.5">
-              <Timer className="w-3 h-3" />Agora
+              <Timer className="w-3 h-3" />{t('dashboard:actions.urgentBadge')}
             </span>
           )}
         </div>
@@ -388,7 +393,7 @@ function LeadCard({
       <div className="flex items-center gap-2 shrink-0">
         {/* Status badge */}
         <span className={`hidden sm:flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-lg ${sc.className}`}>
-          <StatusIcon className="w-3 h-3" />{sc.label}
+          <StatusIcon className="w-3 h-3" />{translatedLabel}
         </span>
 
         {/* Quick actions — novos: aprovar / rejeitar */}
@@ -398,13 +403,13 @@ function LeadCard({
               onClick={e => { e.stopPropagation(); onApprove(); }}
               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 transition-colors"
             >
-              <CheckCircle className="w-3.5 h-3.5" /> Aprovar
+              <CheckCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.approve')}
             </button>
             <button
               onClick={e => { e.stopPropagation(); onReject(); }}
               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 border border-red-200 transition-colors"
             >
-              <XCircle className="w-3.5 h-3.5" /> Rejeitar
+              <XCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.reject')}
             </button>
           </div>
         )}
@@ -415,7 +420,7 @@ function LeadCard({
             onClick={e => { e.stopPropagation(); onSchedule(); }}
             className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            <CalendarCheck className="w-3 h-3" /> Agendar
+            <CalendarCheck className="w-3 h-3" /> {t('dashboard:actions.schedule')}
           </button>
         )}
 
@@ -425,7 +430,7 @@ function LeadCard({
             onClick={e => { e.stopPropagation(); onReschedule(); }}
             className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 transition-colors"
           >
-            <RotateCcw className="w-3 h-3" /> Reagendar
+            <RotateCcw className="w-3 h-3" /> {t('dashboard:actions.reschedule')}
           </button>
         )}
 
@@ -436,7 +441,7 @@ function LeadCard({
               onClick={e => { e.stopPropagation(); onComplete(); }}
               className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 transition-colors"
             >
-              <CheckCircle className="w-3.5 h-3.5" /> Finalizar
+              <CheckCircle className="w-3.5 h-3.5" /> {t('dashboard:actions.complete')}
             </button>
           </div>
         )}
@@ -447,7 +452,7 @@ function LeadCard({
             onClick={e => { e.stopPropagation(); onContract(); }}
             className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 border border-violet-200 transition-colors"
           >
-            <Trophy className="w-3.5 h-3.5" /> Fechar Contrato
+            <Trophy className="w-3.5 h-3.5" /> {t('dashboard:actions.contract')}
           </button>
         )}
 
@@ -457,7 +462,7 @@ function LeadCard({
             onClick={e => { e.stopPropagation(); onRevertContract(); }}
             className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition-colors"
           >
-            <RotateCcw className="w-3 h-3" /> Reverter
+            <RotateCcw className="w-3 h-3" /> {t('dashboard:actions.revert')}
           </button>
         )}
 
@@ -469,16 +474,17 @@ function LeadCard({
 
 // ─── Stats Row ────────────────────────────────────────────────────────────────
 function StatsRow({ candidates, glass = false }: { candidates: Candidate[]; glass?: boolean }) {
+  const { t } = useTranslation('dashboard');
   const total = candidates.length;
   const excellent = candidates.filter(c => c.classification === 'excellent').length;
   const visitsScheduled = candidates.filter(c => c.status === 'visit_scheduled').length;
   const avgScore = total > 0 ? Math.round(candidates.reduce((s, c) => s + c.score, 0) / total) : 0;
 
   const stats = [
-    { label: 'Candidatos', value: total, icon: Users, sub: 'total', accent: null },
-    { label: 'Alta prioridade', value: excellent, icon: ArrowUpRight, sub: 'para contactar', accent: excellent > 0 ? 'emerald' : null },
-    { label: 'Visitas marcadas', value: visitsScheduled, icon: CalendarCheck, sub: 'confirmadas', accent: visitsScheduled > 0 ? 'blue' : null },
-    { label: 'Score médio', value: avgScore, icon: TrendingUp, sub: 'dos candidatos', accent: avgScore >= 70 ? 'amber' : null },
+    { label: t('stats.candidates'), value: total, icon: Users, sub: t('stats.candidatesSub'), accent: null },
+    { label: t('priority.highPriority'), value: excellent, icon: ArrowUpRight, sub: t('stats.highPrioritySub'), accent: excellent > 0 ? 'emerald' : null },
+    { label: t('priority.scheduledVisits'), value: visitsScheduled, icon: CalendarCheck, sub: t('stats.scheduledVisitsSub'), accent: visitsScheduled > 0 ? 'blue' : null },
+    { label: t('priority.avgScore'), value: avgScore, icon: TrendingUp, sub: t('stats.avgScoreSub'), accent: avgScore >= 70 ? 'amber' : null },
   ];
 
   const accentText: Record<string, string> = { emerald: 'text-emerald-400', blue: 'text-blue-400', amber: 'text-amber-400' };
@@ -506,6 +512,7 @@ function StatsRow({ candidates, glass = false }: { candidates: Candidate[]; glas
 }
 
 function DashboardSplash() {
+  const { t } = useTranslation('dashboard');
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0f1115]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.16),transparent_36%),linear-gradient(135deg,#151922_0%,#0f1115_55%,#0b0d11_100%)]" />
@@ -540,8 +547,8 @@ function DashboardSplash() {
             transition={{ delay: 0.15, duration: 0.4 }}
             className="mt-6 text-center"
           >
-            <p className="text-white text-sm font-semibold tracking-[0.24em] uppercase">A preparar dashboard</p>
-            <p className="mt-2 text-sm text-white/55">A carregar imagem, imóveis e candidatos.</p>
+            <p className="text-white text-sm font-semibold tracking-[0.24em] uppercase">{t('header.loading')}</p>
+            <p className="mt-2 text-sm text-white/55">{t('header.loadingDesc')}</p>
           </motion.div>
         </motion.div>
       </div>
@@ -557,6 +564,7 @@ export default function Dashboard() {
   const { currentAgencyId, user, status: authStatus, memberships } = useAuth();
   const isOwner = (memberships.find(m => m.agencyId === currentAgencyId)?.role ?? '') === 'OWNER';
   const { toast } = useToast();
+  const { t } = useTranslation(['dashboard', 'common']);
   const location = useLocation();
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -653,8 +661,8 @@ export default function Dashboard() {
       const msg = err instanceof Error ? err.message : null;
       toast({
         variant: 'destructive',
-        title: 'Imóvel já reservado',
-        description: msg ?? 'Outro lead já tem contrato fechado para este imóvel.',
+        title: t('insights.actionContract'),
+        description: msg ?? t('propertyBanner.contractedError'),
       });
     }
   }
@@ -780,13 +788,13 @@ export default function Dashboard() {
                     <div>
                       <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest mb-1">Dashboard</p>
                       <h1 className="font-display text-2xl md:text-3xl font-700 tracking-tight text-foreground leading-tight">
-                        {property?.title ?? 'Imóveis'}
+                        {property?.title ?? t('header.properties')}
                       </h1>
                       {(property?.rentalPrice ?? property?.price) && (
                         <p className="text-muted-foreground text-sm mt-0.5">
                           €{(property.rentalPrice ?? property.price)?.toLocaleString('pt-PT')}/mês
                           {selectedPropertyDto?.status === 'PAUSED' && (
-                            <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30">Pausado</span>
+                            <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30">{t('header.paused')}</span>
                           )}
                         </p>
                       )}
@@ -801,7 +809,7 @@ export default function Dashboard() {
                             : 'bg-muted text-muted-foreground border-border/60'
                         }`}>
                           <Home className="w-2.5 h-2.5" />
-                          {activeCount} / {maxProperties} imóveis ativos
+                          {t('header.propertiesActive', { active: activeCount, max: maxProperties })}
                         </span>
                       )}
                       {atLimit ? (
@@ -812,10 +820,10 @@ export default function Dashboard() {
                           className="gap-1.5 rounded-full font-semibold bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm"
                         >
                           <ArrowUpRight className="w-3.5 h-3.5" />
-                          Fazer upgrade
+                          {t('header.upgrade')}
                         </Button>
                         ) : (
-                          <span className="text-xs text-muted-foreground">Contacte o proprietário para fazer upgrade.</span>
+                          <span className="text-xs text-muted-foreground">{t('header.contactOwnerUpgrade')}</span>
                         )
                       ) : (
                         <Button
@@ -824,7 +832,7 @@ export default function Dashboard() {
                           className="gap-2 rounded-full font-semibold"
                         >
                           <Plus className="w-4 h-4" />
-                          <span className="hidden sm:inline">Novo imóvel</span>
+                          <span className="hidden sm:inline">{t('header.newProperty')}</span>
                         </Button>
                       )}
                     </div>
@@ -832,7 +840,7 @@ export default function Dashboard() {
 
           {propertyDtos.length === 0 ? (
             <div className="rounded-2xl border bg-card p-16 text-center">
-              <p className="text-sm text-muted-foreground">Nenhum imóvel atribuído a este agente.</p>
+              <p className="text-sm text-muted-foreground">{t('propertyBanner.agentNoProperties')}</p>
             </div>
           ) : (
             <>
@@ -845,13 +853,13 @@ export default function Dashboard() {
                     className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
                       propertyStatusFilter === 'active' ? 'bg-background text-foreground shadow' : 'text-muted-foreground hover:text-foreground'
                     }`}
-                  >Ativos</button>
+                  >{t('propertySelector.active')}</button>
                   <button
                     onClick={() => { setPropertyStatusFilter('closed'); handleSelectProperty(null); }}
                     className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
                       propertyStatusFilter === 'closed' ? 'bg-background text-foreground shadow' : 'text-muted-foreground hover:text-foreground'
                     }`}
-                  >Encerrados</button>
+                  >{t('propertySelector.closed')}</button>
                 </div>
                 {/* Property selector */}
                 <DropdownMenu>
@@ -863,7 +871,7 @@ export default function Dashboard() {
                         <Home className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
                       )}
                       <span className="text-xs font-semibold truncate flex-1 min-w-0 text-left">
-                        {property?.title ?? 'Selecionar imóvel'}
+                        {property?.title ?? t('leads.selectProperty')}
                       </span>
                       <ChevronDown className="w-3 h-3 shrink-0 text-white/60" />
                     </button>
@@ -907,7 +915,7 @@ export default function Dashboard() {
                       className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white text-foreground hover:bg-muted transition-all"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Ver página</span>
+                      <span className="hidden sm:inline">{t('propertySelector.viewPage')}</span>
                     </Link>
                   )}
                   {selectedPropertyDto && (
@@ -919,28 +927,28 @@ export default function Dashboard() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-44">
                         <DropdownMenuItem onClick={() => { setEditingPropertyDto(selectedPropertyDto); setEditOpen(true); }} className="gap-2">
-                          <Pencil className="w-3.5 h-3.5" /> Editar imóvel
+                          <Pencil className="w-3.5 h-3.5" /> {t('propertySelector.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {selectedPropertyDto.status === 'ACTIVE' ? (
                           <DropdownMenuItem onClick={() => setPropertyStatus(selectedPropertyDto.id, 'PAUSED')} className="gap-2">
-                            <PauseCircle className="w-3.5 h-3.5" /> Pausar
+                            <PauseCircle className="w-3.5 h-3.5" /> {t('propertySelector.pause')}
                           </DropdownMenuItem>
                         ) : (
                           <DropdownMenuItem onClick={() => setPropertyStatus(selectedPropertyDto.id, 'ACTIVE')} className="gap-2">
-                            <PlayCircle className="w-3.5 h-3.5" /> Retomar
+                            <PlayCircle className="w-3.5 h-3.5" /> {t('propertySelector.resume')}
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="gap-2 text-destructive focus:text-destructive data-[state=open]:text-destructive">
-                            <Archive className="w-3.5 h-3.5" /> Encerrar
+                            <Archive className="w-3.5 h-3.5" /> {t('propertySelector.close')}
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-44">
                             <DropdownMenuItem onClick={() => setPropertyStatus(selectedPropertyDto.id, 'RENTED')} className="gap-2">
-                              <KeyRound className="w-3.5 h-3.5" /> Imóvel arrendado
+                              <KeyRound className="w-3.5 h-3.5" /> {t('propertySelector.rented')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setPropertyStatus(selectedPropertyDto.id, 'ARCHIVED')} className="gap-2 text-destructive focus:text-destructive">
-                              <Archive className="w-3.5 h-3.5" /> Retirar imóvel
+                              <Archive className="w-3.5 h-3.5" /> {t('propertySelector.archived')}
                             </DropdownMenuItem>
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
@@ -966,7 +974,7 @@ export default function Dashboard() {
 
               {filteredProperties.length === 0 ? (
                 <div className="rounded-2xl border bg-card p-12 text-center">
-                  <p className="text-sm text-muted-foreground">Nenhum imóvel encerrado.</p>
+                  <p className="text-sm text-muted-foreground">{t('propertySelector.noPropertiesClosed')}</p>
                 </div>
               ) : (
                 <>
@@ -998,7 +1006,7 @@ export default function Dashboard() {
                       className="rounded-2xl border bg-card p-5 mb-8"
                     >
                       <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">
-                        Visitas confirmadas
+                        {t('visits.confirmed')}
                       </h3>
                       <div className="space-y-2">
                         {propertyAppointments
@@ -1023,7 +1031,7 @@ export default function Dashboard() {
                   {/* Filters + Lead list */}
                   <div className="flex flex-wrap gap-2.5 mb-5 items-center">
                     <h2 className="font-display font-700 text-base flex-1 text-foreground">
-                      Todos os candidatos
+                      {t('candidatesTitle')}
                       <span className="ml-2 text-sm font-400 text-muted-foreground font-sans">
                         ({propertyCandidates.length})
                       </span>
@@ -1032,37 +1040,37 @@ export default function Dashboard() {
                       <Select value={scoreFilter} onValueChange={setScoreFilter}>
                         <SelectTrigger className="h-8 text-xs rounded-lg w-[130px]">
                           <Filter className="w-3 h-3 mr-1.5" />
-                          <SelectValue placeholder="Score" />
+                          <SelectValue placeholder={t('filters.allScores')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos os scores</SelectItem>
-                          <SelectItem value="high">Alta prioridade (80+)</SelectItem>
-                          <SelectItem value="mid">Média (60–79)</SelectItem>
-                          <SelectItem value="low">Baixa (&lt;60)</SelectItem>
+                          <SelectItem value="all">{t('filters.allScores')}</SelectItem>
+                          <SelectItem value="high">{t('filters.highScore')}</SelectItem>
+                          <SelectItem value="mid">{t('filters.midScore')}</SelectItem>
+                          <SelectItem value="low">{t('filters.lowScore')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
                         <SelectTrigger className="h-8 text-xs rounded-lg w-[120px]">
                           <Timer className="w-3 h-3 mr-1.5" />
-                          <SelectValue placeholder="Urgência" />
+                          <SelectValue placeholder={t('filters.allUrgency')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Toda urgência</SelectItem>
-                          <SelectItem value="immediate">Urgente</SelectItem>
-                          <SelectItem value="soon">Em breve</SelectItem>
-                          <SelectItem value="flexible">Flexível</SelectItem>
+                          <SelectItem value="all">{t('filters.allUrgency')}</SelectItem>
+                          <SelectItem value="immediate">{t('filters.urgent')}</SelectItem>
+                          <SelectItem value="soon">{t('filters.soon')}</SelectItem>
+                          <SelectItem value="flexible">{t('filters.flexible')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="h-8 text-xs rounded-lg w-[130px]">
-                          <SelectValue placeholder="Estado" />
+                          <SelectValue placeholder={t('filters.allStatus')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos os estados</SelectItem>
-                          <SelectItem value="new">Novos</SelectItem>
-                          <SelectItem value="approved">Aprovados</SelectItem>
-                          <SelectItem value="visit_scheduled">Visita marcada</SelectItem>
-                          <SelectItem value="rejected">Rejeitados</SelectItem>
+                          <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
+                          <SelectItem value="new">{t('filters.filterNew')}</SelectItem>
+                          <SelectItem value="approved">{t('filters.filterApproved')}</SelectItem>
+                          <SelectItem value="visit_scheduled">{t('filters.filterVisit')}</SelectItem>
+                          <SelectItem value="rejected">{t('filters.filterRejected')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1091,26 +1099,26 @@ export default function Dashboard() {
                           {leadsHiddenCount > 0 ? (
                             <>
                               <p className="text-sm font-semibold tracking-tight">
-                                {leadsHiddenCount} candidato{leadsHiddenCount !== 1 ? 's' : ''} oculto{leadsHiddenCount !== 1 ? 's' : ''} por limite de leads
+                                {t('limitBanner.hiddenTitle', { count: leadsHiddenCount })}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                O teu plano está no limite de {leadPlanLimit} leads para este imóvel.
+                                {t('limitBanner.hiddenDesc', { limit: leadPlanLimit })}
                               </p>
                             </>
                           ) : atLeadLimit ? (
                             <>
-                              <p className="text-sm font-semibold tracking-tight">Limite de leads atingido</p>
+                              <p className="text-sm font-semibold tracking-tight">{t('limitBanner.atLimitTitle')}</p>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                Novos candidatos não serão recebidos até aumentares a capacidade.
+                                {t('limitBanner.atLimitDesc')}
                               </p>
                             </>
                           ) : (
                             <>
                               <p className="text-sm font-semibold tracking-tight">
-                                {remainingLeads === 1 ? 'Apenas 1 lead' : `${remainingLeads} leads`} até ao limite deste imóvel
+                                {t('leads.atLimit', { count: remainingLeads ?? 0 })}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                Aumenta a capacidade antes de perderes candidatos.
+                                {t('limitBanner.nearLimitDesc')}
                               </p>
                             </>
                           )}
@@ -1121,7 +1129,7 @@ export default function Dashboard() {
                               onClick={() => setBuyLeadsOpen(true)}
                               className="text-xs font-semibold bg-accent text-accent-foreground hover:bg-accent/85 rounded-xl px-3.5 py-2 transition-all"
                             >
-                              Comprar leads
+                              {t('leads.buyLeads')}
                             </button>
                           )}
                           {isOwner ? (
@@ -1129,10 +1137,10 @@ export default function Dashboard() {
                             onClick={() => navigate('/onboarding/upgrade')}
                             className="text-xs font-medium text-muted-foreground hover:text-foreground border border-border bg-background hover:bg-muted rounded-xl px-3.5 py-2 transition-all"
                           >
-                            Fazer upgrade
+                            {t('header.upgrade')}
                           </button>
                           ) : (
-                            <span className="text-xs text-muted-foreground">Contacte o proprietário para aumentar o limite.</span>
+                            <span className="text-xs text-muted-foreground">{t('leads.contactOwnerLimit')}</span>
                           )}
                         </div>
                       </div>
@@ -1141,7 +1149,7 @@ export default function Dashboard() {
 
                   {propertyCandidates.length === 0 ? (
                     <div className="rounded-2xl border bg-card p-12 text-center">
-                      <p className="text-sm text-muted-foreground">Nenhum candidato encontrado com os filtros actuais.</p>
+                      <p className="text-sm text-muted-foreground">{t('leads.empty')}</p>
                     </div>
                   ) : (
                     <>
@@ -1169,14 +1177,18 @@ export default function Dashboard() {
                       {candidatesTotalPages > 1 && (
                         <div className="flex items-center justify-between pt-4 pb-10">
                           <p className="text-xs text-muted-foreground">
-                            {(candidatesPage - 1) * CANDIDATES_PAGE_SIZE + 1}–{Math.min(candidatesPage * CANDIDATES_PAGE_SIZE, propertyCandidates.length)} de {propertyCandidates.length} candidatos
+                            {t('pagination.showing', {
+                              from: (candidatesPage - 1) * CANDIDATES_PAGE_SIZE + 1,
+                              to: Math.min(candidatesPage * CANDIDATES_PAGE_SIZE, propertyCandidates.length),
+                              total: propertyCandidates.length,
+                            })}
                           </p>
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => setCandidatesPage(p => Math.max(1, p - 1))}
                               disabled={candidatesPage === 1}
                               className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm"
-                              aria-label="Página anterior"
+                              aria-label={t('leads.prevPage')}
                             >
                               ‹
                             </button>
@@ -1213,7 +1225,7 @@ export default function Dashboard() {
                               onClick={() => setCandidatesPage(p => Math.min(candidatesTotalPages, p + 1))}
                               disabled={candidatesPage === candidatesTotalPages}
                               className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all text-sm"
-                              aria-label="Próxima página"
+                              aria-label={t('leads.nextPage')}
                             >
                               ›
                             </button>

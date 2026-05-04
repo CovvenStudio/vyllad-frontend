@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Plus, Search, Home, MoreHorizontal, Pencil, PauseCircle, PlayCircle,
@@ -29,12 +30,12 @@ import { usePlans } from '@/plans';
 import { useToast } from '@/hooks/use-toast';
 import { ApiError } from '@/lib/api-client';
 
-// ── Status config ─────────────────────────────────────────────────────────────
-const STATUS_CONFIG: Record<PropertyDto['status'], { label: string; className: string }> = {
-  ACTIVE:   { label: 'Activo',     className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  PAUSED:   { label: 'Pausado',    className: 'bg-amber-50 text-amber-700 border-amber-200' },
-  RENTED:   { label: 'Arrendado',  className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  ARCHIVED: { label: 'Arquivado',  className: 'bg-slate-100 text-slate-500 border-slate-200' },
+// ── Status className config (labels are now t('properties:status.X')) ────────
+const STATUS_CLASSNAME: Record<PropertyDto['status'], string> = {
+  ACTIVE:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+  PAUSED:   'bg-amber-50 text-amber-700 border-amber-200',
+  RENTED:   'bg-blue-50 text-blue-700 border-blue-200',
+  ARCHIVED: 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 // ── Candidate count badge ─────────────────────────────────────────────────────
@@ -70,7 +71,8 @@ function PropertyRow({
   onSetStatus: (id: string, status: PropertyDto['status']) => void;
 }) {
   const navigate = useNavigate();
-  const status = STATUS_CONFIG[property.status];
+  const { t } = useTranslation(['properties', 'common']);
+  const statusClassName = STATUS_CLASSNAME[property.status];
 
   return (
     <motion.tr
@@ -117,8 +119,8 @@ function PropertyRow({
 
       {/* Status */}
       <td className="px-4 py-3.5">
-        <span className={`inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full border ${status.className}`}>
-          {status.label}
+        <span className={`inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full border ${statusClassName}`}>
+          {t(`properties:status.${property.status}`)}
         </span>
       </td>
 
@@ -170,31 +172,31 @@ function PropertyRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
             <DropdownMenuItem onClick={() => onEdit(property)} className="gap-2">
-              <Pencil className="w-3.5 h-3.5" /> Editar
+              <Pencil className="w-3.5 h-3.5" /> {t('properties:actions.edit')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {property.status === 'ACTIVE' ? (
               <DropdownMenuItem onClick={() => onSetStatus(property.id, 'PAUSED')} className="gap-2">
-                <PauseCircle className="w-3.5 h-3.5" /> Pausar
+                <PauseCircle className="w-3.5 h-3.5" /> {t('properties:actions.pause')}
               </DropdownMenuItem>
             ) : property.status === 'PAUSED' ? (
               <DropdownMenuItem onClick={() => onSetStatus(property.id, 'ACTIVE')} className="gap-2">
-                <PlayCircle className="w-3.5 h-3.5" /> Retomar
+                <PlayCircle className="w-3.5 h-3.5" /> {t('properties:actions.resume')}
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger className="gap-2 text-destructive focus:text-destructive data-[state=open]:text-destructive">
-                <Archive className="w-3.5 h-3.5" /> Encerrar
+                <Archive className="w-3.5 h-3.5" /> {t('properties:actions.close')}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="w-44">
                 <DropdownMenuItem onClick={() => onSetStatus(property.id, 'RENTED')} className="gap-2">
-                  <KeyRound className="w-3.5 h-3.5" /> Imóvel arrendado
+                  <KeyRound className="w-3.5 h-3.5" /> {t('properties:actions.rented')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onSetStatus(property.id, 'ARCHIVED')}
                   className="gap-2 text-destructive focus:text-destructive"
                 >
-                  <Archive className="w-3.5 h-3.5" /> Retirar imóvel
+                  <Archive className="w-3.5 h-3.5" /> {t('properties:actions.archived')}
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
@@ -235,6 +237,7 @@ export default function Imoveis() {
   const { currentAgencyId, user, memberships } = useAuth();
   const isOwner = (memberships.find(m => m.agencyId === currentAgencyId)?.role ?? '') === 'OWNER';
   const navigate = useNavigate();
+  const { t } = useTranslation(['properties', 'common']);
   const { properties, loading, setStatus, refresh: refreshProperties } = useProperties();
   const { plans } = usePlans();
   const userPlan = plans.find(p => p.backendPlanId === user?.planId);
@@ -250,11 +253,11 @@ export default function Imoveis() {
       if (err instanceof ApiError && err.errorCode === 'PLAN_PROPERTY_LIMIT_REACHED') {
         toast({
           variant: 'destructive',
-          title: 'Limite de imóveis ativos atingido',
-          description: `O teu plano permite no máximo ${maxProperties} imóve${maxProperties === 1 ? 'l' : 'is'} ativo${maxProperties === 1 ? '' : 's'}. Faz upgrade para retomar mais imóveis.`,
+          title: t('properties:limitReached.title'),
+          description: t('properties:limitReached.desc', { count: maxProperties }),
         });
       } else {
-        toast({ variant: 'destructive', title: 'Erro', description: err instanceof Error ? err.message : 'Não foi possível alterar o estado do imóvel.' });
+        toast({ variant: 'destructive', title: t('common:errors.generic'), description: err instanceof Error ? err.message : String(err) });
       }
     }
   }
@@ -318,7 +321,7 @@ export default function Imoveis() {
     return counts;
   }, [properties]);
 
-  if (loading) return <DashboardLayout><PageSplash label="A carregar imóveis" /></DashboardLayout>;
+  if (loading) return <DashboardLayout><PageSplash label={t('properties:loading')} /></DashboardLayout>;
 
   return (
     <DashboardLayout>
@@ -332,9 +335,9 @@ export default function Imoveis() {
           className="flex items-center justify-between mb-6 gap-4"
         >
           <div>
-            <h1 className="font-display text-2xl md:text-3xl font-700 tracking-tight text-foreground">Imóveis</h1>
+            <h1 className="font-display text-2xl md:text-3xl font-700 tracking-tight text-foreground">{t('properties:title')}</h1>
             <p className="text-muted-foreground text-sm mt-0.5 flex items-center gap-2 flex-wrap">
-              {properties.length} imóve{properties.length === 1 ? 'l' : 'is'} na agência
+              {t('properties:totalCount', { count: properties.length })}
               {maxProperties !== null && (
                 <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
                   activeCount >= maxProperties
@@ -356,10 +359,10 @@ export default function Imoveis() {
               className="gap-1.5 rounded-full font-semibold shrink-0 bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Fazer upgrade
+              {t('properties:upgrade')}
             </Button>
             ) : (
-              <span className="text-xs text-muted-foreground shrink-0">Contacte o proprietário para fazer upgrade.</span>
+              <span className="text-xs text-muted-foreground shrink-0">{t('properties:contactOwnerUpgrade')}</span>
             )
           ) : (
             <Button
@@ -367,7 +370,7 @@ export default function Imoveis() {
               className="gap-2 rounded-full font-semibold shrink-0"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Adicionar imóvel</span>
+              <span className="hidden sm:inline">{t('properties:addProperty')}</span>
             </Button>
           )}
         </motion.div>
@@ -382,11 +385,11 @@ export default function Imoveis() {
           {/* Status quick-filter pills */}
           <div className="flex items-center gap-1.5 p-1 rounded-full bg-muted/70 ring-1 ring-border/60">
             {([
-              ['ALL', 'Todos'],
-              ['ACTIVE', 'Activos'],
-              ['PAUSED', 'Pausados'],
-              ['RENTED', 'Arrendados'],
-              ['ARCHIVED', 'Arquivados'],
+              ['ALL', t('properties:filter.all')],
+              ['ACTIVE', t('properties:filter.active')],
+              ['PAUSED', t('properties:filter.paused')],
+              ['RENTED', t('properties:filter.rented')],
+              ['ARCHIVED', t('properties:filter.archived')],
             ] as const).map(([value, label]) => (
               <button
                 key={value}
@@ -413,7 +416,7 @@ export default function Imoveis() {
             <Input
               value={search}
               onChange={e => handleSearch(e.target.value)}
-              placeholder="Pesquisar imóvel, localização…"
+              placeholder={t('properties:searchPlaceholder')}
               className="pl-8 h-9 text-sm rounded-full border-border/60 bg-background"
             />
           </div>
@@ -431,22 +434,22 @@ export default function Imoveis() {
               <thead>
                 <tr className="border-b bg-muted/30">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Imóvel
+                    {t('properties:table.property')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Referência
+                    {t('properties:table.reference')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Estado
+                    {t('properties:table.status')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Preço
+                    {t('properties:table.price')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Detalhes
+                    {t('properties:table.details')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Candidatos
+                    {t('properties:table.candidates')}
                   </th>
                   <th className="px-4 py-3 w-12" />
                 </tr>
@@ -462,11 +465,11 @@ export default function Imoveis() {
                           <Home className="w-5 h-5 text-muted-foreground/50" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-foreground">Nenhum imóvel encontrado</p>
+                          <p className="text-sm font-semibold text-foreground">{t('properties:noProperties')}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {search || statusFilter !== 'ALL'
-                              ? 'Tenta ajustar os filtros de pesquisa.'
-                              : 'Adiciona o teu primeiro imóvel para começar.'}
+                              ? t('properties:noPropertiesFilter')
+                              : t('properties:noPropertiesHint')}
                           </p>
                         </div>
                         {!search && statusFilter === 'ALL' && (
@@ -474,14 +477,14 @@ export default function Imoveis() {
                             isOwner ? (
                             <Button size="sm" onClick={() => navigate('/onboarding/upgrade')} className="gap-1.5 rounded-full mt-1 font-semibold bg-accent text-accent-foreground hover:bg-accent/90 border-0 shadow-sm">
                               <Sparkles className="w-3 h-3" />
-                              Fazer upgrade
+                              {t('properties:upgrade')}
                             </Button>
                             ) : (
-                              <p className="text-xs text-muted-foreground mt-1">Contacte o proprietário para fazer upgrade.</p>
+                              <p className="text-xs text-muted-foreground mt-1">{t('properties:contactOwnerUpgrade')}</p>
                             )
                           ) : (
                             <Button size="sm" onClick={() => setAddOpen(true)} className="gap-2 rounded-full mt-1">
-                              <Plus className="w-3.5 h-3.5" /> Adicionar imóvel
+                              <Plus className="w-3.5 h-3.5" /> {t('properties:addProperty')}
                             </Button>
                           )
                         )}
@@ -509,7 +512,7 @@ export default function Imoveis() {
           {!loading && filtered.length > PAGE_SIZE && (
             <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/20">
               <p className="text-xs text-muted-foreground">
-                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length} imóveis
+                {t('properties:pagination.showing', { from: (page - 1) * PAGE_SIZE + 1, to: Math.min(page * PAGE_SIZE, filtered.length), total: filtered.length })}
               </p>
               <div className="flex items-center gap-1">
                 <Button

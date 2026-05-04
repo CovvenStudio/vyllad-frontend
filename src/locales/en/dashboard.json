@@ -1,0 +1,228 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "properties": "Properties",
+    "agents": "Agents",
+    "appointments": "Appointments",
+    "billing": "Billing",
+    "settings": "Settings",
+    "scoring": "Scoring",
+    "screening": "Screening",
+    "signOut": "Sign out"
+  },
+  "trialBanner": {
+    "expired": "Trial expired today",
+    "daysLeft_one": "{{count}} day left in trial",
+    "daysLeft_other": "{{count}} days left in trial",
+    "upgrade": "Upgrade Plan"
+  },
+  "leads": {
+    "title": "Candidates",
+    "score": "Score",
+    "urgency": "Urgency",
+    "status": "Status",
+    "selectProperty": "Select property",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "empty": "No candidates found with the current filters.",
+    "emptyAgent": "No candidates found.",
+    "atLimit": "Only 1 lead until this property's limit",
+    "atLimit_other": "{{count}} leads until this property's limit",
+    "buyLeads": "Buy leads",
+    "limitWarning": "Increase capacity before losing candidates.",
+    "limitUpgrade": "Upgrade to not miss candidates.",
+    "contactOwnerLimit": "Contact the owner to increase the limit."
+  },
+  "priority": {
+    "contactNow": "Contact now",
+    "evaluate": "Evaluate",
+    "deprioritize": "Deprioritize",
+    "topToday": "Top 5 today",
+    "highPriority": "High priority",
+    "readyNow": "Ready now",
+    "avgScore": "Average score",
+    "scheduledVisits": "Scheduled visits"
+  },
+  "insights": {
+    "excellent": "Excellent financial and employment profile",
+    "excellentUrgent": "Excellent profile · ready to close",
+    "excellentSoon": "Excellent profile · available soon",
+    "goodUrgent": "Good profile · high urgency",
+    "reasonable": "Reasonable profile · no immediate urgency",
+    "medium": "Profile with medium compatibility with this property",
+    "low": "Low compatibility with criteria",
+    "petsLow": "Pets · low compatibility with this property",
+    "guaranteeLow": "Insufficient guarantees for this property",
+    "incomeLow": "Income below recommended minimum",
+    "actionUrgent": "High urgency to move — don't waste time.",
+    "actionExcellent": "Highest conversion probability. Contact first.",
+    "actionLow": "Low compatibility with criteria. Save your energy.",
+    "actionContract": "Property already reserved"
+  },
+  "propertyBanner": {
+    "limit": "Contact the owner to upgrade.",
+    "agentNoProperties": "No properties assigned to this agent.",
+    "contractedError": "Another lead already has a signed contract for this property."
+  },
+  "detailSheet": {
+    "title": "Profile",
+    "income": "Income",
+    "incomeRatio": "Rent ratio",
+    "people": "People",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people",
+    "pets": "Pets",
+    "job": "Employment",
+    "jobDuration": "In role for",
+    "jobDuration_months_one": "{{count}} month",
+    "jobDuration_months_other": "{{count}} months",
+    "jobDuration_years_one": "{{count}} year",
+    "jobDuration_years_other": "{{count}} years",
+    "guarantor": "Guarantor",
+    "availability": "Availability",
+    "nationality": "Nationality",
+    "residency": "Resident for",
+    "stayDuration": "Intended stay",
+    "hasVisited": "Already visited properties?",
+    "motivation": "Motivation",
+    "customQuestions": "Custom questions",
+    "contact": "Contact",
+    "actions": {
+      "approve": "Approve candidate",
+      "reject": "Reject",
+      "schedule": "Schedule visit",
+      "sendLink": "Send visit link",
+      "sendingLink": "Sending...",
+      "linkSent": "Email sent!",
+      "linkError": "Error sending email",
+      "visitConfirmed": "Visit confirmed"
+    },
+    "scores": {
+      "d1": "D1 · Financial Capacity",
+      "d2": "D2 · Risk Profile",
+      "d3": "D3 · Guarantees",
+      "d4": "D4 · Fit & Intent"
+    },
+    "urgency": {
+      "immediate": "Urgent",
+      "soon": "Soon",
+      "flexible": "Flexible"
+    },
+    "diagnosis": "Diagnosis",
+    "scoreSection": "Score breakdown",
+    "employment": {
+      "permanent": "Permanent contract",
+      "contract": "Fixed-term contract",
+      "freelancer": "Self-employed",
+      "student": "Student",
+      "retired": "Retired",
+      "other": "Other"
+    },
+    "whyText": {
+      "financeSolid": "solid financial capacity",
+      "financeWeak": "financial capacity below ideal",
+      "jobStable": "high job stability",
+      "jobRisk": "high employment risk",
+      "guaranteesAbove": "guarantees above required",
+      "guaranteesInsufficient": "insufficient guarantees",
+      "moveNow": "ready to move now",
+      "noUrgency": "no urgency to move",
+      "medium": "Profile with average compatibility with this property"
+    }
+  },
+  "xray": {
+    "title": "X-Ray",
+    "ignored": "Factor ignored — does not count towards score",
+    "finalScore": "Composite final score",
+    "thresholds": "Thresholds: Excellent ≥{{excellent}} · Potential ≥{{potential}} · Low <{{potential}}",
+    "withinLimit": "within the limit (max. {{max}} people)",
+    "slightlyAbove": "slightly above the limit (max. {{max}})",
+    "exceeds": "exceeds the maximum allowed ({{max}} people)",
+    "petsAllowed": "allowed in this property",
+    "petsNotAllowed": "not allowed in this property",
+    "commitmentsDeclared": "Declared commitments: {{amount}}",
+    "incomeNote": "Income €{{income}}/mo ÷ rent €{{rent}} = {{ratio}}× — {{verdict}}",
+    "commitmentsNote": "Commitments €{{amount}}/mo = {{pct}}% of income — {{verdict}}",
+    "noGuarantorRequired": "Guarantor not required for this property",
+    "exemptPermanent": "Exempt — permanent contract waives guarantor",
+    "noGuarantorAlternative": "No guarantor — advance alternative accepted by property",
+    "noGuarantorRequired2": "No guarantor — required by property and not provided",
+    "noCommitments": "No monthly commitments declared"
+  },
+  "header": {
+    "loading": "Preparing dashboard",
+    "loadingDesc": "Loading property, listings and candidates.",
+    "properties": "Properties",
+    "paused": "Paused",
+    "propertiesActive": "{{active}} / {{max}} active properties",
+    "upgrade": "Upgrade",
+    "newProperty": "New property",
+    "contactOwnerUpgrade": "Contact the owner to upgrade."
+  },
+  "propertySelector": {
+    "active": "Active",
+    "closed": "Closed",
+    "viewPage": "View page",
+    "edit": "Edit property",
+    "pause": "Pause",
+    "resume": "Resume",
+    "close": "Close",
+    "rented": "Property rented",
+    "archived": "Remove property",
+    "noPropertiesClosed": "No closed properties."
+  },
+  "visits": {
+    "confirmed": "Confirmed visits"
+  },
+  "stats": {
+    "candidates": "Candidates",
+    "candidatesSub": "total",
+    "highPrioritySub": "to contact",
+    "scheduledVisitsSub": "confirmed",
+    "avgScoreSub": "of candidates"
+  },
+  "insightsPanel": {
+    "toIgnore": "To ignore",
+    "empty": "No leads in this category."
+  },
+  "filters": {
+    "allScores": "All scores",
+    "highScore": "High priority (80+)",
+    "midScore": "Medium (60\u201379)",
+    "lowScore": "Low (<60)",
+    "allUrgency": "All urgency",
+    "urgent": "Urgent",
+    "soon": "Soon",
+    "flexible": "Flexible",
+    "allStatus": "All statuses",
+    "filterNew": "New",
+    "filterApproved": "Approved",
+    "filterVisit": "Visit scheduled",
+    "filterRejected": "Rejected"
+  },
+  "candidatesTitle": "All candidates",
+  "pagination": {
+    "showing": "{{from}}\u2013{{to}} of {{total}} candidates"
+  },
+  "limitBanner": {
+    "hiddenTitle_one": "{{count}} candidate hidden by lead limit",
+    "hiddenTitle_other": "{{count}} candidates hidden by lead limit",
+    "hiddenDesc": "Your plan is at the limit of {{limit}} leads for this property.",
+    "atLimitTitle": "Lead limit reached",
+    "atLimitDesc": "New candidates will not be received until you increase capacity.",
+    "nearLimitDesc": "Increase capacity before losing candidates."
+  },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "schedule": "Schedule",
+    "reschedule": "Reschedule",
+    "complete": "Complete",
+    "contract": "Close Contract",
+    "revert": "Revert",
+    "urgentBadge": "Now",
+    "approvedBadge": "Approved",
+    "visitBadge": "Visit scheduled",
+    "urgentLabel": "Urgent"
+  }
+}

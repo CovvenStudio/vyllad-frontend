@@ -1,0 +1,110 @@
+{
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "months": {
+    "jan": "January",
+    "feb": "February",
+    "mar": "March",
+    "apr": "April",
+    "may": "May",
+    "jun": "June",
+    "jul": "July",
+    "aug": "August",
+    "sep": "September",
+    "oct": "October",
+    "nov": "November",
+    "dec": "December"
+  },
+  "timePeriods": {
+    "morning": "Morning",
+    "afternoon": "Early afternoon",
+    "evening": "End of day"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Remove",
+    "add": "Add",
+    "send": "Send",
+    "back": "Back",
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "upgrade": "Upgrade",
+    "subscribe": "Subscribe",
+    "changePlan": "Change plan",
+    "download": "Download PDF",
+    "viewInvoice": "View invoice",
+    "managePortal": "Manage billing",
+    "close": "Close"
+  },
+  "status": {
+    "new": "New",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "active": "Active",
+    "contacted": "Contacted",
+    "qualified": "Qualified",
+    "contracted": "Contract signed",
+    "visitScheduled": "Visit scheduled",
+    "visitCancelled": "Visit cancelled",
+    "visitFinished": "Visit completed"
+  },
+  "roles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "agent": "Agent"
+  },
+  "yesNo": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "animals": {
+    "dog": "Dog",
+    "cat": "Cat",
+    "rabbit": "Rabbit",
+    "fish": "Fish",
+    "bird": "Bird",
+    "hamster": "Hamster",
+    "reptile": "Reptile"
+  },
+  "errors": {
+    "generic": "Error",
+    "tryAgain": "Please try again.",
+    "loading": "Error loading data.",
+    "contactOwner": "Contact the owner to upgrade."
+  },
+  "loading": "Loading...",
+  "empty": "—",
+  "copied": "Copied",
+  "linkCopied": "Link copied!",
+  "optional": "(optional)",
+  "months": "months",
+  "agents": {
+    "invite": "Invite agent",
+    "gmailOnly": "Only @gmail.com addresses are accepted.",
+    "emailGmail": "Gmail email",
+    "role": "Role",
+    "phone": "Phone",
+    "sendingInvite": "Sending invite…",
+    "sendInvite": "Send invite",
+    "editAgent": "Edit agent",
+    "errorInvite": "Error inviting agent.",
+    "errorSave": "Error saving.",
+    "roles": {
+      "MANAGER": "Manager",
+      "AGENT": "Collaborator",
+      "managerDesc": "Can manage properties and appointments",
+      "agentDesc": "Basic read-only access"
+    }
+  }
+}

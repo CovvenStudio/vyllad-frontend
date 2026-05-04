@@ -1,0 +1,166 @@
+{
+  "title": "Faturamento",
+  "subtitle": "Detalhes do seu plano e assinatura",
+  "subscription": {
+    "title": "Assinatura atual",
+    "plan": "Plano",
+    "noSubscription": "Nenhuma assinatura encontrada.",
+    "nextRenewal": "Próxima renovação",
+    "accessUntil": "Acesso até",
+    "trialEndsAt": "Teste termina em",
+    "cancelledWarning": "A assinatura está programada para ser cancelada no final do período atual.",
+    "agents": "agentes",
+    "activeProperties": "imóveis ativos",
+    "leadsPerProperty": "leads/imóvel",
+    "leadsPerPropertyExtra": "leads/imóvel (+ extra)"
+  },
+  "extraLeads": {
+    "title": "Leads extra por imóvel",
+    "max": "máx. 50",
+    "noExtra": "Sem leads extra",
+    "perPackage": "pacote",
+    "perMonth": "/mês",
+    "saveButton": "Salvar alterações",
+    "saving": "Salvando...",
+    "savedSuccess": "Leads extra salvos com sucesso.",
+    "changeInfo": "A alteração é imediata. O valor será ajustado ao tempo restante do mês atual.",
+    "errorSave": "Erro ao salvar leads extra.",
+    "leadsExtra": "+{{count}} leads extra"
+  },
+  "trialCta": {
+    "lastDay": "Último dia de trial!",
+    "expiredToday": "Seu trial expirou hoje",
+    "daysLeft_one": "Apenas {{count}} dia restante no trial",
+    "daysLeft_other": "Apenas {{count}} dias restantes no trial",
+    "inTrial": "Você está no período de teste",
+    "urgentMessage": "Assine agora para não perder o acesso à plataforma e manter todos os seus dados.",
+    "normalMessage": "Assine para continuar usando o vyllad sem interrupções.",
+    "normalMessageDate": "Seu trial termina em {{date}}. Assine para continuar usando o vyllad sem interrupções.",
+    "subscribe": "Assinar agora"
+  },
+  "invoices": {
+    "title": "Histórico de faturas",
+    "history": "Histórico de faturas",
+    "manageStripe": "Gerenciar no Stripe",
+    "upcoming": "Próxima fatura",
+    "upcomingCard": "Próxima fatura",
+    "chargeDate": "Data de cobrança",
+    "amount": "Valor",
+    "prorateNote": "Você alterou o plano no meio do período de faturação. O valor abaixo já inclui o ajuste pelos dias restantes do ciclo atual. Será cobrado na próxima data de renovação.",
+    "empty": "Nenhuma fatura disponível.",
+    "noUpcoming": "Sem fatura prevista."
+  },
+  "status": {
+    "active": "Ativa",
+    "trialing": "Em Período de Teste",
+    "past_due": "Pagamento em Atraso",
+    "cancelled": "Cancelada",
+    "unpaid": "Em aberto",
+    "incomplete": "Incompleta",
+    "incomplete_expired": "Incompleta (expirada)",
+    "paused": "Pausada",
+    "uncollectible": "Incobrável",
+    "draft": "Rascunho"
+  },
+  "invoiceStatus": {
+    "paid": "Paga",
+    "open": "Em aberto",
+    "draft": "Rascunho",
+    "uncollectible": "Incobrável"
+  },
+  "errors": {
+    "loadSubscription": "Erro ao carregar dados de assinatura",
+    "openPortal": "Erro ao abrir portal de faturamento"
+  },
+  "plan": {
+    "contact": "Contatar",
+    "perMonth": "/mês",
+    "properties": "imóveis",
+    "candidatesPerProperty": "candidatos/imóvel",
+    "agents": "agentes",
+    "extraLeadsLabel": "Leads extra:",
+    "perLeads": "por {{count}} leads",
+    "perLead": "/lead"
+  },
+  "upgrade": {
+    "title": "Escolha o seu plano",
+    "subtitle": "Todos os planos incluem triagem automática de candidatos. Pode alterar ou cancelar a qualquer momento.",
+    "billingCountry": "País de faturamento:",
+    "loading": "Carregando planos…",
+    "changePlan": "Alterar plano",
+    "back": "Voltar",
+    "trialExpiredTitle": "Seu período de teste terminou",
+    "trialExpiredDesc": "Para continuar usando o Vyllad escolha um plano abaixo. Sua conta e dados estão preservados.",
+    "errorCheckout": "Erro ao iniciar checkout"
+  },
+  "plans": {
+    "trial": {
+      "name": "Trial",
+      "tagline": "Experimente sem compromisso",
+      "badge": "30 dias grátis",
+      "cta": "Experimentar grátis",
+      "features": [
+        "Gestão e listagem de imóveis",
+        "Triagem automática de candidatos",
+        "Score e classificação de candidatos",
+        "Agendamento de visitas online",
+        "Página pública de candidatura",
+        "Gestão de agentes e equipe",
+        "Insights detalhados por candidato"
+      ]
+    },
+    "basic": {
+      "name": "Basic",
+      "tagline": "Para imobiliárias em crescimento",
+      "badge": null,
+      "cta": "Começar agora",
+      "features": [
+        "Gestão e listagem de imóveis",
+        "Triagem automática de candidatos",
+        "Score e classificação de candidatos",
+        "Agendamento de visitas online",
+        "Página pública de candidatura",
+        "Gestão de agentes e equipe",
+        "Insights detalhados por candidato"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "Para equipes com volume",
+      "badge": "Mais popular",
+      "cta": "Começar com Pro",
+      "features": [
+        "Gestão e listagem de imóveis",
+        "Triagem automática de candidatos",
+        "Score e classificação de candidatos",
+        "Agendamento de visitas online",
+        "Página pública de candidatura",
+        "Gestão de agentes e equipe",
+        "Insights detalhados por candidato"
+      ]
+    },
+    "scale": {
+      "name": "Scale",
+      "tagline": "Solução empresarial sob medida",
+      "badge": "Empresarial",
+      "cta": "Falar com a equipe",
+      "features": [
+        "Gestão e listagem de imóveis",
+        "Triagem automática de candidatos",
+        "Score e classificação de candidatos",
+        "Agendamento de visitas online",
+        "Página pública de candidatura",
+        "Gestão de agentes e equipe",
+        "Insights detalhados por candidato"
+      ]
+    }
+  },
+  "checkoutReturn": {
+    "syncing": "Ativando assinatura…",
+    "syncingSubtitle": "Apenas um momento.",
+    "success": "Assinatura ativada!",
+    "successSubtitle": "Redirecionando para o painel…",
+    "error": "Quase lá…",
+    "errorSubtitle": "O pagamento foi processado. Redirecionando…"
+  }
+}

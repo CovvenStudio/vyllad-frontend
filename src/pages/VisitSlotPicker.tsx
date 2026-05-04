@@ -6,6 +6,7 @@ import {
   ChevronLeft, ChevronRight, Loader2, X, CalendarX2, RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useToast } from '@/hooks/use-toast';
 import {
   getVisitInfo,
@@ -564,6 +565,9 @@ export default function VisitSlotPicker() {
             )}
           </span>
         )}
+        <div className="ml-auto">
+          <LanguageSwitcher />
+        </div>
       </header>
 
       <main className="flex-1 flex items-start justify-center px-4 py-10">

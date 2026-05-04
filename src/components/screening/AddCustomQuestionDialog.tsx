@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +21,7 @@ interface Props {
 const CATEGORIES = ['Disponibilidade', 'Agregado Familiar', 'Animais', 'Financeiro', 'Intenção', 'Outro'];
 
 export default function AddCustomQuestionDialog({ open, question, onOpenChange, onSave, nextOrder }: Props) {
+  const { t } = useTranslation(['settings', 'common']);
   const isEdit = !!question;
 
   const [label, setLabel] = useState(question?.label ?? '');
@@ -74,17 +76,17 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
       <DialogContent className="max-w-md rounded-2xl overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="font-display text-lg font-700">
-            {isEdit ? 'Editar pergunta' : 'Nova pergunta'}
+            {isEdit ? t('settings:leadForm.dialog.editTitle') : t('settings:leadForm.dialog.newTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-1">
           {/* Label */}
           <div>
-            <Label className="text-xs font-medium">Pergunta *</Label>
+            <Label className="text-xs font-medium">{t('settings:leadForm.dialog.labelField')} *</Label>
             <Input
               className="mt-1 rounded-xl"
-              placeholder="Ex: Tem veículo próprio?"
+              placeholder={t('settings:leadForm.dialog.labelPlaceholder')}
               value={label}
               onChange={e => setLabel(e.target.value)}
               autoFocus
@@ -93,7 +95,7 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
 
           {/* Category */}
           <div>
-            <Label className="text-xs font-medium">Categoria</Label>
+            <Label className="text-xs font-medium">{t('settings:leadForm.dialog.categoryField')}</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger className="mt-1 rounded-xl">
                 <SelectValue />
@@ -108,16 +110,16 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
 
           {/* Type */}
           <div>
-            <Label className="text-xs font-medium">Tipo de resposta</Label>
+            <Label className="text-xs font-medium">{t('settings:leadForm.dialog.typeField')}</Label>
             <Select value={type} onValueChange={v => { setType(v as typeof type); setOptions([]); }}>
               <SelectTrigger className="mt-1 rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="single_choice">Escolha única</SelectItem>
-                <SelectItem value="multi_choice">Escolha múltipla</SelectItem>
-                <SelectItem value="boolean">Sim / Não</SelectItem>
-                <SelectItem value="text">Texto livre</SelectItem>
+                <SelectItem value="single_choice">{t('settings:leadForm.questionTypes.single_choice')}</SelectItem>
+                <SelectItem value="multi_choice">{t('settings:leadForm.questionTypes.multi_choice')}</SelectItem>
+                <SelectItem value="boolean">{t('settings:leadForm.questionTypes.boolean')}</SelectItem>
+                <SelectItem value="text">{t('settings:leadForm.questionTypes.text')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -132,11 +134,11 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
                 transition={{ duration: 0.15 }}
               >
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Opções * (mínimo 2)</Label>
+                  <Label className="text-xs font-medium">{t('settings:leadForm.dialog.optionsField')}</Label>
                   <div className="flex gap-2">
                     <Input
                       className="rounded-xl h-9 text-sm flex-1"
-                      placeholder="Adicionar opção..."
+                      placeholder={t('settings:leadForm.dialog.addOptionPlaceholder')}
                       value={optionInput}
                       onChange={e => setOptionInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addOption())}
@@ -164,10 +166,10 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
 
           {/* Description */}
           <div>
-            <Label className="text-xs font-medium text-muted-foreground">Descrição interna (opcional)</Label>
+            <Label className="text-xs font-medium text-muted-foreground">{t('settings:leadForm.dialog.descriptionField')}</Label>
             <Input
               className="mt-1 rounded-xl text-sm"
-              placeholder="Para uso interno da agência..."
+              placeholder={t('settings:leadForm.dialog.descriptionPlaceholder')}
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
@@ -176,8 +178,8 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
           {/* Required toggle */}
           <div className="flex items-center justify-between py-1">
             <div>
-              <p className="text-sm font-medium">Resposta obrigatória</p>
-              <p className="text-xs text-muted-foreground">Candidato não pode avançar sem responder</p>
+              <p className="text-sm font-medium">{t('settings:leadForm.dialog.requiredToggle')}</p>
+              <p className="text-xs text-muted-foreground">{t('settings:leadForm.dialog.requiredHint')}</p>
             </div>
             <Switch checked={required} onCheckedChange={setRequired} />
           </div>
@@ -185,10 +187,10 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
           {/* Actions */}
           <div className="flex gap-2 pt-2">
             <Button variant="outline" className="flex-1 rounded-xl" onClick={() => handleOpenChange(false)}>
-              Cancelar
+              {t('common:actions.cancel')}
             </Button>
             <Button className="flex-1 rounded-xl" disabled={!canSave} onClick={handleSave}>
-              {isEdit ? 'Guardar' : 'Adicionar'}
+              {isEdit ? t('common:actions.save') : t('common:actions.add')}
             </Button>
           </div>
         </div>

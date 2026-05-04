@@ -1,0 +1,103 @@
+{
+  "title": "Appointments",
+  "periods": {
+    "upcoming": "Upcoming",
+    "today": "Today",
+    "history": "History",
+    "pendingSchedule": "Awaiting scheduling",
+    "completed": "Completed",
+    "scheduled": "Upcoming visits"
+  },
+  "filters": {
+    "allProperties": "All properties",
+    "allAgents": "All agents"
+  },
+  "actions": {
+    "copySchedulingLink": "Copy scheduling link",
+    "sendVisitLink": "Send visit link by email",
+    "sendNewVisitLink": "Send new visit link",
+    "schedule": "Schedule",
+    "confirm": "Confirm",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel visit",
+    "complete": "Complete visit",
+    "finalize": "Finalize",
+    "closeContract": "Close contract",
+    "send": "Send",
+    "sendLink": "Send link"
+  },
+  "status": {
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "blocked": "Blocked"
+  },
+  "notesPlaceholder": "E.g.: bring income documents, guided tour of exterior…",
+  "candidate": "Candidate",
+  "toast": {
+    "contracted": "Contract signed! 🎉",
+    "contractedDesc": "{{name}} was marked as tenant of {{property}}.",
+    "scheduled": "Visit scheduled!",
+    "scheduledDesc": "{{date}} at {{time}}",
+    "rescheduled": "Rescheduling started",
+    "linkCopied": "Link copied!",
+    "shareLinkDesc": "Share with {{name}}.",
+    "emailSent": "Email sent!",
+    "emailSentDesc": "Visit link sent to {{name}}.",
+    "newEmailSentDesc": "New visit link sent to {{name}}.",
+    "slotBlocked": "Slot {{slot}} blocked",
+    "slotUnblocked": "Slot {{slot}} unblocked",
+    "visitFinalized": "Visit completed",
+    "visitFinalizedDesc": "{{name}} — {{date}}",
+    "visitCancelled": "Visit cancelled",
+    "visitCancelledDesc": "{{date}} at {{time}}",
+    "errorCancel": "Error cancelling",
+    "errorFinish": "Error completing visit",
+    "errorReschedule": "Error rescheduling",
+    "errorContract": "Error signing contract.",
+    "errorEmail": "Error sending email",
+    "errorBlockUpdate": "Could not update block",
+    "errorSchedule": "Error scheduling visit.",
+    "noToken": "This candidate doesn't have a visit token yet. Approve them first.",
+    "contractReverted": "Candidate moved back to approved list to schedule a new visit."
+  },
+  "attention": "Attention",
+  "modal": {
+    "title": "Schedule visit",
+    "candidatePrefs": "Candidate preferences",
+    "clickToUse": "(click to use)",
+    "showingPeriod": "Showing slots for period \"{{label}}\" ({{start}}–{{end}})",
+    "visitDate": "Visit date",
+    "timeLabel": "Time slot",
+    "noSlots": "No time slots available for this date/period.",
+    "blockTitle": "Manual slot blocking",
+    "blockHint": "Use this to close a time slot before reaching the visit limit.",
+    "updating": "Updating...",
+    "blocked": "Blocked",
+    "occupancy": "Occupancy {{current}}/{{max}}",
+    "agentLabel": "Responsible agent",
+    "notesLabel": "Notes",
+    "optional": "(optional)",
+    "confirmButton": "Schedule visit"
+  },
+  "relTime": {
+    "mins": "{{count}}min ago",
+    "hours": "{{count}}h ago",
+    "day": "1 day ago",
+    "days": "{{count}} days ago"
+  },
+  "card": {
+    "noAppointments": "No appointments",
+    "candidateSlots": "Candidate preferences received",
+    "linkSent": "Link sent {{time}}",
+    "visitCancelled": "Visit cancelled",
+    "agentRole": "Agent",
+    "proposes": "Proposes {{date}} at {{time}}",
+    "contracted": "Contract signed"
+  },
+  "page": {
+    "subtitle": "Confirmed visits and history",
+    "loading": "Loading appointments…",
+    "pendingSection": "Approved candidates — awaiting scheduling"
+  }
+}

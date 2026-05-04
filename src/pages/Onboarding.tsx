@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronLeft, ChevronDown, Loader2, Building2, MapPin, Users, FileText, Zap, BarChart3, Link2, Calendar, Star, Clock, SendHorizonal, Mail } from 'lucide-react';
 import { StepConfirm } from '@/components/onboarding/StepConfirm';
@@ -37,17 +39,15 @@ const BRAZIL_STATES = [
 ];
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
-const STEPS = [
-  { key: 'plan', label: 'Plano' },
-  { key: 'agency', label: 'Imobiliária' },
-  { key: 'confirm', label: 'Confirmação' },
-];
+const STEP_KEYS = ['plan', 'agency', 'confirm'] as const;
 
 function StepIndicator({ current }: { current: string }) {
-  const currentIdx = STEPS.findIndex((s) => s.key === current);
+  const { t } = useTranslation('onboarding');
+  const steps = STEP_KEYS.map((key) => ({ key, label: t(`steps.${key}`) }));
+  const currentIdx = steps.findIndex((s) => s.key === current);
   return (
     <div className="flex items-center gap-0 mb-12">
-      {STEPS.map((step, i) => (
+      {steps.map((step, i) => (
         <div key={step.key} className="flex items-center">
           <div className={cn(
             'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300',
@@ -65,7 +65,7 @@ function StepIndicator({ current }: { current: string }) {
             )}
             {step.label}
           </div>
-          {i < STEPS.length - 1 && (
+          {i < steps.length - 1 && (
             <div className={cn(
               'w-8 h-px mx-1 transition-colors duration-300',
               i < currentIdx ? 'bg-muted-foreground/40' : 'bg-border'
@@ -113,8 +113,12 @@ function PlanCard({
   trialAllowedAt?: string | null;
   onRequestTrial?: () => void;
 }) {
+  const { t } = useTranslation(['billing', 'onboarding']);
   const isTrial = plan.id === 'trial';
   const isScale = plan.id === 'scale';
+
+  const translatedBadge = plan.badge ? t(`plans.${plan.id}.badge`) : null;
+  const translatedFeatures = t(`plans.${plan.id}.features`, { returnObjects: true }) as string[];
 
   // Trial gate states
   const trialApproved = isTrial && !!trialAllowedAt;
@@ -154,7 +158,7 @@ function PlanCard({
       )}
     >
       {/* Badge */}
-      {plan.badge && (
+      {translatedBadge && (
         <span className={cn(
           'absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-semibold tracking-wide whitespace-nowrap',
           plan.highlighted
@@ -163,54 +167,54 @@ function PlanCard({
             ? 'bg-accent text-accent-foreground'
             : 'bg-muted text-muted-foreground',
         )}>
-          {plan.badge}
+          {translatedBadge}
         </span>
       )}
 
       {/* Header */}
       <div>
-        <p className="font-display text-base font-700 tracking-tight">{plan.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
+        <p className="font-display text-base font-700 tracking-tight">{t(`billing:plans.${plan.id}.name`)}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{t(`billing:plans.${plan.id}.tagline`)}</p>
       </div>
 
       {/* Price */}
       <div className="flex items-baseline gap-1">
         {plan.billing === 'contact' ? (
-          <span className="font-display text-xl font-600">Contactar</span>
+          <span className="font-display text-xl font-600">{t('onboarding:plan.contact')}</span>
         ) : isTrial ? (
           <>
-            <span className="font-display text-3xl font-700 tracking-tight">Grátis</span>
-            <span className="text-xs text-muted-foreground">/ {plan.limits.trialDays} dias</span>
+            <span className="font-display text-3xl font-700 tracking-tight">{t('onboarding:plan.free')}</span>
+            <span className="text-xs text-muted-foreground">{t('onboarding:plan.perDays', { count: plan.limits.trialDays ?? 30 })}</span>
           </>
         ) : (
           <>
             <span className="font-display text-3xl font-700 tracking-tight">{currencySymbol}{displayPrice}</span>
-            <span className="text-xs text-muted-foreground">/mês</span>
+            <span className="text-xs text-muted-foreground">{t('onboarding:plan.perMonth')}</span>
           </>
         )}
       </div>
 
       {/* Limits summary */}
       {!isScale && (
-        <div className="grid grid-cols-3 divide-x divide-border/60 py-3 border-y border-border/60">
-          <div className="flex flex-col items-center justify-between gap-1 px-6">
-            <p className="font-display text-lg font-700 leading-none">{plan.limits.properties ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground text-center leading-tight">imóveis</p>
+        <div className="flex flex-col divide-y divide-border/60 py-2 border-y border-border/60">
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('onboarding:plan.properties')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.properties ?? '∞'}</p>
           </div>
-          <div className="flex flex-col items-center justify-between gap-1 px-6">
-            <p className="font-display text-lg font-700 leading-none">{plan.limits.candidatesPerProperty ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground text-center leading-tight">cand./imóvel</p>
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('onboarding:plan.candidatesPerProperty')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.candidatesPerProperty ?? '∞'}</p>
           </div>
-          <div className="flex flex-col items-center justify-between gap-1 px-6">
-            <p className="font-display text-lg font-700 leading-none">{plan.limits.agents ?? '∞'}</p>
-            <p className="text-[10px] text-muted-foreground text-center leading-tight">agentes</p>
+          <div className="flex items-center justify-between py-2 px-1">
+            <p className="text-xs text-muted-foreground">{t('onboarding:plan.agents')}</p>
+            <p className="font-display text-sm font-700">{plan.limits.agents ?? '∞'}</p>
           </div>
         </div>
       )}
 
       {/* Features */}
       <ul className="space-y-1.5 flex-1">
-        {plan.features.map((f) => (
+        {translatedFeatures.map((f) => (
           <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
             <span className="mt-0.5 text-accent shrink-0">{getFeatureIcon(f)}</span>
             {f}
@@ -222,7 +226,7 @@ function PlanCard({
       {trialPending ? (
         <div className="h-8 rounded-lg flex items-center justify-center gap-1.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
           <Clock className="w-3 h-3" />
-          Aguarda aprovação
+          {t('onboarding:plan.pendingApproval')}
         </div>
       ) : trialLocked ? (
         <button
@@ -231,7 +235,7 @@ function PlanCard({
           className="h-8 rounded-lg flex items-center justify-center gap-1.5 text-xs font-medium w-full bg-accent/10 text-accent border border-accent/30 hover:bg-accent/20 transition-colors cursor-pointer"
         >
           <SendHorizonal className="w-3 h-3" />
-          Solicitar Trial
+          {t('onboarding:plan.requestTrial')}
         </button>
       ) : (
         <div className={cn(
@@ -241,9 +245,9 @@ function PlanCard({
             : 'bg-muted/60 text-muted-foreground',
         )}>
           {selected ? (
-            <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> Selecionado</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> {t('onboarding:plan.selected')}</span>
           ) : (
-            plan.cta
+            t(`billing:plans.${plan.id}.cta`)
           )}
         </div>
       )}
@@ -261,6 +265,7 @@ function StepPlan({
   onBillingCountryChange: (c: BillingCountry) => void;
   onSelect: (plan: Plan) => void;
 }) {
+  const { t } = useTranslation('onboarding');
   const { plans, loading } = usePlans();
   const { countries, loading: countriesLoading } = useBillingCountries();
   const { user } = useAuth();
@@ -327,30 +332,30 @@ function StepPlan({
               {/* Headline */}
               <div className="space-y-3">
                 <h1 className="font-display text-2xl tracking-tight text-foreground">
-                  Pedido enviado com sucesso!
+                  {t('plan.trialSuccess.title')}
                 </h1>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  O teu acesso trial está quase aqui — só precisamos de validar o teu pedido.
+                  {t('plan.trialSuccess.subtitle')}
                 </p>
               </div>
 
               {/* Details card */}
               <div className="rounded-xl border border-border bg-card p-5 text-left space-y-3">
                 <p className="text-sm text-foreground leading-relaxed">
-                  A nossa equipa vai analisar o teu pedido e entrar em contacto em breve.
+                  {t('plan.trialSuccess.body1')}
                 </p>
                 <p className="text-sm text-foreground leading-relaxed">
-                  Durante o trial terás acesso completo à plataforma — imóveis, triagem automática e relatórios.
+                  {t('plan.trialSuccess.body2')}
                 </p>
                 <p className="text-sm font-medium text-accent">
-                  Normalmente aprovamos em menos de 24 horas. ⚡
+                  {t('plan.trialSuccess.body3')}
                 </p>
               </div>
 
               {/* Email notice */}
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Mail className="h-3.5 w-3.5" />
-                Vais receber um email quando o acesso for ativado.
+                {t('plan.trialSuccess.emailNotice')}
               </div>
 
               {/* Back button */}
@@ -359,7 +364,7 @@ function StepPlan({
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-transparent py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-muted"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Voltar aos planos
+                {t('plan.trialSuccess.backToPlans')}
               </button>
             </motion.div>
           </motion.div>
@@ -367,16 +372,15 @@ function StepPlan({
       </AnimatePresence>
 
       <h1 className="font-display text-3xl font-700 tracking-tight mb-2">
-        Escolha o seu plano
+        {t('plan.title')}
       </h1>
-      <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-        Todos os planos incluem triagem automática de candidatos.<br />
-        Pode alterar ou cancelar a qualquer momento.
+      <p className="text-muted-foreground text-sm mb-6 leading-relaxed whitespace-pre-line">
+        {t('plan.subtitle')}
       </p>
 
       {/* Billing country selector */}
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-sm text-muted-foreground">País de faturação:</span>
+        <span className="text-sm text-muted-foreground">{t('plan.billingCountry')}</span>
         <BillingCountrySelect
           countries={countries}
           value={billingCountry}
@@ -388,7 +392,7 @@ function StepPlan({
       {loading ? (
         <div className="flex items-center gap-3 text-muted-foreground">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-sm">A carregar planos…</span>
+          <span className="text-sm">{t('plan.loading')}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
@@ -428,13 +432,14 @@ function StepAgency({
   onSubmit: (data: AgencySetup) => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation(['onboarding', 'common']);
   const isBR = billingCountry?.countryCode === 'BR';
   const isPT = !billingCountry || billingCountry.countryCode === 'PT';
 
-  const regionLabel  = isPT ? 'Distrito'   : isBR ? 'Estado'  : 'Região';
-  const cityLabel    = isPT ? 'Concelho'   : isBR ? 'Cidade'  : 'Cidade';
-  const regionPlaceholder = isPT ? 'Selecione o distrito' : isBR ? 'Selecione o estado' : 'Região';
-  const cityPlaceholder   = isPT ? 'Ex: Lisboa'           : isBR ? 'Ex: São Paulo'       : 'Cidade';
+  const regionLabel  = isPT ? t('onboarding:agency.district') : isBR ? t('onboarding:agency.state')  : t('onboarding:agency.region');
+  const cityLabel    = isPT ? t('onboarding:agency.county')   : t('onboarding:agency.city');
+  const regionPlaceholder = isPT ? t('onboarding:agency.districtPlaceholder') : isBR ? t('onboarding:agency.statePlaceholder') : t('onboarding:agency.regionPlaceholder');
+  const cityPlaceholder   = isPT ? t('onboarding:agency.countyPlaceholder')   : t('onboarding:agency.cityPlaceholder');
   const useSelectForRegion = isPT || isBR;
   const regionOptions = isPT ? PORTUGAL_DISTRICTS : isBR ? BRAZIL_STATES : [];
 
@@ -469,14 +474,14 @@ function StepAgency({
         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
-        Voltar
+        {t('common:actions.back')}
       </button>
 
       <h1 className="font-display text-3xl font-700 tracking-tight mb-2">
-        Configure a sua imobiliária
+        {t('onboarding:agency.title')}
       </h1>
       <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-        Isto ajuda a personalizar os critérios de qualificação para a sua região.
+        {t('onboarding:agency.subtitle')}
       </p>
 
       {/* Selected country badge */}
@@ -492,11 +497,11 @@ function StepAgency({
         <div className="space-y-1.5">
           <Label htmlFor="agency-name" className="text-sm font-medium flex items-center gap-1.5">
             <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-            Nome da imobiliária
+            {t('onboarding:agency.name')}
           </Label>
           <Input
             id="agency-name"
-            placeholder="Ex: Ribeiro & Associados"
+            placeholder={t('onboarding:agency.namePlaceholder')}
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             className="h-11 rounded-xl"
@@ -561,7 +566,7 @@ function StepAgency({
           disabled={!valid}
           className="w-full h-11 rounded-xl font-medium mt-2"
         >
-          Continuar
+          {t('onboarding:agency.submit')}
         </Button>
       </form>
     </div>
@@ -570,6 +575,7 @@ function StepAgency({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 const Onboarding = () => {
+  const { t } = useTranslation('onboarding');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { step, selectedPlanId, agency, billingCountry, submitting, selectPlan, selectBillingCountry, submitAgency, goBack, confirm } =
@@ -608,7 +614,10 @@ const Onboarding = () => {
             <span className="font-display text-xl font-700 tracking-tight">vyllad</span>
             <span className="text-accent text-xl">.</span>
           </div>
-          <span className="text-xs text-muted-foreground">Configuração inicial</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">{t('onboarding:header')}</span>
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 

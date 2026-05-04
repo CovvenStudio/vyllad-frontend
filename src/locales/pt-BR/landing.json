@@ -1,0 +1,147 @@
+{
+  "navbar": {
+    "pricing": "Preços",
+    "start": "Comece já"
+  },
+  "hero": {
+    "badge": "Plataforma de arrendamento inteligente",
+    "headline1": "O próximo",
+    "headline2": "inquilino ideal",
+    "headline3": "já existe.",
+    "tagline1": "Do lead a visita,",
+    "tagline2": "sem esforço.",
+    "sub": "Qualificação automática, scoring por candidato e visitas agendadas.",
+    "ctaStart": "Comece de graça",
+    "ctaDemo": "Ver demonstração",
+    "scoreCard": {
+      "name": "Ana Ferreira",
+      "label": "Candidata aprovada"
+    },
+    "visitCard": {
+      "label": "Visita marcada",
+      "time": "Amanhã · 10:00",
+      "location": "T2 · Campo de Ourique"
+    },
+    "statsCard": {
+      "period": "Hoje",
+      "value": "12",
+      "label": "candidatos qualificados"
+    },
+    "propertyCard": {
+      "location": "Lisboa, Chiado",
+      "price": "€3.200 / mês",
+      "stats": "T3 · 8 candidatos · 3 aprovados"
+    }
+  },
+  "showcase": {
+    "tag": "O problema real",
+    "headline1": "O arrendamento está",
+    "headline2": "a custar-lhe",
+    "headline3": "mais do que pensa.",
+    "pain": [
+      {
+        "stat": "3h+",
+        "label": "por imóvel",
+        "description": "É o tempo médio que um proprietário gasta a filtrar candidatos manualmente — por cada imóvel, por cada ciclo."
+      },
+      {
+        "stat": "60%",
+        "label": "não qualificam",
+        "description": "Seis em cada dez candidatos falham nos critérios básicos. E só percebe isso depois de horas de conversa."
+      },
+      {
+        "stat": "€0",
+        "label": "de retorno no esforço",
+        "description": "Triagem manual não escala. Cada mensagem, cada chamada — tempo que nunca recupera."
+      }
+    ],
+    "bridge": "O vyllad elimina tudo isto — automaticamente, desde o primeiro candidato."
+  },
+  "features": {
+    "tag": "Como funciona",
+    "headline1": "Tudo o que precisa.",
+    "headline2": "Nada que não precisa.",
+    "sub": "Uma plataforma construída especificamente para quem gere imóveis em Portugal — sem excessos, sem curva de aprendizagem.",
+    "items": [
+      {
+        "title": "Imóvel publicado em 2 minutos",
+        "description": "Título, preço, critérios e link de referência. Sem extração automática, sem dependências — está no ar antes de terminar o café."
+      },
+      {
+        "title": "Formulário que filtra sozinho",
+        "description": "Candidatos respondem apenas o que importa. Sem conta, sem fricção — menos de 60 segundos. Os que não cumprem os critérios ficam de fora automaticamente."
+      },
+      {
+        "title": "Score implacável de 0 a 100",
+        "description": "Renda, estabilidade profissional, adequação ao imóvel. Cada candidato pontuado e ordenado. Você decide apenas o top 3."
+      },
+      {
+        "title": "Visitas que se agendam sozinhas",
+        "description": "Candidatos aprovados escolhem o horário disponível. Zero troca de mensagens, zero confusão. A agenda gere-se a si própria."
+      },
+      {
+        "title": "As suas regras, aplicadas sempre",
+        "description": "Renda mínima, caução, fiador, animais — defina uma vez. O formulário adapta-se e filtra automaticamente. Nenhuma exceção passa."
+      },
+      {
+        "title": "Dashboard que decide por si",
+        "description": "Todos os candidatos, ordenados por score, com estado em tempo real. O que demoraria 4 horas agora dura 4 minutos."
+      }
+    ]
+  },
+  "howItWorks": {
+    "tag": "Processo",
+    "headline1": "Do anúncio à visita marcada.",
+    "headline2": "Em 4 passos.",
+    "steps": [
+      {
+        "title": "Registe o imóvel",
+        "description": "Título, preço e critérios em menos de 2 minutos. Sem formulários longos, sem configuração técnica.",
+        "detail": "Renda mínima, caução, fiador — defina as regras uma vez e nunca mais pense nelas."
+      },
+      {
+        "title": "Partilhe a página",
+        "description": "Cada imóvel tem uma URL elegante e profissional. Substitua o link de contacto no anúncio ou partilhe diretamente.",
+        "detail": "Os candidatos não precisam de conta. Menos fricção = mais candidaturas reais."
+      },
+      {
+        "title": "O sistema qualifica",
+        "description": "Cada candidato é avaliado automaticamente: renda, estabilidade, adequação. Score de 0 a 100, em segundos.",
+        "detail": "Candidatos que não cumprem os critérios ficam sinalizados. Você concentra-se nos que importam."
+      },
+      {
+        "title": "Aprove e agende",
+        "description": "Com um clique, os candidatos aprovados recebem disponibilidade para visita. Escolhem o horário, confirmam — e aparecem.",
+        "detail": "Sem mensagens de WhatsApp às 22h. Sem \"afinal não posso ir\". Sem surpresas."
+      }
+    ]
+  },
+  "pricing": {
+    "tag": "Preços",
+    "headline1": "Simples. Transparente.",
+    "headline2": "Sem surpresas.",
+    "sub": "Comece grátis. Pague apenas quando precisar de mais. Sem contratos, sem taxas escondidas.",
+    "billingCountry": "País de faturação:",
+    "loading": "A carregar planos…",
+    "properties": "imóveis",
+    "candidatesPerProperty": "candidatos/imóvel",
+    "agents": "agentes",
+    "perMonth": "/mês",
+    "free": "Grátis",
+    "trialDays": "/ {{count}} dias",
+    "contact": "Contactar",
+    "cancel": "Pode cancelar ou alterar o plano a qualquer momento."
+  },
+  "cta": {
+    "tag": "Sem cartão. Sem compromisso.",
+    "headline1": "O próximo inquilino perfeito",
+    "headline2": "está a um clique.",
+    "sub": "Cada dia sem o vyllad é mais uma hora perdida com candidatos que nunca iriam fechar.",
+    "ctaStart": "Comece de graça",
+    "ctaDemo": "Ver demonstração",
+    "trust": "Trial gratuito · Sem cartão · Cancele quando quiser"
+  },
+  "footer": {
+    "rights": "© 2026 Vyllad. Todos os direitos reservados."
+  }
+}

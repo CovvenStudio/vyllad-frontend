@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 const Navbar = () => {
+  const { t } = useTranslation('landing');
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -40,7 +43,7 @@ const Navbar = () => {
                 : 'text-white/70 hover:text-white'
             }`}
           >
-            Preços
+            {t('navbar.pricing')}
           </a>
           <Link to="/login">
             <Button
@@ -51,9 +54,10 @@ const Navbar = () => {
                   : 'bg-white text-foreground hover:bg-white/90 border-0 shadow-none'
               }`}
             >
-              Comece já
+              {t('navbar.start')}
             </Button>
           </Link>
+          <LanguageSwitcher />
         </div>
       </div>
     </nav>

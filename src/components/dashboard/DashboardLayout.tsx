@@ -4,30 +4,33 @@ import { Building2, Calendar, UserCog, LogOut, Menu, ChevronsUpDown, ClipboardLi
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 const ROLE_LABEL: Record<string, string> = { OWNER: 'Proprietário', MANAGER: 'Gerente', AGENT: 'Colaborador' };
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true, featureKey: 'dashboard.module_enabled' },
-  { to: '/properties', icon: Home, label: 'Imóveis', featureKey: 'properties.module_enabled' },
-  { to: '/agents', icon: UserCog, label: 'Agentes', featureKey: 'agents.management_enabled' },
-  { to: '/appointments', icon: Calendar, label: 'Agendamentos', featureKey: 'appointments.module_enabled' },
-  { to: '/screening', icon: ClipboardList, label: 'Triagem', featureKey: 'screening.module_enabled' },
+  { to: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard', end: true, featureKey: 'dashboard.module_enabled' },
+  { to: '/properties', icon: Home, labelKey: 'nav.properties', featureKey: 'properties.module_enabled' },
+  { to: '/agents', icon: UserCog, labelKey: 'nav.agents', featureKey: 'agents.management_enabled' },
+  { to: '/appointments', icon: Calendar, labelKey: 'nav.appointments', featureKey: 'appointments.module_enabled' },
+  { to: '/screening', icon: ClipboardList, labelKey: 'nav.screening', featureKey: 'screening.module_enabled' },
 ];
 
 const managerNavItems = [
-  { to: '/scoring', icon: SlidersHorizontal, label: 'Qualificação', featureKey: 'scoring.module_enabled' },
-  { to: '/settings', icon: Settings2, label: 'Configurações', featureKey: 'settings.module_enabled' },
+  { to: '/scoring', icon: SlidersHorizontal, labelKey: 'nav.scoring', featureKey: 'scoring.module_enabled' },
+  { to: '/settings', icon: Settings2, labelKey: 'nav.settings', featureKey: 'settings.module_enabled' },
 ];
 
 const ownerNavItems = [
-  { to: '/billing', icon: CreditCard, label: 'Faturação', featureKey: 'billing.module_enabled' },
+  { to: '/billing', icon: CreditCard, labelKey: 'nav.billing', featureKey: 'billing.module_enabled' },
 ];
 
 function NavContent({ onNav }: { onNav?: () => void }) {
   const navigate = useNavigate();
   const { user, memberships, currentAgencyId, subscription, signOut } = useAuth();
   const { isEnabled } = useFeatureFlags();
+  const { t } = useTranslation('dashboard');
   const [avatarError, setAvatarError] = useState(false);
 
   const currentAgency = memberships.find((m) => m.agencyId === currentAgencyId) ?? null;
@@ -80,7 +83,7 @@ function NavContent({ onNav }: { onNav?: () => void }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold truncate">{currentAgency.agencyName}</p>
-              <p className="text-[10px] text-muted-foreground">{ROLE_LABEL[currentAgency.role] ?? currentAgency.role}</p>
+            <p className="text-[10px] text-muted-foreground">{ROLE_LABEL[currentAgency.role] ?? currentAgency.role}</p>
             </div>
             {hasMultipleAgencies && <ChevronsUpDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
           </button>
@@ -105,7 +108,7 @@ function NavContent({ onNav }: { onNav?: () => void }) {
             }
           >
             <item.icon className="w-[18px] h-[18px]" />
-            {item.label}
+            {t(item.labelKey)}
           </NavLink>
         ))}
       </nav>
@@ -128,10 +131,8 @@ function NavContent({ onNav }: { onNav?: () => void }) {
                 trialDaysLeft <= 2 ? 'text-red-700' : trialDaysLeft <= 5 ? 'text-amber-700' : 'text-foreground'
               }`}>
                 {trialDaysLeft === 0
-                  ? 'Trial expirado hoje'
-                  : trialDaysLeft === 1
-                  ? '1 dia restante no trial'
-                  : `${trialDaysLeft} dias restantes no trial`}
+                  ? t('trialBanner.expired')
+                  : t('trialBanner.daysLeft', { count: trialDaysLeft })}
               </p>
             </div>
             <button
@@ -145,7 +146,7 @@ function NavContent({ onNav }: { onNav?: () => void }) {
               }`}
             >
             <Crown className="w-3 h-3" />
-              Fazer Upgrade
+              {t('trialBanner.upgrade')}
             </button>
           </div>
         )}
@@ -173,12 +174,15 @@ function NavContent({ onNav }: { onNav?: () => void }) {
             </div>
           </div>
         )}
+        <div className="px-3 pb-1">
+          <LanguageSwitcher className="w-full justify-center" />
+        </div>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors w-full px-3 py-2"
         >
           <LogOut className="w-4 h-4" />
-          Sair
+          {t('nav.signOut')}
         </button>
       </div>
     </div>

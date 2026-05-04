@@ -1,0 +1,166 @@
+{
+  "title": "Billing",
+  "subtitle": "Your plan and subscription details",
+  "subscription": {
+    "title": "Current subscription",
+    "plan": "Plan",
+    "noSubscription": "No subscription found.",
+    "nextRenewal": "Next renewal",
+    "accessUntil": "Access until",
+    "trialEndsAt": "Trial ends on",
+    "cancelledWarning": "The subscription is scheduled to be cancelled at the end of the current period.",
+    "agents": "agents",
+    "activeProperties": "active properties",
+    "leadsPerProperty": "leads/property",
+    "leadsPerPropertyExtra": "leads/property (+ extra)"
+  },
+  "extraLeads": {
+    "title": "Extra leads per property",
+    "max": "max. 50",
+    "noExtra": "No extra leads",
+    "perPackage": "package",
+    "perMonth": "/month",
+    "saveButton": "Save changes",
+    "saving": "Saving...",
+    "savedSuccess": "Extra leads saved successfully.",
+    "changeInfo": "Changes take effect immediately. Amount adjusted for remaining days in current month.",
+    "errorSave": "Error saving extra leads.",
+    "leadsExtra": "+{{count}} extra leads"
+  },
+  "trialCta": {
+    "lastDay": "Last day of trial!",
+    "expiredToday": "Your trial expired today",
+    "daysLeft_one": "Only {{count}} day left in trial",
+    "daysLeft_other": "Only {{count}} days left in trial",
+    "inTrial": "You are in the trial period",
+    "urgentMessage": "Subscribe now to keep access to the platform and all your data.",
+    "normalMessage": "Subscribe to keep using vyllad without interruptions.",
+    "normalMessageDate": "Your trial ends on {{date}}. Subscribe to keep using vyllad without interruptions.",
+    "subscribe": "Subscribe now"
+  },
+  "invoices": {
+    "title": "Invoice history",
+    "history": "Invoice history",
+    "manageStripe": "Manage in Stripe",
+    "upcoming": "Next invoice",
+    "upcomingCard": "Next invoice",
+    "chargeDate": "Charge date",
+    "amount": "Amount",
+    "prorateNote": "You changed plans mid-billing period. The amount below already includes the adjustment for the remaining days of the current cycle. This will be charged on the next renewal date.",
+    "empty": "No invoices available.",
+    "noUpcoming": "No upcoming invoice."
+  },
+  "status": {
+    "active": "Active",
+    "trialing": "In Trial Period",
+    "past_due": "Payment Overdue",
+    "cancelled": "Cancelled",
+    "unpaid": "Unpaid",
+    "incomplete": "Incomplete",
+    "incomplete_expired": "Incomplete (expired)",
+    "paused": "Paused",
+    "uncollectible": "Uncollectible",
+    "draft": "Draft"
+  },
+  "invoiceStatus": {
+    "paid": "Paid",
+    "open": "Open",
+    "draft": "Draft",
+    "uncollectible": "Uncollectible"
+  },
+  "errors": {
+    "loadSubscription": "Error loading subscription data",
+    "openPortal": "Error opening billing portal"
+  },
+  "plan": {
+    "contact": "Contact us",
+    "perMonth": "/month",
+    "properties": "properties",
+    "candidatesPerProperty": "candidates/property",
+    "agents": "agents",
+    "extraLeadsLabel": "Extra leads:",
+    "perLeads": "per {{count}} leads",
+    "perLead": "/lead"
+  },
+  "upgrade": {
+    "title": "Choose your plan",
+    "subtitle": "All plans include automatic candidate screening. You can change or cancel at any time.",
+    "billingCountry": "Billing country:",
+    "loading": "Loading plans…",
+    "changePlan": "Change plan",
+    "back": "Back",
+    "trialExpiredTitle": "Your trial period has ended",
+    "trialExpiredDesc": "To continue using Vyllad choose a plan below. Your account and data are preserved.",
+    "errorCheckout": "Error starting checkout"
+  },
+  "plans": {
+    "trial": {
+      "name": "Trial",
+      "tagline": "Try it with no commitment",
+      "badge": "30 days free",
+      "cta": "Start free trial",
+      "features": [
+        "Property management & listings",
+        "Automatic tenant screening",
+        "Tenant scoring & ranking",
+        "Online visit scheduling",
+        "Public application page",
+        "Agent & team management",
+        "Detailed per-candidate insights"
+      ]
+    },
+    "basic": {
+      "name": "Basic",
+      "tagline": "For growing agencies",
+      "badge": null,
+      "cta": "Get started",
+      "features": [
+        "Property management & listings",
+        "Automatic tenant screening",
+        "Tenant scoring & ranking",
+        "Online visit scheduling",
+        "Public application page",
+        "Agent & team management",
+        "Detailed per-candidate insights"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "For high-volume teams",
+      "badge": "Most popular",
+      "cta": "Start with Pro",
+      "features": [
+        "Property management & listings",
+        "Automatic tenant screening",
+        "Tenant scoring & ranking",
+        "Online visit scheduling",
+        "Public application page",
+        "Agent & team management",
+        "Detailed per-candidate insights"
+      ]
+    },
+    "scale": {
+      "name": "Scale",
+      "tagline": "Enterprise solution, tailored for you",
+      "badge": "Enterprise",
+      "cta": "Talk to the team",
+      "features": [
+        "Property management & listings",
+        "Automatic tenant screening",
+        "Tenant scoring & ranking",
+        "Online visit scheduling",
+        "Public application page",
+        "Agent & team management",
+        "Detailed per-candidate insights"
+      ]
+    }
+  },
+  "checkoutReturn": {
+    "syncing": "Activating subscription…",
+    "syncingSubtitle": "Just a moment.",
+    "success": "Subscription activated!",
+    "successSubtitle": "Redirecting to dashboard…",
+    "error": "Almost there…",
+    "errorSubtitle": "Payment processed. Redirecting…"
+  }
+}

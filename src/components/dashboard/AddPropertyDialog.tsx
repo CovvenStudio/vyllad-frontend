@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -29,6 +30,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
   const { agents } = useAgents();
   const { create } = useProperties();
   const { toast } = useToast();
+  const { t } = useTranslation(['properties', 'common']);
 
   const [step, setStep] = useState<Step>('info');
   const [submitting, setSubmitting] = useState(false);
@@ -87,8 +89,8 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
       });
       setStep('done');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao criar imóvel.';
-      toast({ title: 'Erro', description: msg, variant: 'destructive' });
+      const msg = err instanceof Error ? err.message : t('properties:dialog.add.error');
+      toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
@@ -114,19 +116,19 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
       <DialogContent className="sm:max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sticky top-0 bg-background z-10 pb-2 border-b pr-10">
           <DialogTitle className="font-display">
-            {step === 'info' && 'Novo imóvel'}
-            {step === 'criteria' && 'Critérios de candidatura'}
-            {step === 'agents' && 'Agentes responsáveis'}
-            {step === 'done' && 'Imóvel criado!'}
+            {step === 'info' && t('properties:dialog.add.title')}
+            {step === 'criteria' && t('properties:criteria.title')}
+            {step === 'agents' && t('properties:dialog.fields.agents')}
+            {step === 'done' && t('properties:dialog.add.success')}
           </DialogTitle>
         </DialogHeader>
 
         {step === 'info' && (
           <div className="space-y-4 pt-2 pb-4">
             <div>
-              <Label className="text-sm font-medium">Título do anúncio *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.title')} *</Label>
               <Input
-                placeholder="Ex: T2 renovado em Campo de Ourique"
+                placeholder={t('properties:dialog.fields.titlePlaceholder')}
                 value={propertyInfo.title}
                 onChange={(e) => setPropertyInfo(p => ({ ...p, title: e.target.value }))}
                 className="mt-1"
@@ -134,9 +136,9 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">ID de referência *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.reference')} *</Label>
               <Input
-                placeholder="Ex: IMV-2024-001"
+                placeholder={t('properties:dialog.fields.referencePlaceholder')}
                 value={propertyInfo.referenceId}
                 onChange={(e) => setPropertyInfo(p => ({ ...p, referenceId: e.target.value }))}
                 className="mt-1"
@@ -144,9 +146,9 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Link do anúncio *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.announcementLink')} *</Label>
               <Input
-                placeholder="https://idealista.pt/..."
+                placeholder={t('properties:dialog.fields.announcementLinkPlaceholder')}
                 value={propertyInfo.announcementLink}
                 onChange={(e) => setPropertyInfo(p => ({ ...p, announcementLink: e.target.value }))}
                 className="mt-1"
@@ -154,7 +156,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Valor do arrendamento *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.rentalValue')} *</Label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">€</span>
                 <Input
@@ -165,13 +167,13 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
                   className="pl-7"
                 />
               </div>
-              <p className="text-[11px] text-muted-foreground mt-1">Serve de base para cálculo dos adiantamentos e cauções</p>
+              <p className="text-[11px] text-muted-foreground mt-1">{t('properties:dialog.fields.rentalHint')}</p>
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Localização <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.location')} <span className="text-muted-foreground font-normal">{t('common:optional')}</span></Label>
               <Input
-                placeholder="Ex: Campo de Ourique, Lisboa"
+                placeholder={t('properties:dialog.fields.locationPlaceholder')}
                 value={propertyInfo.location}
                 onChange={(e) => setPropertyInfo(p => ({ ...p, location: e.target.value }))}
                 className="mt-1"
@@ -179,7 +181,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Disponível a partir de <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.availableFrom')} <span className="text-muted-foreground font-normal">{t('common:optional')}</span></Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -193,7 +195,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
                     <span className="flex-1 text-left">
                       {availableFrom
                         ? format(availableFrom, "d 'de' MMMM 'de' yyyy", { locale: pt })
-                        : 'Selecionar data'}
+                        : t('properties:dialog.fields.selectDate')}
                     </span>
                     {availableFrom && (
                       <span
@@ -222,9 +224,9 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Descrição <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.description')} <span className="text-muted-foreground font-normal">{t('common:optional')}</span></Label>
               <textarea
-                placeholder="Descreva características especiais do imóvel..."
+                placeholder={t('properties:dialog.fields.descriptionPlaceholder')}
                 value={propertyInfo.description}
                 onChange={(e) => setPropertyInfo(p => ({ ...p, description: e.target.value }))}
                 rows={3}
@@ -237,7 +239,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
               disabled={!propertyInfo.title || !propertyInfo.referenceId || !propertyInfo.announcementLink || !propertyInfo.rentalPrice}
               className="w-full rounded-lg font-semibold"
             >
-              Continuar
+              {t('common:actions.continue')}
             </Button>
           </div>
         )}
@@ -251,29 +253,29 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium">Renda mínima (€)</Label>
+                <Label className="text-xs font-medium">{t('properties:criteria.minIncome')}</Label>
                 <Input type="number" placeholder="2400" value={criteria.minIncome} onChange={(e) => setCriteria(p => ({ ...p, minIncome: e.target.value }))} className="mt-1" />
               </div>
               <div>
-                <Label className="text-xs font-medium">Máx. pessoas</Label>
+                <Label className="text-xs font-medium">{t('properties:criteria.maxPeople')}</Label>
                 <Input type="number" placeholder="3" value={criteria.maxPeople} onChange={(e) => setCriteria(p => ({ ...p, maxPeople: e.target.value }))} className="mt-1" />
               </div>
               <div>
-                <Label className="text-xs font-medium">Adiantamento (meses)</Label>
+                <Label className="text-xs font-medium">{t('properties:criteria.advance')}</Label>
                 <Input type="number" value={criteria.advanceMonths} onChange={(e) => setCriteria(p => ({ ...p, advanceMonths: e.target.value }))} className="mt-1" />
               </div>
               <div>
-                <Label className="text-xs font-medium">Caução (meses)</Label>
+                <Label className="text-xs font-medium">{t('properties:criteria.deposit')}</Label>
                 <Input type="number" value={criteria.depositMonths} onChange={(e) => setCriteria(p => ({ ...p, depositMonths: e.target.value }))} className="mt-1" />
               </div>
             </div>
 
             <div>
-              <Label className="text-xs font-medium mb-2 block">Animais de estimação</Label>
+              <Label className="text-xs font-medium mb-2 block">{t('properties:criteria.pets')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { value: false, label: 'Não permitido', Icon: Ban },
-                  { value: true, label: 'Permitido', Icon: PawPrint },
+                  { value: false, label: t('properties:dialog.fields.petsNotAllowed'), Icon: Ban },
+                  { value: true, label: t('properties:dialog.fields.petsAllowed'), Icon: PawPrint },
                 ].map(({ value, label, Icon }) => {
                   const sel = criteria.petsAllowed === value;
                   return (
@@ -304,7 +306,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
                   >
                     <div className="pt-3">
                       <p className="text-xs text-muted-foreground mb-2">
-                        Que tipos são permitidos? <span className="text-muted-foreground/60">(opcional)</span>
+                        {t('properties:criteria.petTypesLabel')} <span className="text-muted-foreground/60">{t('common:optional')}</span>
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {[
@@ -337,7 +339,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
                         })}
                       </div>
                       {criteria.allowedPetTypes.length === 0 && (
-                        <p className="text-xs text-muted-foreground/60 mt-2">Nenhum selecionado = todos permitidos</p>
+                        <p className="text-xs text-muted-foreground/60 mt-2">{t('properties:criteria.petTypesNone')}</p>
                       )}
                     </div>
                   </motion.div>
@@ -346,20 +348,20 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
             </div>
 
             <div className="flex items-center justify-between py-2">
-              <Label className="text-xs font-medium">Fiador necessário</Label>
+              <Label className="text-xs font-medium">{t('properties:criteria.guarantorRequired')}</Label>
               <Switch checked={criteria.guarantorRequired} onCheckedChange={(v) => setCriteria(p => ({ ...p, guarantorRequired: v }))} />
             </div>
 
             {criteria.guarantorRequired && (
               <div className="p-3 rounded-lg bg-muted/50 border space-y-3">
-                <p className="text-xs font-medium text-muted-foreground">Valores sem fiador</p>
+                <p className="text-xs font-medium text-muted-foreground">{t('properties:criteria.noGuarantorValues')}</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs">Adiantamento s/ fiador (meses)</Label>
+                    <Label className="text-xs">{t('properties:criteria.advanceNoGuarantor')}</Label>
                     <Input type="number" value={criteria.advanceWithoutGuarantor} onChange={(e) => setCriteria(p => ({ ...p, advanceWithoutGuarantor: e.target.value }))} className="mt-1" />
                   </div>
                   <div>
-                    <Label className="text-xs">Caução s/ fiador (meses)</Label>
+                    <Label className="text-xs">{t('properties:criteria.depositNoGuarantor')}</Label>
                     <Input type="number" value={criteria.depositWithoutGuarantor} onChange={(e) => setCriteria(p => ({ ...p, depositWithoutGuarantor: e.target.value }))} className="mt-1" />
                   </div>
                 </div>
@@ -368,10 +370,10 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
 
             <div className="grid grid-cols-2 gap-2 pt-2">
               <Button onClick={() => setStep('info')} variant="outline" className="rounded-lg font-semibold">
-                Voltar
+                {t('common:actions.back')}
               </Button>
               <Button onClick={() => setStep('agents')} className="rounded-lg font-semibold">
-                Continuar
+                {t('common:actions.continue')}
               </Button>
             </div>
           </div>
@@ -415,21 +417,21 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
                 );
               })}
               {agents.filter(a => a.role !== 'OWNER').length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">Nenhum agente disponível.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t('properties:criteria.noAgents')}</p>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Selecione um ou mais agentes responsáveis por este imóvel.</p>
+            <p className="text-xs text-muted-foreground">{t('properties:criteria.agentsHint')}</p>
 
             <div className="grid grid-cols-2 gap-2 pt-2">
               <Button onClick={() => setStep('criteria')} variant="outline" className="rounded-lg font-semibold">
-                Voltar
+                {t('common:actions.back')}
               </Button>
               <Button
                 onClick={handleCreate}
                 disabled={submitting}
                 className="rounded-lg font-semibold"
               >
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar imóvel'}
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : t('properties:dialog.add.submit')}
               </Button>
             </div>
           </div>
@@ -438,9 +440,9 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
         {step === 'done' && (
           <div className="py-8 text-center">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <h3 className="font-display text-lg font-bold mb-2">Imóvel criado com sucesso!</h3>
-            <p className="text-sm text-muted-foreground mb-6">O imóvel está ativo e pronto para receber candidaturas.</p>
-            <Button onClick={handleClose} className="rounded-lg font-semibold">Fechar</Button>
+            <h3 className="font-display text-lg font-bold mb-2">{t('properties:dialog.add.successTitle')}</h3>
+            <p className="text-sm text-muted-foreground mb-6">{t('properties:dialog.add.successDesc')}</p>
+            <Button onClick={handleClose} className="rounded-lg font-semibold">{t('common:actions.close')}</Button>
           </div>
         )}
       </DialogContent>

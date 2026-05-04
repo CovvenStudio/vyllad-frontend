@@ -1,0 +1,72 @@
+{
+  "header": "Configuração inicial",
+  "steps": {
+    "plan": "Plano",
+    "agency": "Imobiliária",
+    "confirm": "Confirmação"
+  },
+  "plan": {
+    "title": "Escolha o seu plano",
+    "subtitle": "Todos os planos incluem triagem automática de candidatos.\nPode alterar ou cancelar a qualquer momento.",
+    "billingCountry": "País de faturamento:",
+    "loading": "Carregando planos…",
+    "properties": "imóveis",
+    "candidatesPerProperty": "candidatos/imóvel",
+    "agents": "agentes",
+    "contact": "Contatar",
+    "free": "Grátis",
+    "perMonth": "/mês",
+    "perDays": "/ {{count}} dias",
+    "selected": "Selecionado",
+    "requestTrial": "Solicitar Trial",
+    "pendingApproval": "Aguarda aprovação",
+    "trialSuccess": {
+      "title": "Pedido enviado com sucesso!",
+      "subtitle": "Seu acesso trial está quase aqui — só precisamos validar o seu pedido.",
+      "body1": "Nossa equipe vai analisar o seu pedido e entrar em contato em breve.",
+      "body2": "Durante o trial você terá acesso completo à plataforma — imóveis, triagem automática e relatórios.",
+      "body3": "Normalmente aprovamos em menos de 24 horas. ⚡",
+      "emailNotice": "Você receberá um email quando o acesso for ativado.",
+      "backToPlans": "Voltar aos planos"
+    }
+  },
+  "agency": {
+    "title": "Configure sua imobiliária",
+    "subtitle": "Isso ajuda a personalizar os critérios de qualificação para a sua região.",
+    "name": "Nome da imobiliária",
+    "namePlaceholder": "Ex: Silva Imóveis",
+    "district": "Distrito",
+    "state": "Estado",
+    "region": "Região",
+    "county": "Município",
+    "city": "Cidade",
+    "districtPlaceholder": "Selecione o distrito",
+    "statePlaceholder": "Selecione o estado",
+    "regionPlaceholder": "Região",
+    "countyPlaceholder": "Ex: Lisboa",
+    "cityPlaceholder": "Ex: São Paulo",
+    "submit": "Continuar"
+  },
+  "confirm": {
+    "title": "Confirmar assinatura",
+    "submit": "Confirmar e começar",
+    "submitting": "Criando conta…",
+    "subtitle": "Revise os detalhes antes de começar.",
+    "agency": "Imobiliária",
+    "plan": "Plano",
+    "trialFree": "{{count}} mês grátis",
+    "contact": "A combinar",
+    "free": "Grátis",
+    "afterTrial": "após trial: {{price}}/mês",
+    "pricePerMonth": "{{price}}/mês",
+    "extraLeads": "Leads extra",
+    "perExtraLead": "por lead adicional",
+    "extraLeadsNote": "Disponível após atingir o limite do plano",
+    "cancelNote": "Você pode cancelar ou alterar o plano a qualquer momento.",
+    "submitPay": "Confirmar e pagar",
+    "submitTrial": "Experimentar grátis",
+    "submitScale": "Falar com a equipe",
+    "settingUp": "Configurando…",
+    "wait": "Aguarde…"
+  }
+}

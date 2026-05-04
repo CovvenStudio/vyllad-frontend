@@ -167,9 +167,16 @@ export function commitmentsVerdict(pct: number, thresholds: number[] = [20, 40, 
 }
 
 // ── Public helpers ────────────────────────────────────────────────────────────
+// These are thin wrappers — the source of truth is now the JSON locale files.
+// Kept as standalone functions so all existing call sites remain unchanged.
+// For new code, prefer using useTranslation('scoring') directly.
 
-export function tLevel(label: string):       string { return LEVEL_LABELS[label]    ?? label; }
-export function tCategory(label: string):    string { return CATEGORY_LABELS[label] ?? label; }
-export function tFactor(label: string):      string { return FACTOR_LABELS[label]   ?? label; }
-export function tOptionValue(value: string): string { return OPTION_VALUES[value]   ?? value; }
-export function tVerdict(verdict: string):   string { return VERDICTS[verdict]      ?? verdict; }
+import i18n from '@/lib/i18n';
+
+const ns = 'scoring';
+
+export function tLevel(label: string):       string { return i18n.t(`${ns}:levels.${label}`,    { defaultValue: LEVEL_LABELS[label]    ?? label }); }
+export function tCategory(label: string):    string { return i18n.t(`${ns}:categories.${label}`, { defaultValue: CATEGORY_LABELS[label] ?? label }); }
+export function tFactor(label: string):      string { return i18n.t(`${ns}:factors.${label}`,   { defaultValue: FACTOR_LABELS[label]   ?? label }); }
+export function tOptionValue(value: string): string { return i18n.t(`${ns}:options.${value}`,   { defaultValue: OPTION_VALUES[value]   ?? value }); }
+export function tVerdict(verdict: string):   string { return i18n.t(`${ns}:verdicts.${verdict}`, { defaultValue: VERDICTS[verdict]      ?? verdict }); }

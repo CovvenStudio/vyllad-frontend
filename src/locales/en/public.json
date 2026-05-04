@@ -1,0 +1,180 @@
+{
+  "visit": {
+    "title": "Schedule a visit",
+    "subtitle": "Choose a date and time that works for you",
+    "noSlots": "No availability",
+    "noSlotsDesc": "No time slots available for this property.",
+    "slotSelected": "Selected",
+    "slotAvailable": "Available",
+    "slotFull": "Full",
+    "submitPreferences": "Send preferences",
+    "submitSuccess": "Visit request sent!",
+    "submitSubtitle": "The agent will confirm shortly.",
+    "errorSend": "Error sending preferences. Please try again.",
+    "errorReschedule": "Error rescheduling. Please try again.",
+    "errorCancel": "Error cancelling. Please try again."
+  },
+  "booking": {
+    "title": "Visit confirmed",
+    "description": "Your visit request was successfully submitted."
+  },
+  "form": {
+    "disclaimer": {
+      "title": "Property application",
+      "description": "Before continuing, confirm you have read the property details and meet the application criteria.",
+      "responsibilityTitle": "Responsibility for data accuracy",
+      "body1": "By filling in this form, you declare that all information provided is true and up to date. Any inconsistency or inaccuracy in the data provided may harm your application or result in your elimination from the process.",
+      "body2": "If you have additional information that you consider relevant to your application, you can share it in the last step of the form.",
+      "guarantorNote": "Without a guarantor, the entry values are adjusted according to the property criteria."
+    },
+    "pets": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "bird": "Bird",
+      "rabbit": "Rabbit",
+      "fish": "Fish",
+      "reptile": "Reptile",
+      "hamster": "Hamster"
+    },
+    "guarantorSection": {
+      "title": "Estimated entry values",
+      "advance": "Advance ({{count}} months)",
+      "deposit": "Deposit ({{count}} months)",
+      "total": "Estimated total"
+    },
+    "contact": {
+      "title": "Contact details",
+      "name": "Full name",
+      "namePlaceholder": "John Smith",
+      "email": "Email",
+      "phone": "Phone",
+      "notes": "Additional notes (optional)",
+      "notesPlaceholder": "E.g.: I'm available for visits on weekends. I have a recommendation letter from my previous landlord...",
+      "submit": "Submit application",
+      "submitting": "Submitting...",
+      "errorSubmit": "Error submitting application. Please try again."
+    },
+    "steps": {
+      "skip": "Skip (optional) →",
+      "next": "Continue",
+      "back": "Back",
+      "urgency": {
+        "title": "When do you plan to move?",
+        "immediately": "Immediately",
+        "within15": "Within 15 days",
+        "within1month": "Within 1 month",
+        "justBrowsing": "Just browsing"
+      },
+      "household": {
+        "title": "Who will live in the property?",
+        "onlyMe": "Just me",
+        "2people": "2 people",
+        "3people": "3 people",
+        "4orMore": "4 or more"
+      },
+      "pets": {
+        "title": "Will you bring pets?",
+        "yes": "Yes, I have pets",
+        "no": "No pets",
+        "count": "How many?",
+        "types": "Pet types"
+      },
+      "income": {
+        "title": "Household net monthly income (€)?",
+        "placeholder": "E.g.: 2500"
+      },
+      "commitments": {
+        "title": "Total fixed monthly commitments (€)?",
+        "placeholder": "E.g.: 300"
+      },
+      "job": {
+        "title": "Employment situation?",
+        "permanent": "Permanent contract",
+        "fixedTerm": "Fixed-term contract",
+        "selfEmployed": "Self-employed",
+        "student": "Student",
+        "betweenJobs": "Between jobs",
+        "other": "Other",
+        "descPlaceholder": "Describe your employment situation..."
+      },
+      "employmentDuration": {
+        "title": "How long have you been in this situation?",
+        "under6": "Less than 6 months",
+        "6to12": "6 to 12 months",
+        "1to3years": "1 to 3 years",
+        "over3years": "More than 3 years"
+      },
+      "guarantor": {
+        "title": "Do you have a guarantor available?",
+        "yes": "Yes, I have one",
+        "no": "No guarantor"
+      },
+      "hasVisited": {
+        "title": "Have you recently visited any properties?",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "stayDuration": {
+        "title": "How long do you intend to stay?",
+        "under1year": "Less than 1 year",
+        "1to2years": "1 to 2 years",
+        "2to3years": "2 to 3 years",
+        "3plus": "3 or more years"
+      },
+      "motivation": {
+        "title": "What are you mainly looking for?",
+        "workRelocation": "Work relocation",
+        "betterPrice": "Better price",
+        "betterLocation": "Better location",
+        "other": "Other reason",
+        "answer": "What is your main reason?",
+        "placeholder": "Your answer..."
+      },
+      "nationality": {
+        "title": "What is your nationality?",
+        "search": "Search country..."
+      },
+      "residencyDuration": {
+        "under1year": "Less than 1 year",
+        "1to3years": "1 to 3 years",
+        "3to5years": "3 to 5 years",
+        "over5years": "More than 5 years"
+      }
+    }
+  },
+  "property": {
+    "notFound": "Property not found",
+    "backToHome": "Back to home",
+    "back": "Back",
+    "perMonth": "/month",
+    "availableFrom": "Available from",
+    "viewListing": "View listing",
+    "description": "Description",
+    "conditionsTitle": "Rental conditions",
+    "apply": "Apply for a visit",
+    "applyHint": "Quick process — less than 60 seconds",
+    "applicationTitle": "Application",
+    "garage": "🅿️ Garage",
+    "elevator": "🛗 Elevator",
+    "criteria": {
+      "minIncome": "Min. income",
+      "maxPeople": "Max. people",
+      "pets": "Pets",
+      "petTypes": "Pet types",
+      "petsAllowed": "✅ Allowed",
+      "petsNotAllowed": "❌ Not allowed",
+      "guarantor": "Guarantor",
+      "guarantorRequired": "Required",
+      "guarantorNotRequired": "Not required",
+      "advance": "Advance",
+      "deposit": "Deposit",
+      "advanceNoGuarantor": "Advance w/o guarantor",
+      "depositNoGuarantor": "Deposit w/o guarantor",
+      "minContract": "Min. contract",
+      "smoking": "Smoking",
+      "smokingAllowed": "✅ Allowed",
+      "smokingNotAllowed": "❌ Not allowed",
+      "months": "{{count}} months"
+    }
+  }
+}

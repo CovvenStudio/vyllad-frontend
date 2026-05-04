@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
 import { resolveFirstAccessibleLoggedRoute } from '@/lib/route-access';
 import heroVilla from '@/assets/hero-villa.jpg';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -22,6 +24,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const { isEnabled } = useFeatureFlags();
+  const { t } = useTranslation('auth');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +43,7 @@ const Login = () => {
         navigate('/select-agency', { replace: true });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao autenticar com o Google.');
+      setError(err instanceof Error ? err.message : t('invite.errorAuth'));
     } finally {
       setLoading(false);
     }
@@ -48,7 +51,7 @@ const Login = () => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
-    onError: () => setError('O login com Google foi cancelado ou falhou.'),
+    onError: () => setError(t('login.googleFailed')),
   });
 
   const handleGoogleClick = () => {
@@ -64,6 +67,7 @@ const Login = () => {
           <span className="font-display text-xl font-700 tracking-tight">vyllad</span>
           <span className="text-accent text-xl">.</span>
         </Link>
+        <LanguageSwitcher className="absolute top-8 right-8" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,9 +75,9 @@ const Login = () => {
           transition={{ duration: 0.6 }}
           className="w-full max-w-sm"
         >
-          <h1 className="font-display text-3xl font-700 tracking-tight mb-3">Bem-vindo</h1>
+          <h1 className="font-display text-3xl font-700 tracking-tight mb-3">{t('login.welcome')}</h1>
           <p className="text-muted-foreground text-sm mb-10 leading-relaxed">
-            Entre na sua conta de imobiliária para gerir os seus imóveis e candidatos.
+            {t('login.description')}
           </p>
 
           <Button
@@ -87,7 +91,7 @@ const Login = () => {
             ) : (
               <>
                 <GoogleIcon />
-                Continuar com Google
+                {t('login.signInGoogle')}
               </>
             )}
           </Button>
@@ -111,11 +115,11 @@ const Login = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
         <div className="absolute bottom-12 left-12 right-12 text-primary-foreground">
-          <p className="text-xs tracking-[0.2em] uppercase text-accent mb-3">Vyllad</p>
+          <p className="text-xs tracking-[0.2em] uppercase text-accent mb-3">{t('login.heroLabel')}</p>
           <p className="font-display text-2xl font-600 leading-tight max-w-md">
-            "A Vyllad transformou a forma como gerimos candidatos. Triagem 5× mais rápida."
+            {t('login.testimonial')}
           </p>
-          <p className="text-sm text-primary-foreground/60 mt-4">— Inês Carvalho, Real Estate</p>
+          <p className="text-sm text-primary-foreground/60 mt-4">{t('login.testimonialAuthor')}</p>
         </div>
       </div>
     </div>

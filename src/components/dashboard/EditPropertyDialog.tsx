@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -29,6 +30,7 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
   const { agents } = useAgents();
   const { update } = useProperties();
   const { toast } = useToast();
+  const { t } = useTranslation(['properties', 'common']);
 
   const [step, setStep] = useState<Step>('info');
   const [submitting, setSubmitting] = useState(false);
@@ -112,12 +114,12 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             : null,
         },
       });
-      toast({ title: 'Imóvel actualizado!' });
+      toast({ title: t('properties:dialog.edit.success') });
       onSaved?.(saved);
       onOpenChange(false);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao actualizar imóvel.';
-      toast({ title: 'Erro', description: msg, variant: 'destructive' });
+      const msg = err instanceof Error ? err.message : t('properties:dialog.edit.error');
+      toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
@@ -136,9 +138,9 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
       <DialogContent className="sm:max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sticky top-0 bg-background z-10 pb-2 border-b pr-10">
           <DialogTitle className="font-display">
-            {step === 'info' && 'Editar imóvel'}
-            {step === 'criteria' && 'Critérios de candidatura'}
-            {step === 'agents' && 'Agentes responsáveis'}
+            {step === 'info' && t('properties:dialog.edit.title')}
+            {step === 'criteria' && t('properties:criteria.title')}
+            {step === 'agents' && t('properties:dialog.fields.agents')}
           </DialogTitle>
           {/* step pills */}
           <div className="flex gap-1.5 pt-1">
@@ -162,9 +164,9 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
         {step === 'info' && (
           <div className="space-y-4 pt-2 pb-4">
             <div>
-              <Label className="text-sm font-medium">Título do anúncio *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.title')} *</Label>
               <Input
-                placeholder="Ex: T2 renovado em Campo de Ourique"
+                placeholder={t('properties:dialog.fields.titlePlaceholder')}
                 value={info.title}
                 onChange={e => setInfo(p => ({ ...p, title: e.target.value }))}
                 className="mt-1"
@@ -172,10 +174,10 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             </div>
             <div>
               <Label className="text-sm font-medium">
-                ID de referência <span className="text-muted-foreground font-normal">(opcional)</span>
+                {t('properties:dialog.fields.reference')} <span className="text-muted-foreground font-normal">({t('common:optional')})</span>
               </Label>
               <Input
-                placeholder="Ex: IMV-2024-001"
+                placeholder={t('properties:dialog.fields.referencePlaceholder')}
                 value={info.referenceId}
                 onChange={e => setInfo(p => ({ ...p, referenceId: e.target.value }))}
                 className="mt-1"
@@ -183,17 +185,17 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Link do anúncio <span className="text-muted-foreground font-normal">(opcional)</span>
+                {t('properties:dialog.fields.announcementLink')} <span className="text-muted-foreground font-normal">({t('common:optional')})</span>
               </Label>
               <Input
-                placeholder="https://idealista.pt/..."
+                placeholder={t('properties:dialog.fields.announcementLinkPlaceholder')}
                 value={info.announcementLink}
                 onChange={e => setInfo(p => ({ ...p, announcementLink: e.target.value }))}
                 className="mt-1"
               />
             </div>
             <div>
-              <Label className="text-sm font-medium">Valor do arrendamento *</Label>
+              <Label className="text-sm font-medium">{t('properties:dialog.fields.rentalValue')} *</Label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">€</span>
                 <Input
@@ -207,10 +209,10 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Localização <span className="text-muted-foreground font-normal">(opcional)</span>
+                {t('properties:dialog.fields.location')} <span className="text-muted-foreground font-normal">({t('common:optional')})</span>
               </Label>
               <Input
-                placeholder="Ex: Campo de Ourique, Lisboa"
+                placeholder={t('properties:dialog.fields.locationPlaceholder')}
                 value={info.location}
                 onChange={e => setInfo(p => ({ ...p, location: e.target.value }))}
                 className="mt-1"
@@ -218,7 +220,7 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Disponível a partir de <span className="text-muted-foreground font-normal">(opcional)</span>
+                {t('properties:dialog.fields.availableFrom')} <span className="text-muted-foreground font-normal">({t('common:optional')})</span>
               </Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
@@ -233,7 +235,7 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
                     <span className="flex-1 text-left">
                       {availableFrom
                         ? format(availableFrom, "d 'de' MMMM 'de' yyyy", { locale: pt })
-                        : 'Selecionar data'}
+                        : t('properties:dialog.fields.selectDate')}
                     </span>
                     {availableFrom && (
                       <span
@@ -261,10 +263,10 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Descrição <span className="text-muted-foreground font-normal">(opcional)</span>
+                {t('properties:dialog.fields.description')} <span className="text-muted-foreground font-normal">({t('common:optional')})</span>
               </Label>
               <textarea
-                placeholder="Descreva características especiais do imóvel..."
+                placeholder={t('properties:dialog.fields.descriptionPlaceholder')}
                 value={info.description}
                 onChange={e => setInfo(p => ({ ...p, description: e.target.value }))}
                 rows={3}

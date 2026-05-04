@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   Calendar as CalendarIcon, Clock, MapPin, User, Filter,
   X, CalendarCheck, UserCheck, Plus, ChevronRight, ChevronLeft, Link2, Check, Loader2,
@@ -42,12 +43,6 @@ const TIME_SLOTS = [
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
 ];
 
-const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-const MONTHS = [
-  'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro',
-];
-
 function toLocalDateString(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -73,6 +68,9 @@ function MiniCalendar({
   minDate?: string;
   availableWeekdays?: number[];
 }) {
+  const { t } = useTranslation('common');
+  const WEEKDAYS = [t('days.sun'), t('days.mon'), t('days.tue'), t('days.wed'), t('days.thu'), t('days.fri'), t('days.sat')];
+  const MONTHS = [t('months.jan'), t('months.feb'), t('months.mar'), t('months.apr'), t('months.may'), t('months.jun'), t('months.jul'), t('months.aug'), t('months.sep'), t('months.oct'), t('months.nov'), t('months.dec')];
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
 
@@ -183,9 +181,9 @@ function MiniCalendar({
 }
 
 const statusConfig = {
-  confirmed: { label: 'Confirmada', className: 'bg-accent/10 text-accent' },
-  completed: { label: 'Concluída', className: 'bg-emerald-500/10 text-emerald-600' },
-  cancelled: { label: 'Cancelada', className: 'bg-destructive/10 text-destructive' },
+  confirmed: { className: 'bg-accent/10 text-accent' },
+  completed: { className: 'bg-emerald-500/10 text-emerald-600' },
+  cancelled: { className: 'bg-destructive/10 text-destructive' },
 };
 
 // ─── Schedule Modal ───────────────────────────────────────────────────────────
@@ -216,6 +214,7 @@ function generateSubSlots(start: string, end: string, intervalMinutes: number): 
 
 const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, confirmedAppointments, onClose, onConfirm }: ScheduleModalProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation(['appointments', 'common']);
   const proposedSlots = lead.proposedSlots ?? [];
   const hasSuggestions = proposedSlots.length > 0;
 
@@ -339,7 +338,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
           next.delete(slot);
           return next;
         });
-        toast({ title: `Horário ${slot} desbloqueado` });
+        toast({ title: t('appointments:toast.slotUnblocked', { slot }) });
       } else {
         await blockVisitSlot(agencyId, lead.propertyId, { date, time: slot });
         setBlockedTimes((prev) => {
@@ -348,10 +347,10 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
           return next;
         });
         if (time === slot) setTime('');
-        toast({ title: `Horário ${slot} bloqueado` });
+        toast({ title: t('appointments:toast.slotBlocked', { slot }) });
       }
     } catch {
-      toast({ title: 'Não foi possível atualizar o bloqueio', variant: 'destructive' });
+      toast({ title: t('appointments:toast.errorBlockUpdate'), variant: 'destructive' });
     } finally {
       setTogglingBlockedTime(null);
     }
@@ -403,7 +402,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
           {/* Header — fixo */}
           <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b shrink-0">
             <div>
-              <h2 className="font-display font-700 text-lg tracking-tight">Agendar visita</h2>
+              <h2 className="font-display font-700 text-lg tracking-tight">{t('appointments:modal.title')}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {lead.name} · {property?.title ?? '—'}
               </p>
@@ -420,8 +419,8 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
             {hasSuggestions && (
               <div>
                 <Label className="text-xs font-medium mb-2 block">
-                  Preferências do candidato
-                  <span className="text-muted-foreground font-normal ml-1">(clica para usar)</span>
+                  {t('appointments:modal.candidatePrefs')}
+                  <span className="text-muted-foreground font-normal ml-1">({t('appointments:modal.clickToUse')})</span>
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {proposedSlots.map((s, i) => (
@@ -443,7 +442,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
                 {activePeriod && (
                   <p className="text-[11px] text-amber-600 mt-2 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    Mostrando horários do período "{activePeriod.label}" ({activePeriod.start}–{activePeriod.end})
+                    {t('appointments:modal.showingPeriod', { period: activePeriod.label, start: activePeriod.start, end: activePeriod.end })}
                   </p>
                 )}
               </div>
@@ -451,7 +450,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
             {/* Date */}
             <div>
-              <Label className="text-xs font-medium mb-2 block">Data da visita</Label>
+              <Label className="text-xs font-medium mb-2 block">{t('appointments:modal.visitDate')}</Label>
               <MiniCalendar
                 value={date}
                 onChange={d => { setDate(d); setTime(''); }}
@@ -463,7 +462,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
             {/* Agent sub-slots */}
             <div>
               <Label className="text-xs font-medium mb-2 block">
-                Horário
+                {t('appointments:modal.timeLabel')}
                 {activePeriod && (
                   <span className="text-muted-foreground font-normal ml-1">
                     — {activePeriod.label}
@@ -487,7 +486,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
                 ))}
                 {availableSlots.length === 0 && (
                   <p className="text-xs text-muted-foreground col-span-4">
-                    Não há horários disponíveis para esta data/período.
+                    {t('appointments:modal.noSlots')}
                   </p>
                 )}
               </div>
@@ -495,9 +494,9 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
             {/* Manual block/unblock */}
             <div>
-              <Label className="text-xs font-medium mb-2 block">Bloqueio manual por horário</Label>
+              <Label className="text-xs font-medium mb-2 block">{t('appointments:modal.blockTitle')}</Label>
               <p className="text-[11px] text-muted-foreground mb-2">
-                Use quando quiser fechar um horário antes de atingir o limite de visitas.
+                {t('appointments:modal.blockHint')}
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {timeSlots.map((slot) => {
@@ -519,10 +518,10 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
                       <div className="font-semibold">{slot}</div>
                       <div className="text-[10px] opacity-80">
                         {isBusy
-                          ? 'A atualizar...'
+                          ? t('appointments:modal.updating')
                           : isBlocked
-                            ? 'Bloqueado'
-                            : `Ocupação ${occupancy}/${maxVisitsPerTime}`}
+                            ? t('appointments:modal.blocked')
+                            : t('appointments:modal.occupancy', { count: occupancy, max: maxVisitsPerTime })}
                       </div>
                     </button>
                   );
@@ -532,7 +531,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
             {/* Agent */}
             <div>
-              <Label className="text-xs font-medium mb-1.5 block">Agente responsável</Label>
+              <Label className="text-xs font-medium mb-1.5 block">{t('appointments:modal.agentLabel')}</Label>
               <Select value={agentId} onValueChange={v => { setAgentId(v); setTime(''); }}>
                 <SelectTrigger className="rounded-xl h-10">
                   <SelectValue />
@@ -547,7 +546,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
             {/* Notes */}
             <div>
-              <Label className="text-xs font-medium mb-1.5 block">Notas <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label className="text-xs font-medium mb-1.5 block">{t('appointments:modal.notesLabel')} <span className="text-muted-foreground font-normal">({t('appointments:modal.optional')})</span></Label>
               <Textarea
                 placeholder="Ex: trazer documentos de rendimento, visita guiada ao exterior…"
                 value={notes}
@@ -561,7 +560,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
           {/* Footer — fixo */}
           <div className="shrink-0 px-6 pb-5 pt-4 border-t flex gap-3">
             <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl">
-              Cancelar
+              {t('common:actions.cancel')}
             </Button>
             <Button
               disabled={!canSubmit}
@@ -571,7 +570,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
               {submitting
                 ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
                 : <CalendarCheck className="w-4 h-4 mr-1.5" />}
-              Agendar visita
+              {t('appointments:modal.confirmButton')}
             </Button>
           </div>
         </div>
@@ -582,15 +581,15 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatRelativeTime(isoDate: string): string {
+function formatRelativeTime(isoDate: string, t: (k: string, opts?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
   const mins  = Math.floor(diff / 60_000);
   const hours = Math.floor(diff / 3_600_000);
   const days  = Math.floor(diff / 86_400_000);
-  if (mins < 60)  return `há ${mins}min`;
-  if (hours < 24) return `há ${hours}h`;
-  if (days === 1) return 'há 1 dia';
-  return `há ${days} dias`;
+  if (mins < 60)  return t('appointments:relTime.mins', { count: mins });
+  if (hours < 24) return t('appointments:relTime.hours', { count: hours });
+  if (days === 1) return t('appointments:relTime.day');
+  return t('appointments:relTime.days', { count: days });
 }
 
 // ─── Pending Card ─────────────────────────────────────────────────────────────
@@ -609,6 +608,7 @@ const PendingCard = ({
   const proposedVisit: string | undefined = (lead as LeadDto & { proposedVisit?: string }).proposedVisit;
   const hasProposed = !!proposedVisit;
   const { toast } = useToast();
+  const { t } = useTranslation(['appointments', 'common']);
   const { currentAgencyId } = useAuth();
   const [copied, setCopied] = useState(false);
   const [sendingLink, setSendingLink] = useState(false);
@@ -618,10 +618,10 @@ const PendingCard = ({
     setSendingLink(true);
     try {
       await sendVisitLink(currentAgencyId, lead.id);
-      toast({ title: 'Email enviado!', description: `Link de visita enviado para ${lead.name.split(' ')[0]}.` });
+      toast({ title: t('appointments:toast.emailSent'), description: t('appointments:toast.emailSentDesc', { name: lead.name.split(' ')[0] }) });
       onLinkSent?.();
     } catch {
-      toast({ title: 'Erro ao enviar email', variant: 'destructive' });
+      toast({ title: t('common:errors.generic'), variant: 'destructive' });
     } finally {
       setSendingLink(false);
     }
@@ -633,9 +633,9 @@ const PendingCard = ({
     navigator.clipboard.writeText(url);
     setCopied(true);
     if (!token) {
-      toast({ title: 'Atenção', description: 'Este candidato ainda não tem token de visita. Aprova-o primeiro.', variant: 'destructive' });
+      toast({ title: t('appointments:attention'), description: t('appointments:toast.noToken'), variant: 'destructive' });
     } else {
-      toast({ title: 'Link copiado!', description: `Partilhe com ${lead.name.split(' ')[0]}.` });
+      toast({ title: t('appointments:toast.linkCopied'), description: t('appointments:toast.shareLinkDesc', { name: lead.name.split(' ')[0] }) });
     }
     setTimeout(() => setCopied(false), 2000);
   };
@@ -655,7 +655,7 @@ const PendingCard = ({
         <p className="text-xs text-muted-foreground truncate">{property?.title ?? '—'}</p>
         {hasProposed && (
           <p className="text-xs text-amber-600 mt-0.5 flex items-center gap-1">
-            <CalendarCheck className="w-3 h-3" />
+          <CalendarCheck className="w-3.5 h-3.5" />
             Propõe {new Date(proposedVisit!).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })} às{' '}
             {new Date(proposedVisit!).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
           </p>
@@ -664,13 +664,13 @@ const PendingCard = ({
           {(lead.proposedSlots?.length ?? 0) > 0 && (
             <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <CalendarCheck className="w-2.5 h-2.5" />
-              Preferências do candidato recebidas
+              {t('appointments:card.candidateSlots')}
             </span>
           )}
           {lead.visitLinkSentAt && (
             <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
               <Send className="w-2.5 h-2.5" />
-              Link enviado {formatRelativeTime(lead.visitLinkSentAt)}
+              {t('appointments:card.linkSent', { time: formatRelativeTime(lead.visitLinkSentAt, t) })}
             </span>
           )}
         </div>
@@ -683,7 +683,7 @@ const PendingCard = ({
           className={`p-2 rounded-lg border transition-all text-xs flex items-center gap-1.5 border-border hover:border-primary/40 hover:bg-muted/50 text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           {sendingLink ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-          <span className="hidden sm:inline">Enviar</span>
+          <span className="hidden sm:inline">{t('appointments:actions.send')}</span>
         </button>
         <button
           onClick={handleCopyLink}
@@ -695,7 +695,7 @@ const PendingCard = ({
           }`}
         >
           {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
-          <span className="hidden sm:inline">{copied ? 'Copiado' : 'Link'}</span>
+          <span className="hidden sm:inline">{copied ? t('common:copied') : 'Link'}</span>
         </button>
         <Button
           size="sm"
@@ -704,9 +704,9 @@ const PendingCard = ({
           className="rounded-lg shrink-0 gap-1.5 text-xs"
         >
           {hasProposed ? (
-            <><CalendarCheck className="w-3.5 h-3.5" /> Confirmar</>
+            <><CalendarCheck className="w-3.5 h-3.5" /> {t('appointments:actions.confirm')}</>
           ) : (
-            <><Plus className="w-3.5 h-3.5" /> Agendar</>
+            <><Plus className="w-3.5 h-3.5" /> {t('appointments:actions.schedule')}</>
           )}
           <ChevronRight className="w-3 h-3" />
         </Button>
@@ -730,6 +730,7 @@ const CancelledCard = ({
 }) => {
   const hasProposed = (lead.proposedSlots?.length ?? 0) > 0;
   const { toast } = useToast();
+  const { t } = useTranslation(['appointments', 'common']);
   const { currentAgencyId } = useAuth();
   const [sendingLink, setSendingLink] = useState(false);
 
@@ -738,10 +739,10 @@ const CancelledCard = ({
     setSendingLink(true);
     try {
       await sendVisitLink(currentAgencyId, lead.id);
-      toast({ title: 'Email enviado!', description: `Novo link de visita enviado para ${lead.name.split(' ')[0]}.` });
+      toast({ title: t('appointments:toast.emailSent'), description: t('appointments:toast.newEmailSentDesc', { name: lead.name.split(' ')[0] }) });
       onLinkSent?.();
     } catch {
-      toast({ title: 'Erro ao enviar email', variant: 'destructive' });
+      toast({ title: t('common:errors.generic'), variant: 'destructive' });
     } finally {
       setSendingLink(false);
     }
@@ -756,7 +757,7 @@ const CancelledCard = ({
         <div className="flex items-center gap-2 mb-0.5">
           <span className="font-semibold text-sm">{lead.name}</span>
           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
-            Visita cancelada
+            {t('appointments:card.visitCancelled')}
           </span>
         </div>
         <p className="text-xs text-muted-foreground truncate">{property?.title ?? '—'}</p>
@@ -764,13 +765,13 @@ const CancelledCard = ({
           {hasProposed && (
             <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <CalendarCheck className="w-2.5 h-2.5" />
-              Preferências do candidato recebidas
+              {t('appointments:card.candidateSlots')}
             </span>
           )}
           {lead.visitLinkSentAt && (
             <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
               <Send className="w-2.5 h-2.5" />
-              Link enviado {formatRelativeTime(lead.visitLinkSentAt)}
+              {t('appointments:card.linkSent', { time: formatRelativeTime(lead.visitLinkSentAt, t) })}
             </span>
           )}
         </div>
@@ -783,7 +784,7 @@ const CancelledCard = ({
           className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary/40 hover:bg-muted/50 text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           {sendingLink ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-          <span>Enviar link</span>
+          <span>{t('appointments:actions.sendLink')}</span>
         </button>
         <Button
           size="sm"
@@ -791,7 +792,7 @@ const CancelledCard = ({
           onClick={onSchedule}
           className="rounded-lg shrink-0 gap-1.5 text-xs"
         >
-          <RotateCcw className="w-3.5 h-3.5" /> Reagendar
+          <RotateCcw className="w-3.5 h-3.5" /> {t('appointments:actions.reschedule')}
           <ChevronRight className="w-3 h-3" />
         </Button>
       </div>
@@ -832,14 +833,15 @@ const Section = ({
   onReschedule?: (apt: EnrichedAppointment) => void;
   onComplete?: (apt: EnrichedAppointment) => void;
   onContract?: (apt: EnrichedAppointment) => void;
-}) => (
+}) => {
+  const { t } = useTranslation(['appointments', 'common']);
+  return (
   <div className={muted ? 'mt-10 opacity-70' : 'mb-10'}>
     <h2 className="font-display font-600 text-sm mb-4">{title}</h2>
     {items.length === 0 ? (
       <div className="rounded-2xl border bg-card p-12 text-center text-muted-foreground">
         <CalendarIcon className="w-7 h-7 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">Sem agendamentos</p>
-      </div>
+        <p className="text-sm">{t('appointments:card.noAppointments')}</p>      </div>
     ) : (
       <div className="space-y-3">
         {items.map((apt, i) => {
@@ -866,7 +868,7 @@ const Section = ({
                     <span className="font-bold text-base truncate">{apt.lead.name}</span>
                     {st && (
                       <Badge variant="secondary" className={`${st.className} text-[11px] font-medium shrink-0`}>
-                        {st.label}
+                        {t(`appointments:status.${apt.status}`)}
                       </Badge>
                     )}
                   </div>
@@ -893,7 +895,7 @@ const Section = ({
                   <div className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center text-xs font-semibold text-primary" style={{ display: apt.agent.avatarUrl ? 'none' : 'flex' }}>{apt.agent.name[0]}</div>
                   <div className="text-xs">
                     <div className="font-medium truncate max-w-[120px]">{apt.agent.name}</div>
-                    <div className="text-muted-foreground text-[10px]">Agente</div>
+                    <div className="text-muted-foreground text-[10px]">{t('appointments:card.agentRole')}</div>
                   </div>
                 </div>
               )}
@@ -907,7 +909,7 @@ const Section = ({
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-emerald-700 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all font-medium"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                      <span>Finalizar</span>
+                      <span>{t('appointments:actions.finalize')}</span>
                     </button>
                   )}
                   {apt.status === 'confirmed' && onReschedule && (
@@ -916,7 +918,7 @@ const Section = ({
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-amber-700 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-all font-medium"
                     >
                       <RotateCcw className="w-3.5 h-3.5 shrink-0" />
-                      <span>Reagendar</span>
+                      <span>{t('appointments:actions.reschedule')}</span>
                     </button>
                   )}
                   {apt.status === 'confirmed' && onCancel && (
@@ -925,7 +927,7 @@ const Section = ({
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20 transition-all font-medium"
                     >
                       <Ban className="w-3.5 h-3.5 shrink-0" />
-                      <span>Cancelar</span>
+                      <span>{t('common:actions.cancel')}</span>
                     </button>
                   )}
                   {/* Completed: Fechar contrato (only if lead not yet contracted) */}
@@ -935,12 +937,12 @@ const Section = ({
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-violet-700 hover:bg-violet-50 border border-transparent hover:border-violet-200 transition-all font-medium"
                     >
                       <Trophy className="w-3.5 h-3.5 shrink-0" />
-                      <span>Fechar contrato</span>
+                      <span>{t('appointments:actions.closeContract')}</span>
                     </button>
                   )}
                   {apt.status === 'completed' && apt.lead?.status === 'contracted' && (
                     <span className="text-[10px] font-medium text-violet-600 bg-violet-50 border border-violet-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
-                      <Trophy className="w-3 h-3 shrink-0" /> Contrato fechado
+                      <Trophy className="w-3 h-3 shrink-0" /> {t('appointments:card.contracted')}
                     </span>
                   )}
                 </div>
@@ -951,7 +953,8 @@ const Section = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -964,6 +967,7 @@ const Appointments = () => {
   const { properties, loading: loadingProps } = useProperties();
   const { agents, loading: loadingAgents } = useAgents();
   const { toast } = useToast();
+  const { t } = useTranslation(['appointments', 'common']);
 
   const [leads, setLeads] = useState<LeadDto[]>([]);
   const [allLeads, setAllLeads] = useState<LeadDto[]>([]);
@@ -1065,10 +1069,10 @@ const Appointments = () => {
       // Refresh approved leads so scheduled lead disappears from pending list
       await loadLeads();
       setSchedulingFor(null);
-      toast({ title: 'Visita agendada!', description: `${input.date} às ${input.time}` });
+      toast({ title: t('appointments:toast.scheduled'), description: `${input.date} às ${input.time}` });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao agendar visita.';
-      toast({ title: 'Erro', description: msg, variant: 'destructive' });
+      const msg = err instanceof Error ? err.message : t('appointments:toast.errorSchedule');
+      toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     }
   };
 
@@ -1078,9 +1082,9 @@ const Appointments = () => {
       await updateAppointmentStatus(currentAgencyId, apt.id, { status: 'completed' });
       refreshApts();
       await loadLeads();
-      toast({ title: 'Visita finalizada', description: `${apt.lead?.name ?? 'Candidato'} — ${apt.date}` });
+      toast({ title: t('appointments:toast.visitFinalized'), description: `${apt.lead?.name ?? ''} — ${apt.date}` });
     } catch {
-      toast({ title: 'Erro ao finalizar visita', variant: 'destructive' });
+      toast({ title: t('common:errors.generic'), variant: 'destructive' });
     }
   };
 
@@ -1090,12 +1094,12 @@ const Appointments = () => {
       await contractLead(currentAgencyId, apt.lead.id);
       await loadLeads();
       toast({
-        title: 'Contrato fechado! 🎉',
-        description: `${apt.lead.name} foi marcado como arrendatário de ${apt.property?.title ?? 'imóvel'}.`,
+        title: t('appointments:toast.contracted'),
+        description: t('appointments:toast.contractedDesc', { name: apt.lead.name, property: apt.property?.title ?? '' }),
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao fechar contrato.';
-      toast({ title: 'Erro', description: msg, variant: 'destructive' });
+      const msg = err instanceof Error ? err.message : t('appointments:toast.errorContract');
+      toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     }
   };
 
@@ -1105,9 +1109,9 @@ const Appointments = () => {
       await cancelAppointment(currentAgencyId, apt.id);
       refreshApts();
       await loadLeads();
-      toast({ title: 'Visita cancelada', description: `${apt.date} às ${apt.time}` });
+      toast({ title: t('appointments:toast.visitCancelled'), description: `${apt.date} às ${apt.time}` });
     } catch {
-      toast({ title: 'Erro ao cancelar', variant: 'destructive' });
+      toast({ title: t('appointments:toast.errorCancel'), variant: 'destructive' });
     }
   };
 
@@ -1118,11 +1122,11 @@ const Appointments = () => {
       refreshApts();
       await loadLeads();
       toast({
-        title: 'Reagendamento iniciado',
-        description: 'O candidato voltou para a lista de aprovados para agendar nova visita.',
+        title: t('appointments:toast.rescheduled'),
+        description: t('appointments:toast.contractReverted'),
       });
     } catch {
-      toast({ title: 'Erro ao reagendar', variant: 'destructive' });
+      toast({ title: t('common:errors.generic'), variant: 'destructive' });
     }
   };
 
@@ -1134,17 +1138,17 @@ const Appointments = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
           <div>
-            <h1 className="font-display text-2xl font-700 tracking-tight">Agendamentos</h1>
-            <p className="text-sm text-muted-foreground mt-1">Visitas confirmadas e histórico</p>
+            <h1 className="font-display text-2xl font-700 tracking-tight">{t('appointments:title')}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t('appointments:page.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Filter className="w-4 h-4 text-muted-foreground" />
             <Select value={propertyFilter} onValueChange={setPropertyFilter}>
               <SelectTrigger className="w-[180px] rounded-lg">
-                <SelectValue placeholder="Todos os imóveis" />
+                <SelectValue placeholder={t('appointments:filters.allProperties')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os imóveis</SelectItem>
+                <SelectItem value="all">{t('appointments:filters.allProperties')}</SelectItem>
                 {properties.map(p => (
                   <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
                 ))}
@@ -1155,7 +1159,7 @@ const Appointments = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os agentes</SelectItem>
+                <SelectItem value="all">{t('appointments:filters.allAgents')}</SelectItem>
                 {agents.map(a => (
                   <SelectItem key={a.userId ?? a.id} value={a.userId ?? a.id}>{a.name}</SelectItem>
                 ))}
@@ -1168,16 +1172,16 @@ const Appointments = () => {
         {isLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
             <Loader2 className="w-4 h-4 animate-spin" />
-            A carregar agendamentos…
+            {t('appointments:page.loading')}
           </div>
         )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Stat label="Próximas" value={upcoming.length} />
-          <Stat label="Concluídas" value={enriched.filter(a => a.status === 'completed').length} />
-          <Stat label="Hoje" value={upcoming.filter(a => a.date === today).length} />
-          <Stat label="Aguardam agendamento" value={pendingLeads.length} />
+          <Stat label={t('appointments:periods.upcoming')} value={upcoming.length} />
+          <Stat label={t('appointments:periods.completed')} value={enriched.filter(a => a.status === 'completed').length} />
+          <Stat label={t('appointments:periods.today')} value={upcoming.filter(a => a.date === today).length} />
+          <Stat label={t('appointments:periods.pendingSchedule')} value={pendingLeads.length} />
         </div>
 
         {/* Pending scheduling — approved leads */}
@@ -1188,7 +1192,7 @@ const Appointments = () => {
             className="mb-10"
           >
             <div className="flex items-center gap-2 mb-3">
-              <h2 className="font-display font-600 text-sm">Candidatos aprovados — aguardam agendamento</h2>
+              <h2 className="font-display font-600 text-sm">{t('appointments:page.pendingSection')}</h2>
               <span className="text-[11px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
                 {pendingLeads.length}
               </span>
@@ -1234,8 +1238,8 @@ const Appointments = () => {
         )}
 
         {/* Appointment lists */}
-        <Section title="Próximas visitas" items={upcoming} onCancel={handleCancel} onReschedule={handleReschedule} onComplete={handleComplete} />
-        {past.length > 0 && <Section title="Histórico" items={past} muted onContract={handleContract} />}
+        <Section title={t('appointments:periods.upcoming')} items={upcoming} onCancel={handleCancel} onReschedule={handleReschedule} onComplete={handleComplete} />
+        {past.length > 0 && <Section title={t('appointments:periods.history')} items={past} muted onContract={handleContract} />}
       </div>
 
       {/* Schedule modal */}

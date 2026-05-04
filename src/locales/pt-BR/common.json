@@ -1,0 +1,110 @@
+{
+  "days": {
+    "mon": "Seg",
+    "tue": "Ter",
+    "wed": "Qua",
+    "thu": "Qui",
+    "fri": "Sex",
+    "sat": "Sáb",
+    "sun": "Dom"
+  },
+  "months": {
+    "jan": "Janeiro",
+    "feb": "Fevereiro",
+    "mar": "Março",
+    "apr": "Abril",
+    "may": "Maio",
+    "jun": "Junho",
+    "jul": "Julho",
+    "aug": "Agosto",
+    "sep": "Setembro",
+    "oct": "Outubro",
+    "nov": "Novembro",
+    "dec": "Dezembro"
+  },
+  "timePeriods": {
+    "morning": "Manhã",
+    "afternoon": "Início da tarde",
+    "evening": "Final do dia"
+  },
+  "actions": {
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Remover",
+    "add": "Adicionar",
+    "send": "Enviar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "confirm": "Confirmar",
+    "upgrade": "Fazer upgrade",
+    "subscribe": "Assinar",
+    "changePlan": "Alterar plano",
+    "download": "Baixar PDF",
+    "viewInvoice": "Ver fatura",
+    "managePortal": "Gerenciar faturamento",
+    "close": "Fechar"
+  },
+  "status": {
+    "new": "Novo",
+    "approved": "Aprovado",
+    "rejected": "Rejeitado",
+    "cancelled": "Cancelada",
+    "active": "Ativa",
+    "contacted": "Contactado",
+    "qualified": "Qualificado",
+    "contracted": "Contrato fechado",
+    "visitScheduled": "Visita marcada",
+    "visitCancelled": "Visita cancelada",
+    "visitFinished": "Visita realizada"
+  },
+  "roles": {
+    "owner": "Proprietário",
+    "manager": "Gerente",
+    "agent": "Colaborador"
+  },
+  "yesNo": {
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "animals": {
+    "dog": "Cachorro",
+    "cat": "Gato",
+    "rabbit": "Coelho",
+    "fish": "Peixe",
+    "bird": "Pássaro",
+    "hamster": "Hamster",
+    "reptile": "Réptil"
+  },
+  "errors": {
+    "generic": "Erro",
+    "tryAgain": "Tente novamente.",
+    "loading": "Erro ao carregar dados.",
+    "contactOwner": "Contate o proprietário para fazer upgrade."
+  },
+  "loading": "Carregando...",
+  "empty": "—",
+  "copied": "Copiado",
+  "linkCopied": "Link copiado!",
+  "optional": "(opcional)",
+  "months": "meses",
+  "agents": {
+    "invite": "Convidar agente",
+    "gmailOnly": "Apenas endereços @gmail.com são aceitos.",
+    "emailGmail": "Email Gmail",
+    "role": "Função",
+    "phone": "Telefone",
+    "sendingInvite": "Enviando convite…",
+    "sendInvite": "Enviar convite",
+    "editAgent": "Editar agente",
+    "errorInvite": "Erro ao convidar agente.",
+    "errorSave": "Erro ao salvar.",
+    "roles": {
+      "MANAGER": "Gerente",
+      "AGENT": "Colaborador",
+      "managerDesc": "Pode gerenciar propriedades e agendamentos",
+      "agentDesc": "Acesso básico de consulta"
+    }
+  }
+}

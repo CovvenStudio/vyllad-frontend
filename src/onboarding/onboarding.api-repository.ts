@@ -2,6 +2,7 @@
 // Calls POST /api/onboarding/complete on the real backend.
 
 import { apiFetch } from '@/lib/api-client';
+import i18n from '@/lib/i18n';
 import type { IOnboardingRepository } from './onboarding.repository';
 import type { OnboardingState, OnboardingSubmission } from './onboarding.types';
 
@@ -38,6 +39,7 @@ class OnboardingApiRepository implements IOnboardingRepository {
           countryCode: submission.countryCode || submission.agency.countryCode || undefined,
           billingMarket: submission.billingMarket,
           billingCurrency: submission.billingCurrency,
+          locale: i18n.language,
         }),
       },
     );

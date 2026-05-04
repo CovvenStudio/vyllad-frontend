@@ -1,0 +1,72 @@
+{
+  "header": "Configuración inicial",
+  "steps": {
+    "plan": "Plan",
+    "agency": "Inmobiliaria",
+    "confirm": "Confirmación"
+  },
+  "plan": {
+    "title": "Elige tu plan",
+    "subtitle": "Todos los planes incluyen cribado automático de candidatos.\nPuedes cambiar o cancelar en cualquier momento.",
+    "billingCountry": "País de facturación:",
+    "loading": "Cargando planes…",
+    "properties": "propiedades",
+    "candidatesPerProperty": "candidatos/propiedad",
+    "agents": "agentes",
+    "contact": "Contactar",
+    "free": "Gratis",
+    "perMonth": "/mes",
+    "perDays": "/ {{count}} días",
+    "selected": "Seleccionado",
+    "requestTrial": "Solicitar prueba",
+    "pendingApproval": "Pendiente de aprobación",
+    "trialSuccess": {
+      "title": "¡Solicitud enviada con éxito!",
+      "subtitle": "Tu acceso de prueba está casi listo — solo necesitamos validar tu solicitud.",
+      "body1": "Nuestro equipo revisará tu solicitud y se pondrá en contacto pronto.",
+      "body2": "Durante la prueba tendrás acceso completo a la plataforma — propiedades, cribado automático e informes.",
+      "body3": "Normalmente aprobamos en menos de 24 horas. ⚡",
+      "emailNotice": "Recibirás un email cuando el acceso esté activado.",
+      "backToPlans": "Volver a los planes"
+    }
+  },
+  "agency": {
+    "title": "Configura tu inmobiliaria",
+    "subtitle": "Esto ayuda a personalizar los criterios de calificación para tu región.",
+    "name": "Nombre de la inmobiliaria",
+    "namePlaceholder": "Ej: García & Asociados",
+    "district": "Distrito",
+    "state": "Comunidad autónoma",
+    "region": "Región",
+    "county": "Municipio",
+    "city": "Ciudad",
+    "districtPlaceholder": "Selecciona el distrito",
+    "statePlaceholder": "Selecciona la comunidad",
+    "regionPlaceholder": "Región",
+    "countyPlaceholder": "Ej: Madrid",
+    "cityPlaceholder": "Ej: Madrid",
+    "submit": "Continuar"
+  },
+  "confirm": {
+    "title": "Confirmar suscripción",
+    "submit": "Confirmar y empezar",
+    "submitting": "Creando cuenta…",
+    "subtitle": "Revise los detalles antes de comenzar.",
+    "agency": "Inmobiliaria",
+    "plan": "Plan",
+    "trialFree": "{{count}} mes gratis",
+    "contact": "A convenir",
+    "free": "Gratis",
+    "afterTrial": "tras el trial: {{price}}/mes",
+    "pricePerMonth": "{{price}}/mes",
+    "extraLeads": "Leads extra",
+    "perExtraLead": "por lead adicional",
+    "extraLeadsNote": "Disponible al alcanzar el límite del plan",
+    "cancelNote": "Puede cancelar o cambiar el plan en cualquier momento.",
+    "submitPay": "Confirmar y pagar",
+    "submitTrial": "Probar gratis",
+    "submitScale": "Hablar con el equipo",
+    "settingUp": "Configurando…",
+    "wait": "Espere…"
+  }
+}

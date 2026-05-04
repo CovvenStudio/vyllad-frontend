@@ -1,0 +1,228 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "properties": "Imóveis",
+    "agents": "Agentes",
+    "appointments": "Agendamentos",
+    "billing": "Faturamento",
+    "settings": "Configurações",
+    "scoring": "Qualificação",
+    "screening": "Triagem",
+    "signOut": "Sair"
+  },
+  "trialBanner": {
+    "expired": "Trial expirado hoje",
+    "daysLeft_one": "{{count}} dia restante no trial",
+    "daysLeft_other": "{{count}} dias restantes no trial",
+    "upgrade": "Fazer Upgrade"
+  },
+  "leads": {
+    "title": "Candidatos",
+    "score": "Score",
+    "urgency": "Urgência",
+    "status": "Status",
+    "selectProperty": "Selecionar imóvel",
+    "prevPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "empty": "Nenhum candidato encontrado com os filtros atuais.",
+    "emptyAgent": "Nenhum candidato encontrado.",
+    "atLimit": "Apenas 1 lead até o limite deste imóvel",
+    "atLimit_other": "{{count}} leads até o limite deste imóvel",
+    "buyLeads": "Comprar leads",
+    "limitWarning": "Aumente a capacidade antes de perder candidatos.",
+    "limitUpgrade": "Faça upgrade para não perder candidatos.",
+    "contactOwnerLimit": "Contate o proprietário para aumentar o limite."
+  },
+  "priority": {
+    "contactNow": "Contatar agora",
+    "evaluate": "Avaliar",
+    "deprioritize": "Despriorizar",
+    "topToday": "Top 5 hoje",
+    "highPriority": "Alta prioridade",
+    "readyNow": "Prontos agora",
+    "avgScore": "Score médio",
+    "scheduledVisits": "Visitas marcadas"
+  },
+  "insights": {
+    "excellent": "Excelente perfil financeiro e profissional",
+    "excellentUrgent": "Excelente perfil · pronto para fechar",
+    "excellentSoon": "Excelente perfil · disponível em breve",
+    "goodUrgent": "Bom perfil · alta urgência de mudança",
+    "reasonable": "Perfil razoável · sem urgência imediata",
+    "medium": "Perfil com compatibilidade média com este imóvel",
+    "low": "Baixa compatibilidade com os critérios",
+    "petsLow": "Animais · compatibilidade baixa com o imóvel",
+    "guaranteeLow": "Garantias insuficientes para este imóvel",
+    "incomeLow": "Renda abaixo do mínimo recomendado",
+    "actionUrgent": "Alta urgência de mudança — não perca tempo.",
+    "actionExcellent": "Maior probabilidade de conversão. Contate primeiro.",
+    "actionLow": "Baixa compatibilidade com os critérios. Poupe energia.",
+    "actionContract": "Imóvel já reservado"
+  },
+  "propertyBanner": {
+    "limit": "Contate o proprietário para fazer upgrade.",
+    "agentNoProperties": "Nenhum imóvel atribuído a este agente.",
+    "contractedError": "Outro lead já tem contrato fechado para este imóvel."
+  },
+  "detailSheet": {
+    "title": "Perfil",
+    "income": "Renda",
+    "incomeRatio": "Razão aluguel",
+    "people": "Pessoas",
+    "people_one": "{{count}} pessoa",
+    "people_other": "{{count}} pessoas",
+    "pets": "Animais",
+    "job": "Situação",
+    "jobDuration": "No cargo há",
+    "jobDuration_months_one": "{{count}} mês",
+    "jobDuration_months_other": "{{count}} meses",
+    "jobDuration_years_one": "{{count}} ano",
+    "jobDuration_years_other": "{{count}} anos",
+    "guarantor": "Fiador",
+    "availability": "Disponibilidade",
+    "nationality": "Nacionalidade",
+    "residency": "Reside há",
+    "stayDuration": "Tempo pretendido",
+    "hasVisited": "Já visitou imóveis?",
+    "motivation": "Motivação",
+    "customQuestions": "Perguntas personalizadas",
+    "contact": "Contato",
+    "actions": {
+      "approve": "Aprovar candidato",
+      "reject": "Rejeitar",
+      "schedule": "Agendar visita",
+      "sendLink": "Enviar link de visita",
+      "sendingLink": "Enviando...",
+      "linkSent": "Email enviado!",
+      "linkError": "Erro ao enviar email",
+      "visitConfirmed": "Visita confirmada"
+    },
+    "scores": {
+      "d1": "D1 · Capacidade Financeira",
+      "d2": "D2 · Perfil de Risco",
+      "d3": "D3 · Garantias",
+      "d4": "D4 · Fit e Intenção"
+    },
+    "urgency": {
+      "immediate": "Urgente",
+      "soon": "Em breve",
+      "flexible": "Flexível"
+    },
+    "diagnosis": "Diagnóstico",
+    "scoreSection": "Análise de pontuação",
+    "employment": {
+      "permanent": "Contrato sem prazo",
+      "contract": "Contrato a prazo",
+      "freelancer": "Autônomo",
+      "student": "Estudante",
+      "retired": "Aposentado",
+      "other": "Outro"
+    },
+    "whyText": {
+      "financeSolid": "capacidade financeira sólida",
+      "financeWeak": "capacidade financeira abaixo do ideal",
+      "jobStable": "estabilidade profissional elevada",
+      "jobRisk": "risco profissional elevado",
+      "guaranteesAbove": "garantias acima do exigido",
+      "guaranteesInsufficient": "garantias insuficientes",
+      "moveNow": "pronto para se mudar agora",
+      "noUrgency": "sem urgência de mudança",
+      "medium": "Perfil com compatibilidade média com este imóvel"
+    }
+  },
+  "xray": {
+    "title": "Raio-X",
+    "ignored": "Fator ignorado — não conta para o score",
+    "finalScore": "Score final composto",
+    "thresholds": "Limiares: Excelente ≥{{excellent}} · Potencial ≥{{potential}} · Baixo <{{potential}}",
+    "withinLimit": "dentro do limite (máx. {{max}} pessoas)",
+    "slightlyAbove": "ligeiramente acima do limite (máx. {{max}})",
+    "exceeds": "excede o máximo permitido ({{max}} pessoas)",
+    "petsAllowed": "permitidos neste imóvel",
+    "petsNotAllowed": "não permitidos neste imóvel",
+    "commitmentsDeclared": "Compromissos declarados: {{amount}}",
+    "incomeNote": "Renda €{{income}}/mês ÷ aluguel €{{rent}} = {{ratio}}× — {{verdict}}",
+    "commitmentsNote": "Compromissos €{{amount}}/mês = {{pct}}% da renda — {{verdict}}",
+    "noGuarantorRequired": "Fiador não exigido para este imóvel",
+    "exemptPermanent": "Isento — contrato indeterminado dispensa fiador",
+    "noGuarantorAlternative": "Sem fiador — alternativa (adiantamento) aceita pelo imóvel",
+    "noGuarantorRequired2": "Sem fiador — exigido pelo imóvel e não apresentou alternativa",
+    "noCommitments": "Sem encargos mensais declarados"
+  },
+  "header": {
+    "loading": "Preparando dashboard",
+    "loadingDesc": "Carregando imóvel, listagens e candidatos.",
+    "properties": "Imóveis",
+    "paused": "Pausado",
+    "propertiesActive": "{{active}} / {{max}} imóveis ativos",
+    "upgrade": "Fazer upgrade",
+    "newProperty": "Novo imóvel",
+    "contactOwnerUpgrade": "Contate o proprietário para fazer upgrade."
+  },
+  "propertySelector": {
+    "active": "Ativos",
+    "closed": "Encerrados",
+    "viewPage": "Ver página",
+    "edit": "Editar imóvel",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "close": "Encerrar",
+    "rented": "Imóvel alugado",
+    "archived": "Remover imóvel",
+    "noPropertiesClosed": "Nenhum imóvel encerrado."
+  },
+  "visits": {
+    "confirmed": "Visitas confirmadas"
+  },
+  "stats": {
+    "candidates": "Candidatos",
+    "candidatesSub": "total",
+    "highPrioritySub": "para contatar",
+    "scheduledVisitsSub": "confirmadas",
+    "avgScoreSub": "dos candidatos"
+  },
+  "insightsPanel": {
+    "toIgnore": "Para ignorar",
+    "empty": "Nenhum lead nesta categoria."
+  },
+  "filters": {
+    "allScores": "Todos os scores",
+    "highScore": "Alta prioridade (80+)",
+    "midScore": "Média (60\u201379)",
+    "lowScore": "Baixa (<60)",
+    "allUrgency": "Toda urgência",
+    "urgent": "Urgente",
+    "soon": "Em breve",
+    "flexible": "Flexível",
+    "allStatus": "Todos os estados",
+    "filterNew": "Novos",
+    "filterApproved": "Aprovados",
+    "filterVisit": "Visita marcada",
+    "filterRejected": "Rejeitados"
+  },
+  "candidatesTitle": "Todos os candidatos",
+  "pagination": {
+    "showing": "{{from}}\u2013{{to}} de {{total}} candidatos"
+  },
+  "limitBanner": {
+    "hiddenTitle_one": "{{count}} candidato oculto por limite de leads",
+    "hiddenTitle_other": "{{count}} candidatos ocultos por limite de leads",
+    "hiddenDesc": "Seu plano está no limite de {{limit}} leads para este imóvel.",
+    "atLimitTitle": "Limite de leads atingido",
+    "atLimitDesc": "Novos candidatos não serão recebidos até você aumentar a capacidade.",
+    "nearLimitDesc": "Aumente a capacidade antes de perder candidatos."
+  },
+  "actions": {
+    "approve": "Aprovar",
+    "reject": "Rejeitar",
+    "schedule": "Agendar",
+    "reschedule": "Reagendar",
+    "complete": "Finalizar",
+    "contract": "Fechar Contrato",
+    "revert": "Reverter",
+    "urgentBadge": "Agora",
+    "approvedBadge": "Aprovado",
+    "visitBadge": "Visita marcada",
+    "urgentLabel": "Urgente"
+  }
+}

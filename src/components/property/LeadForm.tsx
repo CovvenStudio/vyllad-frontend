@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { PublicScreeningDto, CustomScreeningQuestionDto } from '@/lib/screening-api';
 import {
   CheckCircle2, Loader2, X, ChevronLeft,
@@ -155,25 +156,25 @@ const INCOME_MIDPOINTS: Record<string, number> = {
 };
 
 const URGENCY_SCORE: Record<string, number> = {
-  'Imediatamente': 15,
-  'Em 15 dias': 12,
-  'Em 1 mês': 8,
-  'Só a explorar': 2,
+  'immediately':    15,
+  'within_15_days': 12,
+  'within_1_month': 8,
+  'just_browsing':  2,
 };
 
 const JOB_SCORE: Record<string, number> = {
-  'Contrato sem termo': 12,
-  'Contrato a prazo': 9,
-  'Independente': 7,
-  'Estudante': 3,
-  'Entre empregos': 2,
-  'Outro': 4,
+  'permanent_contract':  12,
+  'fixed_term_contract': 9,
+  'self_employed':       7,
+  'student':             3,
+  'between_jobs':        2,
+  'other':               4,
 };
 
 // Returns whether the candidate needs to be asked about guarantor
 function needsGuarantorStep(job: string, criteria: Property['criteria']): boolean {
   if (!criteria.guarantorRequired) return false;
-  return job !== 'Contrato sem termo' && job !== 'Contrato a prazo';
+  return job !== 'permanent_contract' && job !== 'fixed_term_contract';
 }
 
 function calcScore(data: LeadData, property: Property): number {
@@ -190,7 +191,7 @@ function calcScore(data: LeadData, property: Property): number {
   if (income < criteria.minIncome) score = Math.max(0, score - 15);
 
   // ── Property fit (0–25) ──────────────────────────────────────────────────
-  const peopleMap: Record<string, number> = { 'Só eu': 1, '2 pessoas': 2, '3 pessoas': 3, '4 ou mais': 4 };
+  const peopleMap: Record<string, number> = { 'only_me': 1, '2_people': 2, '3_people': 3, '4_or_more': 4 };
   const people = peopleMap[data.household] || 1;
   if (people <= criteria.maxPeople) score += 15;
   else if (people === criteria.maxPeople + 1) score += 5;
@@ -202,9 +203,9 @@ function calcScore(data: LeadData, property: Property): number {
 
   // ── Guarantor fit ────────────────────────────────────────────────────────
   if (criteria.guarantorRequired) {
-    if (data.hasGuarantor === 'Sim') score += 8;
-    else if (data.hasGuarantor === 'Não' && criteria.advanceWithoutGuarantor) score += 3;
-    else if (data.hasGuarantor === 'Não') score = Math.max(0, score - 5);
+    if (data.hasGuarantor === 'yes') score += 8;
+    else if (data.hasGuarantor === 'no' && criteria.advanceWithoutGuarantor) score += 3;
+    else if (data.hasGuarantor === 'no') score = Math.max(0, score - 5);
   }
 
   // ── Urgency (0–15) ───────────────────────────────────────────────────────
@@ -212,8 +213,8 @@ function calcScore(data: LeadData, property: Property): number {
 
   // ── Intent & quality (0–20) ──────────────────────────────────────────────
   score += JOB_SCORE[data.job] || 4;
-  if (data.hasVisited === 'Sim') score += 5;
-  if (data.motivation === 'Relocalização por trabalho' || data.motivation === 'Melhor preço') score += 3;
+  if (data.hasVisited === 'yes') score += 5;
+  if (data.motivation === 'work_relocation' || data.motivation === 'better_price') score += 3;
 
   // suppress unused variable warning
   void price;
@@ -401,7 +402,7 @@ const ProgressBar = ({ current, steps }: { current: string; steps: string[] }) =
       </div>
       {idx >= 0 && (
         <p className="text-[11px] text-muted-foreground mt-1.5 text-right">
-          Passo {idx + 1} de {steps.length}
+          Step {idx + 1} / {steps.length}
         </p>
       )}
     </div>
@@ -409,16 +410,6 @@ const ProgressBar = ({ current, steps }: { current: string; steps: string[] }) =
 };
 
 // ─── Lead Form ────────────────────────────────────────────────────────────────
-
-const PET_TYPES = [
-  { label: 'Cão', icon: '🐕' },
-  { label: 'Gato', icon: '🐈' },
-  { label: 'Pássaro', icon: '🦜' },
-  { label: 'Coelho', icon: '🐇' },
-  { label: 'Peixe', icon: '🐟' },
-  { label: 'Réptil', icon: '🦎' },
-  { label: 'Hamster', icon: '🐹' },
-];
 
 const slideVariants = {
   enter: { opacity: 0, x: 30 },
@@ -436,6 +427,16 @@ const LeadForm = ({
   screeningConfig: PublicScreeningDto | null;
 }) => {
   const { toast } = useToast();
+  const { t } = useTranslation(['public', 'screening', 'common']);
+  const PET_TYPES = [
+    { label: t('public:form.pets.dog'), icon: '🐕' },
+    { label: t('public:form.pets.cat'), icon: '🐈' },
+    { label: t('public:form.pets.bird'), icon: '🦜' },
+    { label: t('public:form.pets.rabbit'), icon: '🐇' },
+    { label: t('public:form.pets.fish'), icon: '🐟' },
+    { label: t('public:form.pets.reptile'), icon: '🦎' },
+    { label: t('public:form.pets.hamster'), icon: '🐹' },
+  ];
   const [step, setStep] = useState<string>('disclaimer');
   const [stepHistory, setStepHistory] = useState<string[]>([]);
   const [data, setData] = useState<LeadData>({
@@ -546,7 +547,7 @@ const LeadForm = ({
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">A analisar o seu perfil…</p>
+        <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
       </div>
     );
   }
@@ -558,15 +559,15 @@ const LeadForm = ({
           <CheckCircle2 className="w-8 h-8 text-emerald-600" />
         </div>
         <div>
-          <h3 className="font-display text-xl font-bold mb-2">Candidatura recebida!</h3>
+          <h3 className="font-display text-xl font-bold mb-2">{t('public:visit.submitSuccess')}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            A sua candidatura foi submetida com sucesso. Receberá um email assim que os nossos agentes analisarem a sua candidatura.
+            {t('public:visit.submitSubtitle')}
           </p>
         </div>
         <div className="p-4 rounded-xl bg-muted/50 border text-sm text-left space-y-3">
           <div className="flex gap-3">
             <Home className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <p className="text-muted-foreground">Assim que a candidatura for <strong className="text-foreground">aprovada</strong>, poderá marcar a visita ao imóvel diretamente pelo link.</p>
+            <p className="text-muted-foreground">{t('public:form.disclaimer.description')}</p>
           </div>
         </div>
       </motion.div>
@@ -595,41 +596,40 @@ const LeadForm = ({
             <FileCheck2 className="w-6 h-6 text-amber-600" />
           </div>
           <div>
-            <h3 className="font-display text-xl font-bold">Antes de começar</h3>
-            <p className="text-sm text-muted-foreground mt-1">Leia com atenção antes de preencher a sua candidatura.</p>
+            <h3 className="font-display text-xl font-bold">{t('public:form.disclaimer.title')}</h3>
+            <p className="text-sm text-muted-foreground mt-1">{t('public:form.disclaimer.description')}</p>
           </div>
         </div>
         <div className="rounded-xl border bg-amber-50/60 p-4 space-y-3 text-sm text-amber-900">
-          <p className="font-semibold">Responsabilidade pela veracidade dos dados</p>
+          <p className="font-semibold">{t('public:form.disclaimer.responsibilityTitle')}</p>
           <p className="leading-relaxed text-amber-800">
-            Ao preencher este formulário, declara que todas as informações fornecidas são verdadeiras e atualizadas.
-            Qualquer inconsistência ou falsidade nos dados indicados poderá prejudicar a sua candidatura ou resultar na sua eliminação do processo.
+            {t('public:form.disclaimer.body1')}
           </p>
           <p className="leading-relaxed text-amber-800">
-            Se tiver informações adicionais que considere relevantes para a sua candidatura, poderá partilhá-las no último passo do formulário.
+            {t('public:form.disclaimer.body2')}
           </p>
         </div>
         <Button
           onClick={() => next(nextAfter('disclaimer'))}
           className="w-full h-12 rounded-xl font-semibold text-sm"
         >
-          Compreendo, continuar
+          {t('public:form.steps.next')}
         </Button>
       </div>
     ),
     urgency: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Quando planeia mudar-se?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Ajuda-nos a perceber a urgência da sua procura.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.urgency')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.urgency')}</p>
         {[
-          { label: 'Imediatamente', icon: <Zap className="w-4 h-4" /> },
-          { label: 'Em 15 dias', icon: <CalendarDays className="w-4 h-4" /> },
-          { label: 'Em 1 mês', icon: <Calendar className="w-4 h-4" /> },
-          { label: 'Só a explorar', icon: <Eye className="w-4 h-4" /> },
+          { key: 'immediately',    icon: <Zap className="w-4 h-4" /> },
+          { key: 'within_15_days', icon: <CalendarDays className="w-4 h-4" /> },
+          { key: 'within_1_month', icon: <Calendar className="w-4 h-4" /> },
+          { key: 'just_browsing',  icon: <Eye className="w-4 h-4" /> },
         ].map(o => (
-          <OptionBtn key={o.label} label={o.label} icon={o.icon}
-            selected={data.urgency === o.label}
-            onClick={() => { set('urgency', o.label); setTimeout(() => next(nextAfter('urgency')), 200); }}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)} icon={o.icon}
+            selected={data.urgency === o.key}
+            onClick={() => { set('urgency', o.key); setTimeout(() => next(nextAfter('urgency')), 200); }}
           />
         ))}
       </div>
@@ -637,17 +637,17 @@ const LeadForm = ({
 
     household: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Quem vai viver no imóvel?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Inclua todas as pessoas que vão residir.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.household')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.household')}</p>
         {[
-          { label: 'Só eu', icon: <User className="w-4 h-4" /> },
-          { label: '2 pessoas', icon: <Users className="w-4 h-4" /> },
-          { label: '3 pessoas', icon: <UserPlus className="w-4 h-4" /> },
-          { label: '4 ou mais', icon: <Home className="w-4 h-4" /> },
+          { key: 'only_me',   icon: <User className="w-4 h-4" /> },
+          { key: '2_people',  icon: <Users className="w-4 h-4" /> },
+          { key: '3_people',  icon: <UserPlus className="w-4 h-4" /> },
+          { key: '4_or_more', icon: <Home className="w-4 h-4" /> },
         ].map(o => (
-          <OptionBtn key={o.label} label={o.label} icon={o.icon}
-            selected={data.household === o.label}
-            onClick={() => { set('household', o.label); setTimeout(() => next(nextAfter('household')), 200); }}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)} icon={o.icon}
+            selected={data.household === o.key}
+            onClick={() => { set('household', o.key); setTimeout(() => next(nextAfter('household')), 200); }}
           />
         ))}
       </div>
@@ -655,14 +655,14 @@ const LeadForm = ({
 
     pets: (
       <div className="space-y-4">
-        <h3 className="font-display text-xl font-bold mb-1">Vai trazer animais de estimação?</h3>
-        <p className="text-sm text-muted-foreground mb-2">Seja honesto — ajuda a encontrar o imóvel certo.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.pets')}</h3>
+        <p className="text-sm text-muted-foreground mb-2">{t('screening:descriptions.pets')}</p>
         <div className="grid grid-cols-2 gap-3">
-          <OptionBtn label="Não" icon={<Ban className="w-4 h-4" />}
+          <OptionBtn label={t('screening:options.no')} icon={<Ban className="w-4 h-4" />}
             selected={data.hasPets === false && data.urgency !== ''}
             onClick={() => { set('hasPets', false); setTimeout(() => next(nextAfter('pets')), 200); }}
           />
-          <OptionBtn label="Sim" icon={<PawPrint className="w-4 h-4" />}
+          <OptionBtn label={t('screening:options.yes')} icon={<PawPrint className="w-4 h-4" />}
             selected={data.hasPets === true}
             onClick={() => set('hasPets', true)}
           />
@@ -673,7 +673,7 @@ const LeadForm = ({
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
               <div className="pt-2 space-y-4">
                 <div>
-                  <Label className="text-xs font-medium mb-2 block">Quantos animais?</Label>
+                  <Label className="text-xs font-medium mb-2 block">{t('public:form.steps.pets.count')}</Label>
                   <div className="flex gap-2">
                     {['1', '2', '3+'].map(n => (
                       <button key={n} type="button" onClick={() => set('petCount', n)}
@@ -684,7 +684,7 @@ const LeadForm = ({
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs font-medium mb-2 block">Que tipo(s) de animais?</Label>
+                  <Label className="text-xs font-medium mb-2 block">{t('public:form.steps.pets.types')}</Label>
                   <div className="flex flex-wrap gap-2">
                     {PET_TYPES.map(({ label, icon }) => (
                       <button key={label} type="button" onClick={() => togglePetType(label)}
@@ -696,7 +696,7 @@ const LeadForm = ({
                   </div>
                 </div>
                 <Button onClick={() => next(nextAfter('pets'))} disabled={!data.petCount || data.petTypes.length === 0} className="w-full rounded-xl">
-                  Continuar
+                  {t('public:form.steps.next')}
                 </Button>
               </div>
             </motion.div>
@@ -707,8 +707,8 @@ const LeadForm = ({
 
     income: (
       <div className="space-y-4">
-        <h3 className="font-display text-xl font-bold mb-1">Qual o rendimento mensal líquido do agregado?</h3>
-        <p className="text-sm text-muted-foreground mb-2">Valor líquido total de todos os membros do agregado que vão residir no imóvel.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.income')}</h3>
+        <p className="text-sm text-muted-foreground mb-2">{t('screening:descriptions.income')}</p>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">€</span>
           <Input
@@ -727,15 +727,15 @@ const LeadForm = ({
           onClick={() => next(nextAfter('income'))}
           className="w-full rounded-xl"
         >
-          Continuar
+          {t('public:form.steps.next')}
         </Button>
       </div>
     ),
 
     commitments: (
       <div className="space-y-4">
-        <h3 className="font-display text-xl font-bold mb-1">Tem prestações ou encargos mensais fixos?</h3>
-        <p className="text-sm text-muted-foreground mb-2">Indique o valor total mensal (crédito automóvel, habitação, outros). Coloque 0 se não tiver nenhum.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.commitments')}</h3>
+        <p className="text-sm text-muted-foreground mb-2">{t('screening:descriptions.commitments')}</p>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">€</span>
           <Input
@@ -754,33 +754,33 @@ const LeadForm = ({
           onClick={() => next(nextAfter('commitments'))}
           className="w-full rounded-xl"
         >
-          Continuar
+          {t('public:form.steps.next')}
         </Button>
       </div>
     ),
 
     job: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Qual é a sua situação profissional?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Esta informação é confidencial e serve apenas para qualificação.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.job')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.job')}</p>
         {[
-          { label: 'Contrato sem termo', icon: <FileCheck2 className="w-4 h-4" /> },
-          { label: 'Contrato a prazo', icon: <FileText className="w-4 h-4" /> },
-          { label: 'Independente', icon: <Briefcase className="w-4 h-4" /> },
-          { label: 'Estudante', icon: <GraduationCap className="w-4 h-4" /> },
-          { label: 'Entre empregos', icon: <Search className="w-4 h-4" /> },
-          { label: 'Outro', icon: <HelpCircle className="w-4 h-4" /> },
+          { key: 'permanent_contract',  icon: <FileCheck2 className="w-4 h-4" /> },
+          { key: 'fixed_term_contract', icon: <FileText className="w-4 h-4" /> },
+          { key: 'self_employed',       icon: <Briefcase className="w-4 h-4" /> },
+          { key: 'student',             icon: <GraduationCap className="w-4 h-4" /> },
+          { key: 'between_jobs',        icon: <Search className="w-4 h-4" /> },
+          { key: 'other',               icon: <HelpCircle className="w-4 h-4" /> },
         ].map(o => (
-          <OptionBtn key={o.label} label={o.label} icon={o.icon}
-            selected={o.label === 'Outro' ? jobIsOther : (!jobIsOther && data.job === o.label)}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)} icon={o.icon}
+            selected={o.key === 'other' ? jobIsOther : (!jobIsOther && data.job === o.key)}
             onClick={() => {
-              if (o.label === 'Outro') {
+              if (o.key === 'other') {
                 setJobIsOther(true);
                 set('job', '');
               } else {
                 setJobIsOther(false);
-                set('job', o.label);
-                setTimeout(() => next(destAfterJob(o.label)), 200);
+                set('job', o.key);
+                setTimeout(() => next(destAfterJob(o.key)), 200);
               }
             }}
           />
@@ -790,7 +790,7 @@ const LeadForm = ({
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
               <div className="space-y-3 pt-1 pb-1 px-1">
                 <Input
-                  placeholder="Descreva a sua situação profissional..."
+                  placeholder={t('public:form.steps.job.descPlaceholder')}
                   value={data.job}
                   onChange={e => set('job', e.target.value)}
                   className="h-11 rounded-xl"
@@ -801,7 +801,7 @@ const LeadForm = ({
                   onClick={() => next(destAfterJob(data.job))}
                   className="w-full rounded-xl"
                 >
-                  Continuar
+                  {t('public:form.steps.next')}
                 </Button>
               </div>
             </motion.div>
@@ -812,17 +812,17 @@ const LeadForm = ({
 
     employmentDuration: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Há quanto tempo está na situação profissional actual?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Ajuda-nos a perceber a estabilidade do seu rendimento.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.employmentDuration')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.employmentDuration')}</p>
         {[
-          { label: 'Menos de 6 meses', value: '< 6 meses' },
-          { label: '6 a 12 meses', value: '6–12 meses' },
-          { label: '1 a 3 anos', value: '1–3 anos' },
-          { label: 'Mais de 3 anos', value: 'Mais de 3 anos' },
+          { key: 'under_6_months' },
+          { key: '6_to_12_months' },
+          { key: '1_to_3_years' },
+          { key: 'over_3_years' },
         ].map(o => (
-          <OptionBtn key={o.value} label={o.label}
-            selected={data.employmentDuration === o.value}
-            onClick={() => { set('employmentDuration', o.value); setTimeout(() => next(destAfterEmploymentDuration()), 200); }}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)}
+            selected={data.employmentDuration === o.key}
+            onClick={() => { set('employmentDuration', o.key); setTimeout(() => next(destAfterEmploymentDuration()), 200); }}
           />
         ))}
       </div>
@@ -830,26 +830,27 @@ const LeadForm = ({
 
     guarantor: (() => {
       const hasGuarantorData = data.hasGuarantor;
-      const advance = hasGuarantorData === 'Não' && property.criteria.advanceWithoutGuarantor
+      const advance = hasGuarantorData === 'no' && property.criteria.advanceWithoutGuarantor
         ? property.criteria.advanceWithoutGuarantor
         : property.criteria.advanceMonths;
-      const deposit = hasGuarantorData === 'Não' && property.criteria.depositWithoutGuarantor
+      const deposit = hasGuarantorData === 'no' && property.criteria.depositWithoutGuarantor
         ? property.criteria.depositWithoutGuarantor
         : property.criteria.depositMonths;
       const rent = property.rentalPrice || property.price;
 
       return (
         <div className="space-y-4">
-          <h3 className="font-display text-xl font-bold mb-1">Tem fiador disponível?</h3>
+          <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.guarantor')}</h3>
           <p className="text-sm text-muted-foreground mb-2">
-            Como não tem contrato de trabalho em Portugal, um fiador pode facilitar a aprovação da candidatura.
+            {t('screening:descriptions.guarantor')}
           </p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { value: 'Sim', label: 'Sim, tenho', sub: 'Fiador disponível', Icon: UserCheck },
-              { value: 'Não', label: 'Não tenho', sub: 'Sem fiador', Icon: UserX },
-            ].map(({ value, label, sub, Icon }) => {
+              { value: 'yes', Icon: UserCheck },
+              { value: 'no',  Icon: UserX },
+            ].map(({ value, Icon }) => {
               const sel = data.hasGuarantor === value;
+              const label = t(`screening:options.${value}`);
               return (
                 <button key={value} type="button" onClick={() => set('hasGuarantor', value)}
                   className={`relative flex flex-col items-center justify-center gap-2 py-6 px-3 rounded-2xl border text-center transition-all ${
@@ -859,7 +860,6 @@ const LeadForm = ({
                     <Icon className={`w-5 h-5 transition-colors ${sel ? 'text-primary' : 'text-muted-foreground'}`} />
                   </span>
                   <span className="text-sm font-semibold leading-tight">{label}</span>
-                  <span className={`text-xs transition-colors ${sel ? 'text-primary/70' : 'text-muted-foreground'}`}>{sub}</span>
                   {sel && <CheckCircle2 className="absolute top-2.5 right-2.5 w-4 h-4 text-primary" />}
                 </button>
               );
@@ -870,27 +870,27 @@ const LeadForm = ({
             {hasGuarantorData !== '' && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <div className="p-4 rounded-xl bg-muted/50 border space-y-3">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Valores estimados de entrada</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('public:form.guarantorSection.title')}</p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Adiantamento ({advance} meses)</span>
+                      <span className="text-muted-foreground">{t('public:form.guarantorSection.advance', { count: advance })}</span>
                       <span className="font-bold">€{(advance * (rent ?? 0)).toLocaleString('pt-PT')}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Caução ({deposit} meses)</span>
+                      <span className="text-muted-foreground">{t('public:form.guarantorSection.deposit', { count: deposit })}</span>
                       <span className="font-bold">€{(deposit * (rent ?? 0)).toLocaleString('pt-PT')}</span>
                     </div>
                     <div className="border-t pt-2 flex items-center justify-between text-sm font-bold">
-                      <span>Total estimado</span>
+                      <span>{t('public:form.guarantorSection.total')}</span>
                       <span>€{((advance + deposit) * (rent ?? 0)).toLocaleString('pt-PT')}</span>
                     </div>
                   </div>
-                  {hasGuarantorData === 'Não' && property.criteria.advanceWithoutGuarantor && (
-                    <p className="text-xs text-amber-600">Sem fiador os valores de entrada são ajustados conforme critérios do imóvel.</p>
+                  {hasGuarantorData === 'no' && property.criteria.advanceWithoutGuarantor && (
+                    <p className="text-xs text-amber-600">{t('public:form.disclaimer.guarantorNote')}</p>
                   )}
                 </div>
                 <Button onClick={() => next(nextAfter('guarantor'))} className="w-full rounded-xl mt-3">
-                  Continuar
+                  {t('public:form.steps.next')}
                 </Button>
               </motion.div>
             )}
@@ -901,16 +901,16 @@ const LeadForm = ({
 
     intent: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Visitou algum imóvel recentemente?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Ajuda-nos a perceber em que fase da procura está.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.intent')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.intent')}</p>
         <div className="grid grid-cols-2 gap-3">
-          <OptionBtn label="Sim" icon={<ThumbsUp className="w-4 h-4" />}
-            selected={data.hasVisited === 'Sim'}
-            onClick={() => { set('hasVisited', 'Sim'); setTimeout(() => next(nextAfter('intent')), 200); }}
+          <OptionBtn label={t('screening:options.yes')} icon={<ThumbsUp className="w-4 h-4" />}
+            selected={data.hasVisited === 'yes'}
+            onClick={() => { set('hasVisited', 'yes'); setTimeout(() => next(nextAfter('intent')), 200); }}
           />
-          <OptionBtn label="Não" icon={<ThumbsDown className="w-4 h-4" />}
-            selected={data.hasVisited === 'Não'}
-            onClick={() => { set('hasVisited', 'Não'); setTimeout(() => next(nextAfter('intent')), 200); }}
+          <OptionBtn label={t('screening:options.no')} icon={<ThumbsDown className="w-4 h-4" />}
+            selected={data.hasVisited === 'no'}
+            onClick={() => { set('hasVisited', 'no'); setTimeout(() => next(nextAfter('intent')), 200); }}
           />
         </div>
       </div>
@@ -918,43 +918,43 @@ const LeadForm = ({
 
     stayDuration: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">Quanto tempo pretende ficar no imóvel?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Uma ideia aproximada ajuda-nos a perceber os seus planos.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.stayDuration')}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.stayDuration')}</p>
         {[
-          { label: 'Menos de 1 ano', value: '< 1 ano' },
-          { label: '1 a 2 anos', value: '1–2 anos' },
-          { label: '2 a 3 anos', value: '2–3 anos' },
-          { label: 'Mais de 3 anos', value: '3+ anos' },
+          { key: 'under_1_year' },
+          { key: '1_to_2_years' },
+          { key: '2_to_3_years' },
+          { key: '3_plus_years' },
         ].map(o => (
-          <OptionBtn key={o.value} label={o.label}
-            selected={data.stayDuration === o.value}
-            onClick={() => { set('stayDuration', o.value); setTimeout(() => next(nextAfter('stayDuration')), 200); }}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)}
+            selected={data.stayDuration === o.key}
+            onClick={() => { set('stayDuration', o.key); setTimeout(() => next(nextAfter('stayDuration')), 200); }}
           />
         ))}
         <button type="button" onClick={() => next(nextAfter('stayDuration'))} className="w-full text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">
-          Saltar esta pergunta →
+          {t('public:form.steps.skip')}
         </button>
       </div>
     ),
 
     motivation: (
       <div className="space-y-3">
-        <h3 className="font-display text-xl font-bold mb-1">O que procura principalmente? <span className="text-muted-foreground text-sm font-normal">(opcional)</span></h3>
+        <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.motivation')} <span className="text-muted-foreground text-sm font-normal">({t('public:form.steps.skip').replace(' →', '')})</span></h3>
         {[
-          { label: 'Melhor localização', icon: <MapPin className="w-4 h-4" /> },
-          { label: 'Melhor preço', icon: <Tag className="w-4 h-4" /> },
-          { label: 'Relocalização por trabalho', icon: <Plane className="w-4 h-4" /> },
-          { label: 'Outro motivo', icon: <MessageCircle className="w-4 h-4" /> },
+          { key: 'better_location',  icon: <MapPin className="w-4 h-4" /> },
+          { key: 'better_price',     icon: <Tag className="w-4 h-4" /> },
+          { key: 'work_relocation',  icon: <Plane className="w-4 h-4" /> },
+          { key: 'other',            icon: <MessageCircle className="w-4 h-4" /> },
         ].map(o => (
-          <OptionBtn key={o.label} label={o.label} icon={o.icon}
-            selected={o.label === 'Outro motivo' ? motivationIsOther : (!motivationIsOther && data.motivation === o.label)}
+          <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)} icon={o.icon}
+            selected={o.key === 'other' ? motivationIsOther : (!motivationIsOther && data.motivation === o.key)}
             onClick={() => {
-              if (o.label === 'Outro motivo') {
+              if (o.key === 'other') {
                 setMotivationIsOther(true);
                 set('motivation', '');
               } else {
                 setMotivationIsOther(false);
-                set('motivation', o.label);
+                set('motivation', o.key);
                 setTimeout(() => next(nextAfter('motivation')), 200);
               }
             }}
@@ -965,7 +965,7 @@ const LeadForm = ({
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
               <div className="space-y-3 pt-1 pb-1 px-1">
                 <Input
-                  placeholder="Qual é o seu principal motivo?"
+                  placeholder={t('public:form.steps.motivation.placeholder')}
                   value={data.motivation}
                   onChange={e => set('motivation', e.target.value)}
                   className="h-11 rounded-xl"
@@ -976,7 +976,7 @@ const LeadForm = ({
                   onClick={() => next(nextAfter('motivation'))}
                   className="w-full rounded-xl"
                 >
-                  Continuar
+                  {t('public:form.steps.next')}
                 </Button>
               </div>
             </motion.div>
@@ -984,7 +984,7 @@ const LeadForm = ({
         </AnimatePresence>
         {!motivationIsOther && (
           <button type="button" onClick={() => next(nextAfter('motivation'))} className="w-full text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">
-            Saltar esta pergunta →
+            {t('public:form.steps.skip')}
           </button>
         )}
       </div>
@@ -999,12 +999,12 @@ const LeadForm = ({
         : COUNTRIES;
       return (
         <div className="space-y-3">
-          <h3 className="font-display text-xl font-bold mb-1">Qual é a sua nacionalidade?</h3>
-          <p className="text-sm text-muted-foreground mb-3">Esta informação é confidencial e apenas utilizada para a qualificação da candidatura.</p>
+          <h3 className="font-display text-xl font-bold mb-1">{t('screening:questions.nationality')}</h3>
+          <p className="text-sm text-muted-foreground mb-3">{t('screening:descriptions.nationality')}</p>
           <div className="relative">
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Pesquisar país..."
+              placeholder={t('public:form.steps.nationality.search')}
               value={nationalitySearch}
               onChange={e => setNationalitySearch(e.target.value)}
               className="h-11 rounded-xl pl-9"
@@ -1042,16 +1042,16 @@ const LeadForm = ({
       return (
         <div className="space-y-3">
           <h3 className="font-display text-xl font-bold mb-1">Há quanto tempo reside em {agencyCountryName}?</h3>
-          <p className="text-sm text-muted-foreground mb-4">Ajuda-nos a avaliar a estabilidade da sua situação de residência.</p>
+          <p className="text-sm text-muted-foreground mb-4">{t('screening:descriptions.residencyDuration')}</p>
           {[
-            { label: 'Menos de 1 ano', value: 'under_1_year' },
-            { label: '1 a 3 anos', value: '1_to_3_years' },
-            { label: '3 a 5 anos', value: '3_to_5_years' },
-            { label: 'Mais de 5 anos', value: 'over_5_years' },
+            { key: 'under_1_year' },
+            { key: '1_to_3_years' },
+            { key: '3_to_5_years' },
+            { key: 'over_5_years' },
           ].map(o => (
-            <OptionBtn key={o.value} label={o.label}
-              selected={data.residencyDuration === o.value}
-              onClick={() => { set('residencyDuration', o.value); setTimeout(() => next(nextAfter('residencyDuration')), 200); }}
+            <OptionBtn key={o.key} label={t(`screening:options.${o.key}`)}
+              selected={data.residencyDuration === o.key}
+              onClick={() => { set('residencyDuration', o.key); setTimeout(() => next(nextAfter('residencyDuration')), 200); }}
             />
           ))}
         </div>
@@ -1060,27 +1060,27 @@ const LeadForm = ({
 
     contact: (
       <div className="space-y-4">
-        <h3 className="font-display text-xl font-bold mb-1">Quase lá! Deixe os seus contactos.</h3>
-        <p className="text-sm text-muted-foreground mb-2">O agente responsável irá contactá-lo para confirmar os próximos passos.</p>
+        <h3 className="font-display text-xl font-bold mb-1">{t('public:form.contact.title')}</h3>
+        <p className="text-sm text-muted-foreground mb-2">{t('public:form.disclaimer.description')}</p>
         <div className="rounded-xl border bg-muted/40 px-4 py-3 text-xs text-muted-foreground leading-relaxed mb-2">
-          Tem alguma informação adicional relevante para a sua candidatura? Pode partilhá-la com o agente através do campo de notas abaixo.
+          {t('public:form.contact.notes')}
         </div>
         <div>
-          <Label className="text-xs font-medium">Nome completo</Label>
-          <Input placeholder="Maria Silva" value={data.name} onChange={e => set('name', e.target.value)} className="mt-1 h-11 rounded-xl" />
+          <Label className="text-xs font-medium">{t('public:form.contact.name')}</Label>
+          <Input placeholder={t('public:form.contact.namePlaceholder')} value={data.name} onChange={e => set('name', e.target.value)} className="mt-1 h-11 rounded-xl" />
         </div>
         <div>
-          <Label className="text-xs font-medium">Telefone</Label>
+          <Label className="text-xs font-medium">{t('public:form.contact.phone')}</Label>
           <Input type="tel" placeholder="+351 912 345 678" value={data.phone} onChange={e => set('phone', e.target.value)} className="mt-1 h-11 rounded-xl" />
         </div>
         <div>
-          <Label className="text-xs font-medium">Email</Label>
+          <Label className="text-xs font-medium">{t('public:form.contact.email')}</Label>
           <Input type="email" placeholder="maria@email.com" value={data.email} onChange={e => set('email', e.target.value)} className="mt-1 h-11 rounded-xl" />
         </div>
         <div>
-          <Label className="text-xs font-medium text-muted-foreground">Notas adicionais (opcional)</Label>
+          <Label className="text-xs font-medium text-muted-foreground">{t('public:form.contact.notes')}</Label>
           <textarea
-            placeholder="Ex: Estou disponível para visita aos fins-de-semana. Tenho carta de recomendação do anterior senhorio..."
+            placeholder={t('public:form.contact.notesPlaceholder')}
             value={data.notes ?? ''}
             onChange={e => set('notes', e.target.value)}
             rows={3}
@@ -1092,11 +1092,8 @@ const LeadForm = ({
           disabled={!data.name || !data.phone || !data.email}
           className="w-full h-12 rounded-xl font-semibold text-sm"
         >
-          Enviar candidatura
+          {t('public:form.contact.submit')}
         </Button>
-        <p className="text-[11px] text-muted-foreground text-center">
-          Receberá um email assim que os nossos agentes analisarem a sua candidatura.
-        </p>
       </div>
     ),
   };
@@ -1132,7 +1129,7 @@ const LeadForm = ({
           }}
           className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors pt-1"
         >
-          <ChevronLeft className="w-3 h-3" /> Voltar
+          <ChevronLeft className="w-3 h-3" /> {t('public:form.steps.back')}
         </button>
       )}
     </div>

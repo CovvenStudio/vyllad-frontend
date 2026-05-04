@@ -1,0 +1,59 @@
+{
+  "title": "Agentes",
+  "subtitle": "Gerir os agentes da sua imobiliária",
+  "loading": "A carregar agentes…",
+  "error": "Erro ao carregar agentes.",
+  "total": "Total na equipa",
+  "pendingInvites": "Convites pendentes",
+  "invite": "Convidar agente",
+  "sendInvite": "Enviar convite",
+  "empty": "Ainda não há agentes na sua equipa.",
+  "inviteFirst": "Convidar primeiro agente",
+  "stats": {
+    "agents": "Agentes",
+    "pending": "Convites pendentes",
+    "total": "Total na equipa"
+  },
+  "limitReached": "Limite atingido",
+  "upgrade": "Fazer upgrade",
+  "contactOwnerUpgrade": "Contacte o proprietário para fazer upgrade.",
+  "pendingExpires": "{{role}} · Expira {{date}}",
+  "slotsLeft_one": "{{count}} lugar disponível no plano",
+  "slotsLeft_other": "{{count}} lugares disponíveis no plano",
+  "atLimit": "O plano <strong>{{plan}}</strong> permite até {{max}} agentes. Faça upgrade para adicionar mais.",
+  "ownerExcluded": "· o proprietário não conta para o limite",
+  "upgradePortalError": "Não foi possível abrir o portal de gestão da subscrição.",
+  "inviteError": "Erro ao convidar agente.",
+  "removeError": "Erro ao remover agente.",
+  "cancelError": "Erro ao cancelar convite.",
+  "dialog": {
+    "invite": {
+      "title": "Convidar agente",
+      "roleAgent": "Colaborador",
+      "roleAgentDesc": "Acesso básico de consulta",
+      "roleManager": "Gerente",
+      "roleManagerDesc": "Pode gerir propriedades e agendamentos",
+      "emailPlaceholder": "email@agência.com",
+      "phonePlaceholder": "+351 912 345 678",
+      "submit": "Enviar convite",
+      "error": "Erro ao convidar agente."
+    },
+    "edit": {
+      "title": "Editar agente",
+      "submit": "Guardar",
+      "error": "Erro ao guardar."
+    },
+    "removeAgent": {
+      "title": "Remover agente",
+      "description": "Tens a certeza que queres remover <strong>{{name}}</strong> da agência? Esta ação não pode ser desfeita.",
+      "confirm": "Remover",
+      "error": "Erro ao remover agente."
+    },
+    "cancelInvite": {
+      "title": "Cancelar convite",
+      "description": "Tens a certeza que queres cancelar o convite para <strong>{{email}}</strong>?",
+      "confirm": "Cancelar convite",
+      "error": "Erro ao cancelar convite."
+    }
+  }
+}

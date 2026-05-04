@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Save, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,17 +15,17 @@ import { tLevel, tCategory, tFactor } from '@/lib/scoring-i18n';
 
 // ── Preset profiles ────────────────────────────────────────────────────────────
 
-const PRESETS: { name: string; profileName: string; factors: Record<string, number> }[] = [
+const PRESETS: { profileName: string; factors: Record<string, number> }[] = [
   {
-    name: 'Conservador', profileName: 'conservative',
+    profileName: 'conservative',
     factors: { incomeRatio: 4, commitments: 3, jobType: 3, employmentDuration: 2, guarantor: 4, household: 2, pets: 2, urgency: 2, stayDuration: 2, hasVisited: 1, motivation: 1 },
   },
   {
-    name: 'Padrão', profileName: 'standard',
+    profileName: 'standard',
     factors: { incomeRatio: 4, commitments: 3, jobType: 2, employmentDuration: 2, guarantor: 3, household: 2, pets: 1, urgency: 2, stayDuration: 2, hasVisited: 1, motivation: 1 },
   },
   {
-    name: 'Flexível', profileName: 'flexible',
+    profileName: 'flexible',
     factors: { incomeRatio: 3, commitments: 2, jobType: 2, employmentDuration: 1, guarantor: 1, household: 2, pets: 0, urgency: 3, stayDuration: 2, hasVisited: 2, motivation: 2 },
   },
 ];
@@ -65,10 +67,12 @@ function LevelSelector({
   value,
   levels,
   onChange,
+  t,
 }: {
   value: number;
   levels: ScoringFactorLevelDto[];
   onChange: (v: number) => void;
+  t: TFunction;
 }) {
   return (
     <div className="flex gap-1">
@@ -98,18 +102,20 @@ function FactorRow({
   level,
   levels,
   onChange,
+  t,
 }: {
   def: ScoringFactorDefinitionDto;
   level: number;
   levels: ScoringFactorLevelDto[];
   onChange: (v: number) => void;
+  t: TFunction;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 py-3 border-b last:border-0">
       <div className="min-w-0 flex-1">
         <span className="text-sm font-medium">{tFactor(def.label)}</span>
       </div>
-      <LevelSelector value={level} levels={levels} onChange={onChange} />
+      <LevelSelector value={level} levels={levels} onChange={onChange} t={t} />
     </div>
   );
 }
@@ -119,6 +125,7 @@ function FactorRow({
 export default function ScoringConfig() {
   const { currentAgencyId } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation('settings');
 
   const [config, setConfig] = useState<Omit<ScoringConfigDto, 'agencyId'> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -141,7 +148,7 @@ export default function ScoringConfig() {
           cp: (nt.commitmentsPercent ?? [20, 40, 60]).map(String),
         });
       })
-      .catch(() => toast({ title: 'Erro ao carregar configuração.', variant: 'destructive' }))
+      .catch(() => toast({ title: t('scoring.errorLoad'), variant: 'destructive' }))
       .finally(() => setLoading(false));
   }, [currentAgencyId]);
 
@@ -163,7 +170,7 @@ export default function ScoringConfig() {
 
   if (loading || !config) return (
     <DashboardLayout>
-      <div className="p-8 text-muted-foreground text-sm">A carregar configuração…</div>
+      <div className="p-8 text-muted-foreground text-sm">{t('scoring.loading')}</div>
     </DashboardLayout>
   );
 
@@ -206,9 +213,9 @@ export default function ScoringConfig() {
       const dto = await saveScoringConfig(currentAgencyId, input);
       const { agencyId: _, ...rest } = dto;
       setConfig(rest);
-      toast({ title: 'Configuração guardada.' });
+      toast({ title: t('scoring.saved') });
     } catch {
-      toast({ title: 'Erro ao guardar configuração.', variant: 'destructive' });
+      toast({ title: t('scoring.errorSave'), variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -222,52 +229,50 @@ export default function ScoringConfig() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3 mb-1">
             <SlidersHorizontal className="w-5 h-5 text-primary" />
-            <h1 className="text-2xl font-bold font-display">Qualificação de Candidatos</h1>
+            <h1 className="text-2xl font-bold font-display">{t('scoring.title')}</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Defina a importância de cada factor na avaliação das candidaturas.
+            {t('scoring.subtitle')}
           </p>
         </motion.div>
 
         {/* Presets */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           className="rounded-xl border p-5 bg-card space-y-4">
-          <h2 className="font-semibold text-sm">Perfil predefinido</h2>
+          <h2 className="font-semibold text-sm">{t('scoring.presetTitle')}</h2>
           <div className="grid grid-cols-3 gap-3">
             {PRESETS.map(p => (
-              <button key={p.name} type="button" onClick={() => applyPreset(p)}
+              <button key={p.profileName} type="button" onClick={() => applyPreset(p)}
                 className={`rounded-lg border p-3 text-left text-sm transition-all ${
                   config.profileName === p.profileName
                     ? 'border-primary bg-primary/5 text-foreground font-medium'
                     : 'border-border hover:border-primary/40 text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <div className="font-semibold">{p.name}</div>
+                <div className="font-semibold">{t(`scoring.profiles.${p.profileName}`)}</div>
                 <div className="text-[11px] mt-0.5 opacity-60">
-                  {p.name === 'Conservador' ? 'Fiador e rendimento como determinantes' :
-                   p.name === 'Padrão' ? 'Equilíbrio financeiro e garantias' :
-                   'Intenção e urgência em destaque'}
+                  {t(`scoring.profileDesc.${p.profileName}`)}
                 </div>
               </button>
             ))}
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Selecionar um perfil aplica os níveis sugeridos — pode ajustar individualmente depois.
+            {t('scoring.presetHint')}
           </p>
         </motion.div>
 
         {/* Legend */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
           className="rounded-xl border p-4 bg-card">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Legenda de importância</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('scoring.legend')}</p>
           <div className="flex flex-wrap gap-2">
             {levels.map(l => (
               <span key={l.level} className={`px-2.5 py-1 rounded-md border text-[11px] font-semibold ${LEVEL_COLORS[l.level]}`}>
                 {tLevel(l.label)}
                 <span className="ml-1.5 opacity-60 font-normal">
-                  {l.level === 0 ? '— excluído' :
-                   l.level === 4 ? '— score baixo aqui = rejeição quase certa' :
-                   `${l.weight}× peso`}
+                  {l.level === 0 ? t('scoring.legendExcluded') :
+                   l.level === 4 ? t('scoring.legendCritical') :
+                   t('scoring.legendWeight', { weight: l.weight })}
                 </span>
               </span>
             ))}
@@ -289,6 +294,7 @@ export default function ScoringConfig() {
                   level={config.factors[def.key] ?? 2}
                   levels={levels}
                   onChange={v => setFactor(def.key, v)}
+                  t={t}
                 />
               ))}
             </div>
@@ -299,16 +305,16 @@ export default function ScoringConfig() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="rounded-xl border p-5 bg-card space-y-4">
           <div>
-            <h2 className="font-semibold text-sm">Limiares de classificação</h2>
+            <h2 className="font-semibold text-sm">{t('scoring.classificationTitle')}</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              A partir de que pontuação final um candidato é <span className="text-emerald-600 font-medium">Excelente</span> ou <span className="text-amber-500 font-medium">Potencial</span>.
+              {t('scoring.classificationSubtitle', { excellent: config.thresholds.excellent, potential: config.thresholds.potential })}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                Excelente (≥ pontos)
+                {t('scoring.excellentLabel')}
               </Label>
               <Input
                 inputMode="numeric"
@@ -324,7 +330,7 @@ export default function ScoringConfig() {
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-                Potencial (≥ pontos)
+                {t('scoring.potentialLabel')}
               </Label>
               <Input
                 inputMode="numeric"
@@ -339,9 +345,7 @@ export default function ScoringConfig() {
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Abaixo de {config.thresholds.potential} → Baixa prioridade.
-            {' '}{config.thresholds.potential}–{config.thresholds.excellent - 1} → Potencial.
-            {' '}≥ {config.thresholds.excellent} → Excelente.
+            {t('scoring.classificationNote', { potential: config.thresholds.potential, excellent: config.thresholds.excellent })}
           </p>
         </motion.div>
 
@@ -350,19 +354,19 @@ export default function ScoringConfig() {
           const nt = config.numericThresholds ?? DEFAULT_NUMERIC_THRESHOLDS;
           const ir = nt.incomeRatio ?? [1.0, 2.0, 3.0, 3.5];
           const cp = nt.commitmentsPercent ?? [20, 40, 60];
-          const irLabels = ['mínimo', 'fraco', 'bom', 'ideal'];
-          const cpLabels = ['max baixo (%)', 'max médio (%)', 'max elevado (%)'];
+          const irLabels = [t('scoring.irMin'), t('scoring.irWeak'), t('scoring.irGood'), t('scoring.irIdeal')];
+          const cpLabels = [t('scoring.cpMaxLow'), t('scoring.cpMaxMid'), t('scoring.cpMaxHigh')];
           return (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
               className="rounded-xl border p-5 bg-card space-y-4">
               <div>
-                <h2 className="font-semibold text-sm">Limiares numéricos</h2>
+                <h2 className="font-semibold text-sm">{t('scoring.numericTitle')}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Defina a partir de que valores o rácio rendimento/renda e os encargos são considerados ideais, bons, fracos ou baixos.
+                  {t('scoring.numericSubtitle')}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium mb-2">Rácio rendimento ÷ renda (multiplicador mínimo)</p>
+                <p className="text-xs font-medium mb-2">{t('scoring.incomeRatioTitle')}</p>
                 <div className="grid grid-cols-4 gap-2">
                   {ir.map((v, i) => (
                     <div key={i} className="space-y-1">
@@ -382,11 +386,11 @@ export default function ScoringConfig() {
                   ))}
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  Bandas: &lt;{ir[0]}× → abaixo mínimo · ≥{ir[0]}× → mínimo · ≥{ir[1]}× → fraco · ≥{ir[2]}× → bom · ≥{ir[3]}× → ideal
+                  {t('scoring.incomeRatioNote', { ir0: ir[0], ir1: ir[1], ir2: ir[2], ir3: ir[3] })}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium mb-2">Encargos mensais (% do rendimento)</p>
+                <p className="text-xs font-medium mb-2">{t('scoring.commitmentsTitle')}</p>
                 <div className="grid grid-cols-3 gap-2">
                   {cp.map((v, i) => (
                     <div key={i} className="space-y-1">
@@ -406,7 +410,7 @@ export default function ScoringConfig() {
                   ))}
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  Bandas: &lt;{cp[0]}% → baixo · {cp[0]}–{cp[1]}% → médio · {cp[1]}–{cp[2]}% → elevado · ≥{cp[2]}% → muito elevado
+                  {t('scoring.commitmentsNote', { cp0: cp[0], cp1: cp[1], cp2: cp[2] })}
                 </p>
               </div>
             </motion.div>
@@ -418,11 +422,11 @@ export default function ScoringConfig() {
         <div className="flex gap-3 justify-end">
           <Button variant="outline" size="sm" onClick={() => applyPreset(PRESETS[0])}>
             <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-            Repor Conservador
+            {t('scoring.reset')}
           </Button>
           <Button size="sm" onClick={handleSave} disabled={saving}>
             <Save className="w-3.5 h-3.5 mr-1.5" />
-            {saving ? 'A guardar…' : 'Guardar'}
+            {saving ? t('scoring.saving') : t('scoring.save')}
           </Button>
         </div>
       </div>

@@ -1,0 +1,178 @@
+{
+  "title": "Inmuebles",
+  "subtitle": "Gestión de inmuebles",
+  "loading": "Cargando inmuebles",
+  "totalCount_one": "{{count}} inmueble en la agencia",
+  "totalCount_other": "{{count}} inmuebles en la agencia",
+  "addProperty": "Añadir inmueble",
+  "newProperty": "Nuevo inmueble",
+  "upgrade": "Hacer upgrade",
+  "contactOwnerUpgrade": "Contacte al propietario para hacer upgrade.",
+  "searchPlaceholder": "Buscar inmueble, ubicación…",
+  "noProperties": "Ningún inmueble encontrado",
+  "noPropertiesHint": "Añade tu primer inmueble para empezar.",
+  "noPropertiesFilter": "Intenta ajustar los filtros de búsqueda.",
+  "search": "Buscar",
+  "table": {
+    "property": "Inmueble",
+    "reference": "Referencia",
+    "status": "Estado",
+    "price": "Precio",
+    "details": "Detalles",
+    "candidates": "Candidatos"
+  },
+  "actions": {
+    "edit": "Editar",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "close": "Cerrar",
+    "rented": "Inmueble alquilado",
+    "archived": "Retirar inmueble"
+  },
+  "pagination": {
+    "showing": "{{from}}–{{to}} de {{total}} inmuebles"
+  },
+  "limitReached": {
+    "title": "Límite de inmuebles activos alcanzado",
+    "desc_one": "Tu plan permite un máximo de {{count}} inmueble activo. Haz upgrade para reanudar más.",
+    "desc_other": "Tu plan permite un máximo de {{count}} inmuebles activos. Haz upgrade para reanudar más."
+  },
+  "filter": {
+    "all": "Todas",
+    "active": "Activas",
+    "paused": "Pausadas",
+    "rented": "Alquiladas",
+    "archived": "Archivadas"
+  },
+  "status": {
+    "ACTIVE": "Activa",
+    "PAUSED": "Pausada",
+    "RENTED": "Alquilada",
+    "ARCHIVED": "Archivada"
+  },
+  "metrics": {
+    "activeCount": "{{count}} / {{max}} activas",
+    "capturedSince": "En captación desde hace",
+    "avgToClose": "Media hasta cerrar",
+    "completedVisits": "Visitas realizadas",
+    "candidates": "Candidatos"
+  },
+  "criteria": {
+    "title": "Criterios de candidatura",
+    "minIncome": "Renta mínima (€)",
+    "maxPeople": "Máx. personas",
+    "advance": "Adelanto (meses)",
+    "deposit": "Depósito (meses)",
+    "pets": "Mascotas",
+    "petTypesLabel": "¿Qué tipos están permitidos?",
+    "petTypesNone": "Ninguno seleccionado = todos permitidos",
+    "guarantorRequired": "Avalista necesario",
+    "noGuarantorValues": "Valores sin avalista",
+    "advanceNoGuarantor": "Adelanto s/ avalista (meses)",
+    "depositNoGuarantor": "Depósito s/ avalista (meses)",
+    "noAgents": "No hay agentes disponibles.",
+    "agentsHint": "Selecciona uno o más agentes responsables de esta propiedad."
+  },
+  "dialog": {
+    "add": {
+      "title": "Nueva propiedad",
+      "submit": "Crear propiedad",
+      "success": "¡Propiedad creada!",
+      "successTitle": "¡Propiedad creada con éxito!",
+      "successDesc": "La propiedad está activa y lista para recibir candidaturas.",
+      "error": "Error al crear la propiedad."
+    },
+    "edit": {
+      "title": "Editar propiedad",
+      "submit": "Guardar cambios",
+      "success": "¡Propiedad actualizada!",
+      "error": "Error al actualizar la propiedad."
+    },
+    "fields": {
+      "title": "Título",
+      "titlePlaceholder": "Ej: Piso 2 hab. reformado en Salamanca",
+      "reference": "Referencia interna",
+      "referencePlaceholder": "Ej: INM-2024-001",
+      "location": "Ubicación",
+      "locationPlaceholder": "Ej: Barrio Salamanca, Madrid",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe las características especiales de la propiedad...",
+      "agents": "Agentes responsables",
+      "availableFrom": "Disponible desde",
+      "selectDate": "Seleccionar fecha",
+      "petsAllowed": "Permitido",
+      "petsNotAllowed": "No permitido",
+      "announcementLink": "Enlace al anuncio",
+      "rentalValue": "Valor del arrendamiento",
+      "rentalHint": "Sirve de base para el cálculo de adelantos y depósitos",
+      "announcementLinkPlaceholder": "https://idealista.com/..."
+    },
+    "errors": {
+      "generic": "Error"
+    }
+  },
+  "detail": {
+    "tabs": {
+      "candidates": "Candidatos",
+      "visits": "Visitas",
+      "contract": "Contrato"
+    },
+    "loading": "Cargando propiedad",
+    "illustrative": "Imagen ilustrativa",
+    "immediateAccess": "Inmediatamente",
+    "floorRC": "Planta baja",
+    "visitCompleted": "Visitas realizadas",
+    "info": "Información del Inmueble",
+    "back": "Inmuebles",
+    "viewPage": "Ver página",
+    "edit": "Editar",
+    "dashboard": "Panel",
+    "location": "Ubicación",
+    "available": "Disponible",
+    "reference": "Referencia",
+    "pets": "Animales",
+    "createdAt": "Creado el",
+    "announcementLink": "Enlace del anuncio",
+    "description": "Descripción",
+    "petsAllowed": "Permitidos",
+    "petsNotAllowed": "No permitidos",
+    "criteriaTitle": "Criterios de arrendamiento",
+    "minIncome": "Ingresos mínimos",
+    "maxPeople": "Máx. personas",
+    "advance": "Adelanto",
+    "deposit": "Depósito",
+    "guarantorRequired": "Obligatorio",
+    "guarantorNotRequired": "No requerido",
+    "advanceNoGuarantor": "Adelanto s/ avalista",
+    "depositNoGuarantor": "Depósito s/ avalista",
+    "minContract": "Duración mínima",
+    "months": "meses",
+    "activeCandidates": "Candidatos activos",
+    "manage": "Gestionar",
+    "noCandidates": "Sin candidatos activos",
+    "price": "Precio mensual",
+    "closed": "Cerrado",
+    "open": "Abierto",
+    "accepting": "Aceptando candidaturas"
+  },
+  "candidates": {
+    "excellent_one": "{{count}} excelente",
+    "excellent_other": "{{count}} excelentes",
+    "potential_one": "{{count}} potencial",
+    "potential_other": "{{count}} potenciales",
+    "low_one": "{{count}} por debajo",
+    "low_other": "{{count}} por debajo"
+  },
+  "upsell": {
+    "title_one": "{{count}} candidato oculto por el límite del plan",
+    "title_other": "{{count}} candidatos ocultos por el límite del plan",
+    "desc": "Tu plan muestra hasta {{limit}} candidatos por inmueble. Haz upgrade para verlos todos.",
+    "link": "Ver planes →"
+  },
+  "badge": {
+    "urgent": "Urgente"
+  },
+  "public": {
+    "illustrative": "Imagen ilustrativa"
+  }
+}

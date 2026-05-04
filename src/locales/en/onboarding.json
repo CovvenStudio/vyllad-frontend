@@ -1,0 +1,72 @@
+{
+  "header": "Initial Setup",
+  "steps": {
+    "plan": "Plan",
+    "agency": "Agency",
+    "confirm": "Confirm"
+  },
+  "plan": {
+    "title": "Choose your plan",
+    "subtitle": "All plans include automatic candidate screening.\nYou can change or cancel at any time.",
+    "billingCountry": "Billing country:",
+    "loading": "Loading plans…",
+    "properties": "properties",
+    "candidatesPerProperty": "candidates/property",
+    "agents": "agents",
+    "contact": "Contact us",
+    "free": "Free",
+    "perMonth": "/month",
+    "perDays": "/ {{count}} days",
+    "selected": "Selected",
+    "requestTrial": "Request Trial",
+    "pendingApproval": "Awaiting approval",
+    "trialSuccess": {
+      "title": "Request sent successfully!",
+      "subtitle": "Your trial access is almost ready — we just need to validate your request.",
+      "body1": "Our team will review your request and get in touch soon.",
+      "body2": "During the trial you'll have full platform access — properties, automatic screening and reports.",
+      "body3": "We usually approve within 24 hours. ⚡",
+      "emailNotice": "You'll receive an email when access is activated.",
+      "backToPlans": "Back to plans"
+    }
+  },
+  "agency": {
+    "title": "Set up your agency",
+    "subtitle": "This helps personalise the qualification criteria for your region.",
+    "name": "Agency name",
+    "namePlaceholder": "E.g. Smith & Associates",
+    "district": "District",
+    "state": "State",
+    "region": "Region",
+    "county": "County",
+    "city": "City",
+    "districtPlaceholder": "Select district",
+    "statePlaceholder": "Select state",
+    "regionPlaceholder": "Region",
+    "countyPlaceholder": "E.g. Lisbon",
+    "cityPlaceholder": "E.g. São Paulo",
+    "submit": "Continue"
+  },
+  "confirm": {
+    "title": "Confirm subscription",
+    "submit": "Confirm and start",
+    "submitting": "Creating account…",
+    "subtitle": "Review the details before getting started.",
+    "agency": "Agency",
+    "plan": "Plan",
+    "trialFree": "{{count}} month free",
+    "contact": "Contact us",
+    "free": "Free",
+    "afterTrial": "after trial: {{price}}/mo",
+    "pricePerMonth": "{{price}}/mo",
+    "extraLeads": "Extra leads",
+    "perExtraLead": "per extra lead",
+    "extraLeadsNote": "Available once you reach the plan limit",
+    "cancelNote": "You can cancel or change your plan at any time.",
+    "submitPay": "Confirm and pay",
+    "submitTrial": "Start free trial",
+    "submitScale": "Talk to the team",
+    "settingUp": "Setting up…",
+    "wait": "Please wait…"
+  }
+}

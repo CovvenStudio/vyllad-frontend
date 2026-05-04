@@ -1,0 +1,103 @@
+{
+  "title": "Citas",
+  "periods": {
+    "upcoming": "Próximas",
+    "today": "Hoy",
+    "history": "Historial",
+    "pendingSchedule": "Pendientes de cita",
+    "completed": "Completadas",
+    "scheduled": "Próximas visitas"
+  },
+  "filters": {
+    "allProperties": "Todas las propiedades",
+    "allAgents": "Todos los agentes"
+  },
+  "actions": {
+    "copySchedulingLink": "Copiar enlace de cita",
+    "sendVisitLink": "Enviar enlace de visita por email",
+    "sendNewVisitLink": "Enviar nuevo enlace de visita",
+    "schedule": "Programar",
+    "confirm": "Confirmar",
+    "reschedule": "Reprogramar",
+    "cancel": "Cancelar visita",
+    "complete": "Finalizar visita",
+    "finalize": "Finalizar",
+    "closeContract": "Cerrar contrato",
+    "send": "Enviar",
+    "sendLink": "Enviar enlace"
+  },
+  "status": {
+    "confirmed": "Confirmada",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "blocked": "Bloqueado"
+  },
+  "notesPlaceholder": "Ej: traer documentos de ingresos, visita guiada al exterior…",
+  "candidate": "Candidato",
+  "toast": {
+    "contracted": "¡Contrato cerrado! 🎉",
+    "contractedDesc": "{{name}} fue marcado como inquilino de {{property}}.",
+    "scheduled": "¡Visita programada!",
+    "scheduledDesc": "{{date}} a las {{time}}",
+    "rescheduled": "Reprogramación iniciada",
+    "linkCopied": "¡Enlace copiado!",
+    "shareLinkDesc": "Comparte con {{name}}.",
+    "emailSent": "¡Email enviado!",
+    "emailSentDesc": "Enlace de visita enviado a {{name}}.",
+    "newEmailSentDesc": "Nuevo enlace de visita enviado a {{name}}.",
+    "slotBlocked": "Horario {{slot}} bloqueado",
+    "slotUnblocked": "Horario {{slot}} desbloqueado",
+    "visitFinalized": "Visita finalizada",
+    "visitFinalizedDesc": "{{name}} — {{date}}",
+    "visitCancelled": "Visita cancelada",
+    "visitCancelledDesc": "{{date}} a las {{time}}",
+    "errorCancel": "Error al cancelar",
+    "errorFinish": "Error al finalizar visita",
+    "errorReschedule": "Error al reprogramar",
+    "errorContract": "Error al cerrar contrato.",
+    "errorEmail": "Error al enviar email",
+    "errorBlockUpdate": "No se pudo actualizar el bloqueo",
+    "errorSchedule": "Error al programar visita.",
+    "noToken": "Este candidato aún no tiene token de visita. Apruébalo primero.",
+    "contractReverted": "El candidato volvió a la lista de aprobados para programar una nueva visita."
+  },
+  "attention": "Atención",
+  "modal": {
+    "title": "Programar visita",
+    "candidatePrefs": "Preferencias del candidato",
+    "clickToUse": "(haz clic para usar)",
+    "showingPeriod": "Mostrando horarios del período \"{{label}}\" ({{start}}–{{end}})",
+    "visitDate": "Fecha de la visita",
+    "timeLabel": "Horario",
+    "noSlots": "No hay horarios disponibles para esta fecha/período.",
+    "blockTitle": "Bloqueo manual por horario",
+    "blockHint": "Usa cuando quieras cerrar un horario antes de alcanzar el límite de visitas.",
+    "updating": "Actualizando...",
+    "blocked": "Bloqueado",
+    "occupancy": "Ocupación {{current}}/{{max}}",
+    "agentLabel": "Agente responsable",
+    "notesLabel": "Notas",
+    "optional": "(opcional)",
+    "confirmButton": "Programar visita"
+  },
+  "relTime": {
+    "mins": "hace {{count}}min",
+    "hours": "hace {{count}}h",
+    "day": "hace 1 día",
+    "days": "hace {{count}} días"
+  },
+  "card": {
+    "noAppointments": "Sin citas",
+    "candidateSlots": "Preferencias del candidato recibidas",
+    "linkSent": "Enlace enviado {{time}}",
+    "visitCancelled": "Visita cancelada",
+    "agentRole": "Agente",
+    "proposes": "Propone {{date}} a las {{time}}",
+    "contracted": "Contrato cerrado"
+  },
+  "page": {
+    "subtitle": "Visitas confirmadas e historial",
+    "loading": "Cargando citas…",
+    "pendingSection": "Candidatos aprobados — pendientes de cita"
+  }
+}

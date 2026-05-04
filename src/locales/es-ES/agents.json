@@ -1,0 +1,59 @@
+{
+  "title": "Agentes",
+  "subtitle": "Gestionar los agentes de tu agencia",
+  "loading": "Cargando agentes…",
+  "error": "Error al cargar agentes.",
+  "total": "Total en el equipo",
+  "pendingInvites": "Invitaciones pendientes",
+  "invite": "Invitar agente",
+  "sendInvite": "Enviar invitación",
+  "empty": "Aún no hay agentes en tu equipo.",
+  "inviteFirst": "Invitar primer agente",
+  "stats": {
+    "agents": "Agentes",
+    "pending": "Invitaciones pendientes",
+    "total": "Total en el equipo"
+  },
+  "limitReached": "Límite alcanzado",
+  "upgrade": "Hacer upgrade",
+  "contactOwnerUpgrade": "Contacte al propietario para hacer upgrade.",
+  "pendingExpires": "{{role}} · Expira {{date}}",
+  "slotsLeft_one": "{{count}} plaza disponible en el plan",
+  "slotsLeft_other": "{{count}} plazas disponibles en el plan",
+  "atLimit": "El plan <strong>{{plan}}</strong> permite hasta {{max}} agentes. Haz upgrade para añadir más.",
+  "ownerExcluded": "· el propietario no cuenta para el límite",
+  "upgradePortalError": "No fue posible abrir el portal de gestión de suscripción.",
+  "inviteError": "Error al invitar agente.",
+  "removeError": "Error al eliminar agente.",
+  "cancelError": "Error al cancelar invitación.",
+  "dialog": {
+    "invite": {
+      "title": "Invitar agente",
+      "roleAgent": "Colaborador",
+      "roleAgentDesc": "Acceso básico de consulta",
+      "roleManager": "Gerente",
+      "roleManagerDesc": "Puede gestionar propiedades y citas",
+      "emailPlaceholder": "email@agencia.com",
+      "phonePlaceholder": "+34 612 345 678",
+      "submit": "Enviar invitación",
+      "error": "Error al invitar agente."
+    },
+    "edit": {
+      "title": "Editar agente",
+      "submit": "Guardar",
+      "error": "Error al guardar."
+    },
+    "removeAgent": {
+      "title": "Eliminar agente",
+      "description": "¿Seguro que quieres eliminar a <strong>{{name}}</strong> de la agencia? Esta acción no se puede deshacer.",
+      "confirm": "Eliminar",
+      "error": "Error al eliminar agente."
+    },
+    "cancelInvite": {
+      "title": "Cancelar invitación",
+      "description": "¿Seguro que quieres cancelar la invitación para <strong>{{email}}</strong>?",
+      "confirm": "Cancelar invitación",
+      "error": "Error al cancelar invitación."
+    }
+  }
+}

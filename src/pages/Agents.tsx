@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Mail, Phone, Clock, Trash2, Pencil, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -12,8 +13,6 @@ import { apiFetch } from '@/lib/api-client';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
 import { cn } from '@/lib/utils';
 
-const ROLE_LABEL: Record<string, string> = { OWNER: 'Proprietário', MANAGER: 'Gerente', AGENT: 'Colaborador' };
-
 function getAvatar(agent: AgentDto) {
   return agent.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(agent.email)}`;
 }
@@ -21,6 +20,7 @@ function getAvatar(agent: AgentDto) {
 const Agents = () => {
   const { agents, pending, ownerPlanId, loading, error, invite, update, remove, removeInvite } = useAgents();
   const { user, memberships, currentAgencyId } = useAuth();
+  const { t } = useTranslation(['agents', 'common']);
   const { plans } = usePlans();
 
   // Derive agency country code from the current membership
@@ -50,7 +50,7 @@ const Agents = () => {
       const { url } = await apiFetch<{ url: string }>('/subscriptions/manage', { method: 'POST' });
       window.location.href = url;
     } catch {
-      setActionError('Não foi possível abrir o portal de gestão da subscrição.');
+      setActionError(t('agents:upgradePortalError'));
     } finally {
       setUpgrading(false);
     }
@@ -61,7 +61,7 @@ const Agents = () => {
     try {
       await invite(email, role, phone);
     } catch (e: unknown) {
-      const msg = (e as { message?: string })?.message ?? 'Erro ao convidar agente.';
+      const msg = (e as { message?: string })?.message ?? t('agents:inviteError');
       setActionError(msg);
       throw e;
     }
@@ -77,7 +77,7 @@ const Agents = () => {
     try {
       await remove(confirmDelete.id);
     } catch (e: unknown) {
-      setActionError((e as { message?: string })?.message ?? 'Erro ao remover agente.');
+      setActionError((e as { message?: string })?.message ?? t('agents:removeError'));
     } finally {
       setConfirmDelete(null);
     }
@@ -88,7 +88,7 @@ const Agents = () => {
     try {
       await removeInvite(confirmDeleteInvite.id);
     } catch {
-      setActionError('Erro ao cancelar convite.');
+      setActionError(t('agents:cancelError'));
     } finally {
       setConfirmDeleteInvite(null);
     }
@@ -100,8 +100,8 @@ const Agents = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
           <div>
-            <h1 className="font-display text-2xl font-700 tracking-tight">Agentes</h1>
-            <p className="text-sm text-muted-foreground mt-1">Gerir os agentes da sua imobiliária</p>
+            <h1 className="font-display text-2xl font-700 tracking-tight">{t('agents:title')}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t('agents:subtitle')}</p>
           </div>
           <Button
             onClick={() => { setActionError(null); setAddOpen(true); }}
@@ -109,7 +109,7 @@ const Agents = () => {
             className="rounded-xl font-semibold text-sm h-10 px-5"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Convidar agente
+            {t('agents:invite')}
           </Button>
         </div>
 
@@ -137,7 +137,7 @@ const Agents = () => {
                   </span>
                   {isAtLimit && (
                     <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full">
-                      Limite atingido
+                      {t('agents:limitReached')}
                     </span>
                   )}
                 </div>
@@ -152,13 +152,13 @@ const Agents = () => {
                 </div>
                 {isAtLimit ? (
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    O plano <span className="font-medium">{currentPlan?.name}</span> permite até {agentLimit} agentes.
-                    Faça upgrade para adicionar mais.
+                    {t('agents:atLimit', { plan: currentPlan?.name, max: agentLimit })}
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    {slotsLeft} {slotsLeft === 1 ? 'lugar disponível' : 'lugares disponíveis'} no plano <span className="font-medium">{currentPlan?.name}</span>
-                    <span className="ml-1 opacity-60">· o proprietário não conta para o limite</span>
+                    {t('agents:slotsLeft', { count: slotsLeft ?? 0 })}
+                    <span className="font-medium">{currentPlan?.name}</span>
+                    <span className="ml-1 opacity-60">{t('agents:ownerExcluded')}</span>
                   </p>
                 )}
               </div>
@@ -169,15 +169,13 @@ const Agents = () => {
                   disabled={upgrading}
                   className="rounded-xl font-semibold shrink-0 gap-2"
                 >
-                  {upgrading
-                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    : <TrendingUp className="w-3.5 h-3.5" />}
-                  Fazer upgrade
+                  {upgrading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <TrendingUp className="w-3.5 h-3.5" />}
+                  {t('agents:upgrade')}
                 </Button>
               )}
               {isAtLimit && currentRole !== 'OWNER' && (
                 <p className="text-xs text-amber-600 dark:text-amber-400 shrink-0">
-                  Contacte o proprietário para fazer upgrade.
+                  {t('agents:contactOwnerUpgrade')}
                 </p>
               )}
             </div>
@@ -186,13 +184,13 @@ const Agents = () => {
 
         {/* Stats */}
         <div className={`grid grid-cols-2 ${canManage ? 'md:grid-cols-3' : ''} gap-4 mb-10`}>
-          <Stat label="Agentes" value={agents.filter((a) => a.role !== 'OWNER').length} />
-          {canManage && <Stat label="Convites pendentes" value={pending.length} />}
-          <Stat label="Total na equipa" value={agents.length + pending.length} />
+          <Stat label={t('agents:stats.agents')} value={agents.filter((a) => a.role !== 'OWNER').length} />
+          {canManage && <Stat label={t('agents:stats.pending')} value={pending.length} />}
+          <Stat label={t('agents:stats.total')} value={agents.length + pending.length} />
         </div>
 
         {loading && (
-          <div className="text-sm text-muted-foreground animate-pulse">A carregar agentes…</div>
+          <div className="text-sm text-muted-foreground animate-pulse">{t('agents:loading')}</div>
         )}
         {error && !loading && (
           <div className="text-sm text-destructive">{error}</div>
@@ -230,7 +228,7 @@ const Agents = () => {
                             ? 'bg-foreground/10 text-foreground'
                             : 'bg-muted text-muted-foreground',
                         )}>
-                          {ROLE_LABEL[agent.role] ?? agent.role}
+                          {t(`common:roles.${agent.role.toLowerCase()}`)}
                         </span>
                       </div>
                       {agent.role !== 'OWNER' && (
@@ -276,7 +274,7 @@ const Agents = () => {
         {!loading && canManage && pending.length > 0 && (
           <div>
             <h2 className="font-display text-sm font-600 tracking-tight text-muted-foreground mb-3 uppercase tracking-widest">
-              Convites pendentes
+              {t('agents:pendingInvites')}
             </h2>
             <div className="space-y-2">
               {pending.map((inv) => (
@@ -289,7 +287,7 @@ const Agents = () => {
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{inv.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        {ROLE_LABEL[inv.role] ?? inv.role} · Expira {new Date(inv.expiresAt).toLocaleDateString('pt-PT')}
+                        {t('agents:pendingExpires', { role: t(`common:roles.${inv.role.toLowerCase()}`), date: new Date(inv.expiresAt).toLocaleDateString() })}
                       </p>
                     </div>
                   </div>
@@ -309,10 +307,10 @@ const Agents = () => {
         {/* Empty state */}
         {!loading && agents.length === 0 && pending.length === 0 && !error && (
           <div className="text-center py-16 text-muted-foreground text-sm">
-            <p className="mb-4">Ainda não há agentes na sua equipa.</p>
+            <p className="mb-4">{t('agents:empty')}</p>
             <Button variant="outline" onClick={() => setAddOpen(true)} className="rounded-xl" disabled={isAtLimit}>
               <Plus className="w-4 h-4 mr-2" />
-              Convidar primeiro agente
+              {t('agents:inviteFirst')}
             </Button>
           </div>
         )}
@@ -331,8 +329,9 @@ const Agents = () => {
 
       {confirmDelete && (
         <ConfirmDialog
-          title="Remover agente"
-          description={`Tem a certeza que quer remover "${confirmDelete.name}" da equipa? Esta ação não pode ser desfeita.`}
+          title={t('agents:dialog.removeAgent.title')}
+          description={t('agents:dialog.removeAgent.description', { name: confirmDelete.name })}
+          confirmLabel={t('agents:dialog.removeAgent.confirm')}
           onConfirm={handleRemove}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -340,8 +339,9 @@ const Agents = () => {
 
       {confirmDeleteInvite && (
         <ConfirmDialog
-          title="Cancelar convite"
-          description={`Cancelar o convite enviado para "${confirmDeleteInvite.email}"?`}
+          title={t('agents:dialog.cancelInvite.title')}
+          description={t('agents:dialog.cancelInvite.description', { email: confirmDeleteInvite.email })}
+          confirmLabel={t('common:actions.cancel')}
           onConfirm={handleRemoveInvite}
           onCancel={() => setConfirmDeleteInvite(null)}
         />
@@ -360,14 +360,17 @@ const Stat = ({ label, value }: { label: string; value: string | number }) => (
 function ConfirmDialog({
   title,
   description,
+  confirmLabel,
   onConfirm,
   onCancel,
 }: {
   title: string;
   description: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation('common');
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-sm rounded-2xl border bg-card p-6 shadow-xl space-y-4">
@@ -375,10 +378,10 @@ function ConfirmDialog({
         <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
         <div className="flex gap-3 pt-1">
           <Button variant="outline" className="flex-1 rounded-xl" onClick={onCancel}>
-            Cancelar
+            {t('actions.cancel')}
           </Button>
           <Button variant="destructive" className="flex-1 rounded-xl" onClick={onConfirm}>
-            Remover
+            {confirmLabel ?? t('actions.delete')}
           </Button>
         </div>
       </div>

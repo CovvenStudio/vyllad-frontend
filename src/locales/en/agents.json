@@ -1,0 +1,59 @@
+{
+  "title": "Agents",
+  "subtitle": "Manage your agency's agents",
+  "loading": "Loading agents…",
+  "error": "Error loading agents.",
+  "total": "Total in team",
+  "pendingInvites": "Pending invites",
+  "invite": "Invite agent",
+  "sendInvite": "Send invite",
+  "empty": "No agents in your team yet.",
+  "inviteFirst": "Invite first agent",
+  "stats": {
+    "agents": "Agents",
+    "pending": "Pending invites",
+    "total": "Total in team"
+  },
+  "limitReached": "Limit reached",
+  "upgrade": "Upgrade",
+  "contactOwnerUpgrade": "Contact the owner to upgrade.",
+  "pendingExpires": "{{role}} · Expires {{date}}",
+  "slotsLeft_one": "{{count}} slot available in the plan",
+  "slotsLeft_other": "{{count}} slots available in the plan",
+  "atLimit": "The <strong>{{plan}}</strong> plan allows up to {{max}} agents. Upgrade to add more.",
+  "ownerExcluded": "· owner does not count towards the limit",
+  "upgradePortalError": "Could not open the subscription management portal.",
+  "inviteError": "Error inviting agent.",
+  "removeError": "Error removing agent.",
+  "cancelError": "Error cancelling invite.",
+  "dialog": {
+    "invite": {
+      "title": "Invite agent",
+      "roleAgent": "Agent",
+      "roleAgentDesc": "Basic read access",
+      "roleManager": "Manager",
+      "roleManagerDesc": "Can manage properties and appointments",
+      "emailPlaceholder": "email@agency.com",
+      "phonePlaceholder": "+1 555 123 4567",
+      "submit": "Send invite",
+      "error": "Error inviting agent."
+    },
+    "edit": {
+      "title": "Edit agent",
+      "submit": "Save",
+      "error": "Error saving."
+    },
+    "removeAgent": {
+      "title": "Remove agent",
+      "description": "Are you sure you want to remove <strong>{{name}}</strong> from the agency? This action cannot be undone.",
+      "confirm": "Remove",
+      "error": "Error removing agent."
+    },
+    "cancelInvite": {
+      "title": "Cancel invite",
+      "description": "Are you sure you want to cancel the invite to <strong>{{email}}</strong>?",
+      "confirm": "Cancel invite",
+      "error": "Error cancelling invite."
+    }
+  }
+}

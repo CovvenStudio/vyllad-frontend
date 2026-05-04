@@ -1,0 +1,147 @@
+{
+  "navbar": {
+    "pricing": "Pricing",
+    "start": "Get started"
+  },
+  "hero": {
+    "badge": "Smart rental platform",
+    "headline1": "Your next",
+    "headline2": "ideal tenant",
+    "headline3": "already exists.",
+    "tagline1": "From lead to visit,",
+    "tagline2": "effortlessly.",
+    "sub": "Automatic qualification, scoring per candidate and scheduled viewings.",
+    "ctaStart": "Start for free",
+    "ctaDemo": "See demo",
+    "scoreCard": {
+      "name": "Ana Ferreira",
+      "label": "Approved candidate"
+    },
+    "visitCard": {
+      "label": "Visit scheduled",
+      "time": "Tomorrow · 10:00",
+      "location": "T2 · Campo de Ourique"
+    },
+    "statsCard": {
+      "period": "Today",
+      "value": "12",
+      "label": "qualified candidates"
+    },
+    "propertyCard": {
+      "location": "Lisbon, Chiado",
+      "price": "€3,200 / month",
+      "stats": "3-bed · 8 candidates · 3 approved"
+    }
+  },
+  "showcase": {
+    "tag": "The real problem",
+    "headline1": "Renting is",
+    "headline2": "costing you",
+    "headline3": "more than you think.",
+    "pain": [
+      {
+        "stat": "3h+",
+        "label": "per property",
+        "description": "That's the average time a landlord spends manually screening candidates — per property, per cycle."
+      },
+      {
+        "stat": "60%",
+        "label": "don't qualify",
+        "description": "Six out of ten candidates fail basic criteria. And you only find out after hours of conversation."
+      },
+      {
+        "stat": "€0",
+        "label": "return on effort",
+        "description": "Manual screening doesn't scale. Every message, every call — time you never get back."
+      }
+    ],
+    "bridge": "vyllad eliminates all of this — automatically, from the very first candidate."
+  },
+  "features": {
+    "tag": "How it works",
+    "headline1": "Everything you need.",
+    "headline2": "Nothing you don't.",
+    "sub": "A platform built specifically for property managers — no bloat, no learning curve.",
+    "items": [
+      {
+        "title": "Property live in 2 minutes",
+        "description": "Title, price, criteria and reference link. No automatic extraction, no dependencies — live before you finish your coffee."
+      },
+      {
+        "title": "Form that filters itself",
+        "description": "Candidates answer only what matters. No account, no friction — under 60 seconds. Those who don't meet criteria are automatically excluded."
+      },
+      {
+        "title": "Ruthless 0–100 score",
+        "description": "Income, employment stability, fit for the property. Every candidate scored and ranked. You only decide the top 3."
+      },
+      {
+        "title": "Visits that book themselves",
+        "description": "Approved candidates pick an available slot. Zero back-and-forth, zero confusion. The calendar manages itself."
+      },
+      {
+        "title": "Your rules, always enforced",
+        "description": "Minimum income, deposit, guarantor, pets — define once. The form adapts and filters automatically. No exceptions slip through."
+      },
+      {
+        "title": "Dashboard that decides for you",
+        "description": "All candidates, ranked by score, with real-time status. What used to take 4 hours now takes 4 minutes."
+      }
+    ]
+  },
+  "howItWorks": {
+    "tag": "Process",
+    "headline1": "From listing to booked visit.",
+    "headline2": "In 4 steps.",
+    "steps": [
+      {
+        "title": "List your property",
+        "description": "Title, price and criteria in under 2 minutes. No lengthy forms, no technical setup.",
+        "detail": "Minimum income, deposit, guarantor — set the rules once and never think about them again."
+      },
+      {
+        "title": "Share the page",
+        "description": "Every property gets an elegant, professional URL. Replace the contact link in your listing or share directly.",
+        "detail": "Candidates don't need an account. Less friction = more real applications."
+      },
+      {
+        "title": "The system qualifies",
+        "description": "Each candidate is automatically assessed: income, stability, fit. Score of 0 to 100, in seconds.",
+        "detail": "Candidates who don't meet criteria are flagged. You focus on the ones that matter."
+      },
+      {
+        "title": "Approve and schedule",
+        "description": "With one click, approved candidates receive visit availability. They pick a time, confirm — and show up.",
+        "detail": "No WhatsApp messages at 10pm. No \"actually I can't make it\". No surprises."
+      }
+    ]
+  },
+  "pricing": {
+    "tag": "Pricing",
+    "headline1": "Simple. Transparent.",
+    "headline2": "No surprises.",
+    "sub": "Start free. Pay only when you need more. No contracts, no hidden fees.",
+    "billingCountry": "Billing country:",
+    "loading": "Loading plans…",
+    "properties": "properties",
+    "candidatesPerProperty": "candidates/property",
+    "agents": "agents",
+    "perMonth": "/mo",
+    "free": "Free",
+    "trialDays": "/ {{count}} days",
+    "contact": "Contact us",
+    "cancel": "Cancel or change your plan at any time."
+  },
+  "cta": {
+    "tag": "No card. No commitment.",
+    "headline1": "Your next perfect tenant",
+    "headline2": "is one click away.",
+    "sub": "Every day without vyllad is another hour lost on candidates who were never going to close.",
+    "ctaStart": "Start for free",
+    "ctaDemo": "See demo",
+    "trust": "Free trial · No card · Cancel anytime"
+  },
+  "footer": {
+    "rights": "© 2026 Vyllad. All rights reserved."
+  }
+}

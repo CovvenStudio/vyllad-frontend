@@ -1,0 +1,178 @@
+{
+  "title": "Properties",
+  "subtitle": "Property management",
+  "loading": "Loading properties",
+  "totalCount_one": "{{count}} property in the agency",
+  "totalCount_other": "{{count}} properties in the agency",
+  "addProperty": "Add property",
+  "newProperty": "New property",
+  "upgrade": "Upgrade",
+  "contactOwnerUpgrade": "Contact the owner to upgrade.",
+  "searchPlaceholder": "Search property, location…",
+  "noProperties": "No properties found",
+  "noPropertiesHint": "Add your first property to get started.",
+  "noPropertiesFilter": "Try adjusting the search filters.",
+  "search": "Search",
+  "table": {
+    "property": "Property",
+    "reference": "Reference",
+    "status": "Status",
+    "price": "Price",
+    "details": "Details",
+    "candidates": "Candidates"
+  },
+  "actions": {
+    "edit": "Edit",
+    "pause": "Pause",
+    "resume": "Resume",
+    "close": "Close",
+    "rented": "Property rented",
+    "archived": "Remove property"
+  },
+  "pagination": {
+    "showing": "{{from}}–{{to}} of {{total}} properties"
+  },
+  "limitReached": {
+    "title": "Active property limit reached",
+    "desc_one": "Your plan allows a maximum of {{count}} active property. Upgrade to resume more.",
+    "desc_other": "Your plan allows a maximum of {{count}} active properties. Upgrade to resume more."
+  },
+  "filter": {
+    "all": "All",
+    "active": "Active",
+    "paused": "Paused",
+    "rented": "Rented",
+    "archived": "Archived"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "PAUSED": "Paused",
+    "RENTED": "Rented",
+    "ARCHIVED": "Archived"
+  },
+  "metrics": {
+    "activeCount": "{{count}} / {{max}} active",
+    "capturedSince": "Listed for",
+    "avgToClose": "Avg. to close",
+    "completedVisits": "Completed visits",
+    "candidates": "Candidates"
+  },
+  "criteria": {
+    "title": "Application criteria",
+    "minIncome": "Min. income (€)",
+    "maxPeople": "Max. people",
+    "advance": "Advance (months)",
+    "deposit": "Deposit (months)",
+    "pets": "Pets",
+    "petTypesLabel": "Which types are allowed?",
+    "petTypesNone": "None selected = all allowed",
+    "guarantorRequired": "Guarantor required",
+    "noGuarantorValues": "Without guarantor values",
+    "advanceNoGuarantor": "Advance w/o guarantor (months)",
+    "depositNoGuarantor": "Deposit w/o guarantor (months)",
+    "noAgents": "No agents available.",
+    "agentsHint": "Select one or more agents responsible for this property."
+  },
+  "dialog": {
+    "add": {
+      "title": "New property",
+      "submit": "Create property",
+      "success": "Property created!",
+      "successTitle": "Property created successfully!",
+      "successDesc": "The property is active and ready to receive applications.",
+      "error": "Error creating property."
+    },
+    "edit": {
+      "title": "Edit property",
+      "submit": "Save changes",
+      "success": "Property updated!",
+      "error": "Error updating property."
+    },
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "E.g.: Renovated T2 in Campo de Ourique",
+      "reference": "Internal reference",
+      "referencePlaceholder": "E.g.: IMV-2024-001",
+      "location": "Location",
+      "locationPlaceholder": "E.g.: Campo de Ourique, Lisbon",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe special features of the property...",
+      "agents": "Responsible agents",
+      "availableFrom": "Available from",
+      "selectDate": "Select date",
+      "petsAllowed": "Allowed",
+      "petsNotAllowed": "Not allowed",
+      "announcementLink": "Listing link",
+      "rentalValue": "Rental value",
+      "rentalHint": "Used as basis for calculating deposits and advance payments",
+      "announcementLinkPlaceholder": "https://rightmove.co.uk/..."
+    },
+    "errors": {
+      "generic": "Error"
+    }
+  },
+  "detail": {
+    "tabs": {
+      "candidates": "Candidates",
+      "visits": "Visits",
+      "contract": "Contract"
+    },
+    "loading": "Loading property",
+    "illustrative": "Illustrative image",
+    "immediateAccess": "Immediately",
+    "floorRC": "Ground floor",
+    "visitCompleted": "Completed visits",
+    "info": "Property Information",
+    "back": "Properties",
+    "viewPage": "View page",
+    "edit": "Edit",
+    "dashboard": "Dashboard",
+    "location": "Location",
+    "available": "Available",
+    "reference": "Reference",
+    "pets": "Pets",
+    "createdAt": "Created on",
+    "announcementLink": "Listing link",
+    "description": "Description",
+    "petsAllowed": "Allowed",
+    "petsNotAllowed": "Not allowed",
+    "criteriaTitle": "Rental criteria",
+    "minIncome": "Min. income",
+    "maxPeople": "Max. people",
+    "advance": "Advance",
+    "deposit": "Deposit",
+    "guarantorRequired": "Required",
+    "guarantorNotRequired": "Not required",
+    "advanceNoGuarantor": "Advance w/o guarantor",
+    "depositNoGuarantor": "Deposit w/o guarantor",
+    "minContract": "Min. contract",
+    "months": "months",
+    "activeCandidates": "Active candidates",
+    "manage": "Manage",
+    "noCandidates": "No active candidates",
+    "price": "Monthly price",
+    "closed": "Closed",
+    "open": "Open",
+    "accepting": "Accepting applications"
+  },
+  "candidates": {
+    "excellent_one": "{{count}} excellent",
+    "excellent_other": "{{count}} excellent",
+    "potential_one": "{{count}} potential",
+    "potential_other": "{{count}} potential",
+    "low_one": "{{count}} below",
+    "low_other": "{{count}} below"
+  },
+  "upsell": {
+    "title_one": "{{count}} candidate hidden by plan limit",
+    "title_other": "{{count}} candidates hidden by plan limit",
+    "desc": "Your plan shows up to {{limit}} candidates per property. Upgrade to see all.",
+    "link": "See plans →"
+  },
+  "badge": {
+    "urgent": "Urgent"
+  },
+  "public": {
+    "illustrative": "Illustrative image"
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CreditCard, CheckCircle2, Clock, AlertTriangle, ExternalLink, Loader2, Receipt, Download, FileText, Crown, Calendar, Info, Gauge, Minus, Plus, Check, Users, Building2, UserCheck } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -65,40 +66,13 @@ function formatMoney(amountCents: number, currency: string): string {
   }).format(amountCents / 100);
 }
 
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  trialing: {
-    label: 'Em Período de Teste',
-    variant: 'secondary',
-    icon: <Clock className="w-3.5 h-3.5" />,
-  },
-  active: {
-    label: 'Ativa',
-    variant: 'default',
-    icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-  },
-  past_due: {
-    label: 'Pagamento em Atraso',
-    variant: 'destructive',
-    icon: <AlertTriangle className="w-3.5 h-3.5" />,
-  },
-  cancelled: {
-    label: 'Cancelada',
-    variant: 'destructive',
-    icon: <AlertTriangle className="w-3.5 h-3.5" />,
-  },
-  incomplete: {
-    label: 'Incompleta',
-    variant: 'outline',
-    icon: <AlertTriangle className="w-3.5 h-3.5" />,
-  },
-};
-
-const INVOICE_STATUS_LABEL: Record<string, string> = {
-  paid: 'Paga',
-  open: 'Em aberto',
-  void: 'Anulada',
-  uncollectible: 'Incobrável',
-  draft: 'Rascunho',
+// STATUS_CONFIG now only stores variant + icon (labels are t('billing:status.X'))
+const STATUS_CONFIG: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+  trialing: { variant: 'secondary', icon: <Clock className="w-3.5 h-3.5" /> },
+  active: { variant: 'default', icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  past_due: { variant: 'destructive', icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  cancelled: { variant: 'destructive', icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  incomplete: { variant: 'outline', icon: <AlertTriangle className="w-3.5 h-3.5" /> },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -107,6 +81,7 @@ export default function Billing() {
   const { memberships, currentAgencyId } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation('billing');
 
   const currentMembership = memberships.find((m) => m.agencyId === currentAgencyId) ?? null;
   const isOwner = currentMembership?.role === 'OWNER';
@@ -143,7 +118,7 @@ export default function Billing() {
         }
       })
       .catch(() => {
-        toast({ title: 'Erro ao carregar dados de subscrição', variant: 'destructive' });
+        toast({ title: t('errors.loadSubscription'), variant: 'destructive' });
       })
       .finally(() => setLoading(false));
   }, [isOwner]);
@@ -164,7 +139,7 @@ export default function Billing() {
       setExtraLeadsQty(updated.extraLeads ?? 0);
       setSavedLeads(true);
     } catch (e) {
-      setLeadsError(e instanceof Error ? e.message : 'Erro ao guardar leads extra.');
+      setLeadsError(e instanceof Error ? e.message : t('extraLeads.errorSave'));
     } finally {
       setSavingLeads(false);
     }
@@ -176,7 +151,7 @@ export default function Billing() {
       const { url } = await apiFetch<{ url: string }>('/subscriptions/manage', { method: 'POST' });
       window.location.href = url;
     } catch (e) {
-      toast({ title: e instanceof Error ? e.message : 'Erro ao abrir portal de faturação', variant: 'destructive' });
+      toast({ title: e instanceof Error ? e.message : t('errors.openPortal'), variant: 'destructive' });
       setPortalLoading(false);
     }
   };
@@ -207,8 +182,8 @@ export default function Billing() {
     <DashboardLayout>
       <div className="p-6 max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Faturação</h1>
-          <p className="text-sm text-muted-foreground mt-1">Detalhes do seu plano e subscrição</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
 
         {/* Subscription Status Card */}
@@ -216,7 +191,7 @@ export default function Billing() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-muted-foreground" />
-              Subscrição atual
+              {t('subscription.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -224,14 +199,14 @@ export default function Billing() {
               <>
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Plano</p>
+                    <p className="text-sm text-muted-foreground">{t('subscription.plan')}</p>
                     <p className="font-semibold text-lg">{subStatus.planName ?? '—'}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {statusCfg && (
                       <Badge variant={statusCfg.variant} className="flex items-center gap-1.5 px-2.5 py-1">
                         {statusCfg.icon}
-                        {statusCfg.label}
+                        {t(`status.${subStatus!.status}`)}
                       </Badge>
                     )}
                     {subStatus.status !== 'cancelled' && (
@@ -242,7 +217,7 @@ export default function Billing() {
                         className="flex items-center gap-1.5 text-xs h-7 px-2.5"
                       >
                         <Crown className="w-3 h-3" />
-                        {isTrial ? 'Subscrever' : 'Alterar plano'}
+                        {isTrial ? t('common:actions.subscribe') : t('common:actions.changePlan')}
                       </Button>
                     )}
                   </div>
@@ -251,14 +226,14 @@ export default function Billing() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
                   {subStatus.status === 'trialing' && subStatus.trialEndsAt && (
                     <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Teste termina em</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{t('subscription.trialEndsAt')}</p>
                       <p className="text-sm font-medium">{formatDate(subStatus.trialEndsAt)}</p>
                     </div>
                   )}
                   {subStatus.currentPeriodEnd && (
                     <div>
                       <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
-                        {subStatus.cancelAtPeriodEnd ? 'Acesso até' : 'Próxima renovação'}
+                        {subStatus.cancelAtPeriodEnd ? t('subscription.accessUntil') : t('subscription.nextRenewal')}
                       </p>
                       <p className="text-sm font-medium">{formatDate(subStatus.currentPeriodEnd)}</p>
                     </div>
@@ -267,7 +242,7 @@ export default function Billing() {
                     <div className="sm:col-span-2">
                       <p className="text-sm text-amber-600 flex items-center gap-1.5">
                         <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                        A subscrição está programada para ser cancelada no final do período atual.
+                          {t('subscription.cancelledWarning')}
                       </p>
                     </div>
                   )}
@@ -280,14 +255,14 @@ export default function Billing() {
                       <div className="flex items-center gap-1.5">
                         <UserCheck className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="text-sm font-semibold">{subStatus.planMaxAgents}</span>
-                        <span className="text-xs text-muted-foreground">agentes</span>
+                        <span className="text-xs text-muted-foreground">{t('subscription.agents')}</span>
                       </div>
                     )}
                     {subStatus.planMaxProperties != null && (
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="text-sm font-semibold">{subStatus.planMaxProperties}</span>
-                        <span className="text-xs text-muted-foreground">imóveis ativos</span>
+                        <span className="text-xs text-muted-foreground">{t('subscription.activeProperties')}</span>
                       </div>
                     )}
                     {subStatus.planMaxLeadsPerProperty != null && (
@@ -299,7 +274,7 @@ export default function Billing() {
                             <span className="text-accent"> +{subStatus.extraLeads * (subStatus.extraLeadsPerUnit ?? 1)}</span>
                           )}
                         </span>
-                        <span className="text-xs text-muted-foreground">leads/imóvel{subStatus.extraLeads > 0 ? ' (+ extra)' : ''}</span>
+                        <span className="text-xs text-muted-foreground">{subStatus.extraLeads > 0 ? t('subscription.leadsPerPropertyExtra') : t('subscription.leadsPerProperty')}</span>
                       </div>
                     )}
                   </div>
@@ -311,9 +286,9 @@ export default function Billing() {
                     <div className="border-t pt-4 space-y-3">
                       <div className="flex items-center gap-2">
                         <Gauge className="w-3.5 h-3.5 text-muted-foreground" />
-                        <p className="text-sm font-medium">Leads extra por imóvel</p>
+                        <p className="text-sm font-medium">{t('extraLeads.title')}</p>
                         <span className="ml-auto text-[11px] text-muted-foreground">
-                          máx. 50 · {formatMoney(Math.round(pricePerLeadUnit * 100), leadCurrency)}/pacote
+                          {t('extraLeads.max')} · {formatMoney(Math.round(pricePerLeadUnit * 100), leadCurrency)}/{t('extraLeads.perPackage')}
                         </span>
                       </div>
 
@@ -331,8 +306,8 @@ export default function Billing() {
                           <span className="text-2xl font-bold">{extraLeadsQty}</span>
                           <p className="text-[11px] text-muted-foreground mt-0.5">
                             {extraLeadsQty === 0
-                              ? 'Sem leads extra'
-                              : `${extraLeadsQty * leadsPerUnit} leads · ${formatMoney(Math.round(extraLeadsQty * pricePerLeadUnit * 100), leadCurrency)}/mês`}
+                              ? t('extraLeads.noExtra')
+                              : `${extraLeadsQty * leadsPerUnit} leads · ${formatMoney(Math.round(extraLeadsQty * pricePerLeadUnit * 100), leadCurrency)}/${t('extraLeads.perMonth')}`}
                           </p>
                         </div>
 
@@ -356,14 +331,14 @@ export default function Billing() {
                       {savedLeads && !extraLeadsChanged && (
                         <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 font-medium">
                           <Check className="w-3.5 h-3.5 shrink-0" />
-                          Leads extra guardados com sucesso.
+                          {t('extraLeads.savedSuccess')}
                         </div>
                       )}
 
                       {extraLeadsChanged && (
                         <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
                           <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                          <span>A alteração é imediata. O valor será ajustado ao tempo restante do mês atual.</span>
+                          <span>{t('extraLeads.changeInfo')}</span>
                         </div>
                       )}
 
@@ -375,7 +350,7 @@ export default function Billing() {
                           className="flex items-center gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
                         >
                           {savingLeads ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Gauge className="w-3.5 h-3.5" />}
-                          {savingLeads ? 'A guardar...' : 'Guardar alterações'}
+                          {savingLeads ? t('extraLeads.saving') : t('extraLeads.saveButton')}
                         </Button>
                       </div>
                     </div>
@@ -383,7 +358,7 @@ export default function Billing() {
                 )}
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhuma subscrição encontrada.</p>
+              <p className="text-sm text-muted-foreground">{t('subscription.noSubscription')}</p>
             )}
           </CardContent>
         </Card>
@@ -401,19 +376,19 @@ export default function Billing() {
                 <div className="flex-1 min-w-0 space-y-1">
                   <p className="font-semibold text-sm">
                     {trialDaysLeft === 0
-                      ? 'O seu trial expirou hoje'
+                      ? t('trialCta.expiredToday')
                       : trialDaysLeft === 1
-                      ? 'Último dia de trial!'
+                      ? t('trialCta.lastDay')
                       : trialDaysLeft !== null && trialDaysLeft <= 5
-                      ? `Apenas ${trialDaysLeft} dias restantes no trial`
-                      : 'Está no período de teste'}
+                      ? t('trialCta.daysLeft', { count: trialDaysLeft })
+                      : t('trialCta.inTrial')}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {trialDaysLeft !== null && trialDaysLeft <= 5
-                      ? 'Subscreva agora para não perder o acesso à plataforma e manter todos os seus dados.'
+                      ? t('trialCta.urgentMessage')
                       : subStatus?.trialEndsAt
-                      ? `O seu trial termina em ${formatDate(subStatus.trialEndsAt)}. Subscreva para continuar a usar o vyllad sem interrupções.`
-                      : 'Subscreva para continuar a usar o vyllad sem interrupções.'}
+                      ? t('trialCta.normalMessageDate', { date: formatDate(subStatus.trialEndsAt) })
+                      : t('trialCta.normalMessage')}
                   </p>
                 </div>
                 <Button
@@ -427,7 +402,7 @@ export default function Billing() {
                   }`}
                 >
                   <Crown className="w-4 h-4" />
-                  Subscrever agora
+                  {t('trialCta.subscribe')}
                 </Button>
               </div>
             </CardContent>
@@ -440,7 +415,7 @@ export default function Billing() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
-                Próxima fatura
+                {t('invoices.upcomingCard')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -449,19 +424,17 @@ export default function Billing() {
                 <div className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 px-3.5 py-3 text-sm text-amber-800 dark:border-amber-600/40 dark:bg-amber-900/20 dark:text-amber-300">
                   <Info className="w-4 h-4 mt-0.5 shrink-0" />
                   <p>
-                    Fizeste uma alteração de plano a meio do período de faturação. O valor abaixo já inclui o
-                    <strong> ajuste ao tempo restante do ciclo atual</strong>.
-                    Este montante será cobrado na próxima data de renovação.
+                    {t('invoices.prorateNote')}
                   </p>
                 </div>
               )}
               <div className="flex items-center justify-between rounded-xl border bg-muted/30 px-4 py-3">
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Data de cobrança</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{t('invoices.chargeDate')}</p>
                   <p className="text-sm font-medium">{formatDate(upcoming.nextPaymentAt)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Valor</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">{t('invoices.amount')}</p>
                   <p className="text-xl font-semibold">{formatMoney(upcoming.amount, upcoming.currency)}</p>
                 </div>
               </div>
@@ -475,7 +448,7 @@ export default function Billing() {
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <CardTitle className="text-base flex items-center gap-2">
                 <Receipt className="w-4 h-4 text-muted-foreground" />
-                Histórico de faturas
+                {t('invoices.history')}
               </CardTitle>
               <Button
                 variant="outline"
@@ -485,7 +458,7 @@ export default function Billing() {
                 className="flex items-center gap-1.5 text-xs"
               >
                 {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
-                Gerir no Stripe
+                {t('invoices.manageStripe')}
               </Button>
             </div>
           </CardHeader>
@@ -495,7 +468,7 @@ export default function Billing() {
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               </div>
             ) : invoices.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">Nenhuma fatura disponível.</p>
+              <p className="text-sm text-muted-foreground py-4 text-center">{t('invoices.empty')}</p>
             ) : (
               <div className="divide-y">
                 {invoices.map((inv) => (
@@ -512,7 +485,7 @@ export default function Billing() {
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
                         <p className="text-sm font-semibold">{formatMoney(inv.amountPaid || inv.amountDue, inv.currency)}</p>
-                        <p className="text-xs text-muted-foreground">{INVOICE_STATUS_LABEL[inv.status ?? ''] ?? inv.status}</p>
+                        <p className="text-xs text-muted-foreground">{t(`invoiceStatus.${inv.status ?? ''}`) || inv.status}</p>
                       </div>
                       <div className="flex items-center gap-1">
                         {inv.hostedUrl && (
