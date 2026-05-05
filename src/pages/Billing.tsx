@@ -22,6 +22,12 @@ interface SubscriptionStatus {
   planMaxProperties: number | null;
   planMaxLeadsPerProperty: number | null;
   planMaxAgents: number | null;
+  effectiveMaxProperties: number | null;
+  effectiveMaxAgents: number | null;
+  effectiveMaxLeads: number | null;
+  hasPropertyGrant: boolean;
+  hasAgentGrant: boolean;
+  hasLeadsGrant: boolean;
   extraLeads: number;
   extraLeadsPerUnit: number | null;
   extraLeadPricePerUnit: number | null;
@@ -257,14 +263,28 @@ export default function Billing() {
                     {subStatus.planMaxAgents != null && (
                       <div className="flex items-center gap-1.5">
                         <UserCheck className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                        <span className="text-sm font-semibold">{subStatus.planMaxAgents}</span>
+                        <span className="text-sm font-semibold">
+                          {subStatus.effectiveMaxAgents ?? subStatus.planMaxAgents}
+                        </span>
+                        {subStatus.hasAgentGrant && (
+                          <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                            ✦ Grant
+                          </span>
+                        )}
                         <span className="text-xs text-muted-foreground">{t('subscription.agents')}</span>
                       </div>
                     )}
                     {subStatus.planMaxProperties != null && (
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                        <span className="text-sm font-semibold">{subStatus.planMaxProperties}</span>
+                        <span className="text-sm font-semibold">
+                          {subStatus.effectiveMaxProperties ?? subStatus.planMaxProperties}
+                        </span>
+                        {subStatus.hasPropertyGrant && (
+                          <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                            ✦ Grant
+                          </span>
+                        )}
                         <span className="text-xs text-muted-foreground">{t('subscription.activeProperties')}</span>
                       </div>
                     )}
@@ -272,12 +292,17 @@ export default function Billing() {
                       <div className="flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="text-sm font-semibold">
-                          {subStatus.planMaxLeadsPerProperty}
-                          {subStatus.extraLeads > 0 && (
+                          {subStatus.effectiveMaxLeads ?? subStatus.planMaxLeadsPerProperty}
+                          {!subStatus.hasLeadsGrant && subStatus.extraLeads > 0 && (
                             <span className="text-accent"> +{subStatus.extraLeads * (subStatus.extraLeadsPerUnit ?? 1)}</span>
                           )}
                         </span>
-                        <span className="text-xs text-muted-foreground">{subStatus.extraLeads > 0 ? t('subscription.leadsPerPropertyExtra') : t('subscription.leadsPerProperty')}</span>
+                        {subStatus.hasLeadsGrant && (
+                          <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                            ✦ Grant
+                          </span>
+                        )}
+                        <span className="text-xs text-muted-foreground">{subStatus.extraLeads > 0 && !subStatus.hasLeadsGrant ? t('subscription.leadsPerPropertyExtra') : t('subscription.leadsPerProperty')}</span>
                       </div>
                     )}
                   </div>

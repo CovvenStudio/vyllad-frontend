@@ -29,6 +29,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import LeadDetailSheet from '@/components/dashboard/LeadDetailSheet';
 import BuyLeadsDialog from '@/components/dashboard/BuyLeadsDialog';
 import { usePlans } from '@/plans';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 // Adapts PropertyDto (API) to the Property shape expected by internal components
 function toProperty(dto: PropertyDto): Property {
   return {
@@ -585,7 +586,10 @@ export default function Dashboard() {
   const { agents: realAgents } = useAgents();
   const { plans } = usePlans();
   const userPlan = plans.find(p => p.backendPlanId === user?.planId);
-  const maxProperties = userPlan?.limits.properties ?? null;
+  const { subStatus } = useSubscriptionStatus();
+  const maxProperties = subStatus?.effectiveMaxProperties ?? userPlan?.limits.properties ?? null;
+  const hasPropertyGrant = subStatus?.hasPropertyGrant ?? false;
+  const hasLeadsGrant = subStatus?.hasLeadsGrant ?? false;
   // Extra lead support (button visibility only — dialog fetches live state)
   const extraLeadMarket = userPlan?.marketPrices?.find(mp => mp.market === 'EUROPE') ?? userPlan?.marketPrices?.[0] ?? null;
   const extraLeadPrice = extraLeadMarket?.extraLeadPrice ?? null;
@@ -811,6 +815,9 @@ export default function Dashboard() {
                         }`}>
                           <Home className="w-2.5 h-2.5" />
                           {t('header.propertiesActive', { active: activeCount, max: maxProperties })}
+                          {hasPropertyGrant && (
+                            <span className="ml-0.5 text-[9px] font-bold uppercase tracking-wide text-blue-600">✦ Grant</span>
+                          )}
                         </span>
                       )}
                       {atLimit ? (
@@ -1099,8 +1106,11 @@ export default function Dashboard() {
                         <div className="flex-1 min-w-0">
                           {leadsHiddenCount > 0 ? (
                             <>
-                              <p className="text-sm font-semibold tracking-tight">
+                              <p className="text-sm font-semibold tracking-tight flex items-center gap-2">
                                 {t('limitBanner.hiddenTitle', { count: leadsHiddenCount })}
+                                {hasLeadsGrant && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">✦ Grant</span>
+                                )}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
                                 {t('limitBanner.hiddenDesc', { limit: leadPlanLimit })}
@@ -1108,15 +1118,23 @@ export default function Dashboard() {
                             </>
                           ) : atLeadLimit ? (
                             <>
-                              <p className="text-sm font-semibold tracking-tight">{t('limitBanner.atLimitTitle')}</p>
+                              <p className="text-sm font-semibold tracking-tight flex items-center gap-2">
+                                {t('limitBanner.atLimitTitle')}
+                                {hasLeadsGrant && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">✦ Grant</span>
+                                )}
+                              </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
                                 {t('limitBanner.atLimitDesc')}
                               </p>
                             </>
                           ) : (
                             <>
-                              <p className="text-sm font-semibold tracking-tight">
+                              <p className="text-sm font-semibold tracking-tight flex items-center gap-2">
                                 {t('leads.atLimit', { count: remainingLeads ?? 0 })}
+                                {hasLeadsGrant && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">✦ Grant</span>
+                                )}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
                                 {t('limitBanner.nearLimitDesc')}

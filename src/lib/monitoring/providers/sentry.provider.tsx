@@ -64,7 +64,7 @@ export class SentryProvider implements IMonitoringProvider {
   }
 
   ErrorBoundary: IMonitoringProvider['ErrorBoundary'] = ({ fallback, children }) => (
-    <Sentry.ErrorBoundary fallback={fallback}>
+    <Sentry.ErrorBoundary fallback={fallback as React.ReactElement}>
       {children}
     </Sentry.ErrorBoundary>
   );

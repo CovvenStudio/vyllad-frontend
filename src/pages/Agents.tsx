@@ -9,6 +9,7 @@ import EditAgentDialog from '@/components/dashboard/EditAgentDialog';
 import { useAgents } from '@/hooks/useAgents';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlans } from '@/plans';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { apiFetch } from '@/lib/api-client';
 import { monitoring } from '@/lib/monitoring/monitoring';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
@@ -39,7 +40,9 @@ const Agents = () => {
 
   // ── Plan limit — based on owner's plan, not the logged-in user's plan ──────
   const currentPlan = plans.find((p) => p.backendPlanId === ownerPlanId) ?? null;
-  const agentLimit = currentPlan?.limits.agents ?? null;
+  const { subStatus } = useSubscriptionStatus();
+  const agentLimit = subStatus?.effectiveMaxAgents ?? currentPlan?.limits.agents ?? null;
+  const hasAgentGrant = subStatus?.hasAgentGrant ?? false;
   // OWNER does not count toward the limit — only non-owner members + pending invites
   const totalUsed = agents.filter((a) => a.role !== 'OWNER').length + pending.length;
   const isAtLimit = agentLimit !== null && totalUsed >= agentLimit;
@@ -139,6 +142,11 @@ const Agents = () => {
                   <span className="text-sm font-semibold">
                     {totalUsed} / {agentLimit} agentes
                   </span>
+                  {hasAgentGrant && (
+                    <span className="text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full">
+                      ✦ Grant
+                    </span>
+                  )}
                   {isAtLimit && (
                     <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full">
                       {t('agents:limitReached')}

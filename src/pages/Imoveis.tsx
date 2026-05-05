@@ -28,6 +28,7 @@ import type { PropertyDto } from '@/lib/properties-api';
 import { listLeadsByAgency } from '@/lib/leads-api';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlans } from '@/plans';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useToast } from '@/hooks/use-toast';
 import { ApiError } from '@/lib/api-client';
 
@@ -242,7 +243,9 @@ export default function Imoveis() {
   const { properties, loading, setStatus, refresh: refreshProperties } = useProperties();
   const { plans } = usePlans();
   const userPlan = plans.find(p => p.backendPlanId === user?.planId);
-  const maxProperties = userPlan?.limits.properties ?? null;
+  const { subStatus } = useSubscriptionStatus();
+  const maxProperties = subStatus?.effectiveMaxProperties ?? userPlan?.limits.properties ?? null;
+  const hasPropertyGrant = subStatus?.hasPropertyGrant ?? false;
   const activeCount = properties.filter(p => p.status === 'ACTIVE').length;
   const atLimit = maxProperties !== null && activeCount >= maxProperties;
   const { toast } = useToast();
@@ -350,6 +353,9 @@ export default function Imoveis() {
                 }`}>
                   <Home className="w-2.5 h-2.5" />
                   {activeCount} / {maxProperties} ativos
+                  {hasPropertyGrant && (
+                    <span className="ml-0.5 text-[9px] font-bold uppercase tracking-wide text-blue-600">✦ Grant</span>
+                  )}
                 </span>
               )}
             </p>
