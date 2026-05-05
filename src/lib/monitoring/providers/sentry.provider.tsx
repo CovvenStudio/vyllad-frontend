@@ -22,12 +22,14 @@ export class SentryProvider implements IMonitoringProvider {
       release: options.release,
       tracesSampleRate: options.tracesSampleRate ?? 0.2,
       replaysOnErrorSampleRate: options.replaysOnErrorSampleRate ?? 1.0,
+      enableLogs: true,
       integrations: [
         Sentry.browserTracingIntegration(),
         Sentry.replayIntegration({
           maskAllText: true,
           blockAllMedia: true,
         }),
+        Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
       ],
       beforeSend(event, hint) {
         const msg = (hint?.originalException as Error)?.message ?? '';

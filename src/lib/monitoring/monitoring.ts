@@ -6,7 +6,7 @@ import { SentryProvider } from './providers/sentry.provider';
 import { ConsoleProvider } from './providers/console.provider';
 import type { IMonitoringProvider } from './types';
 
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV && !import.meta.env.VITE_SENTRY_FORCE;
 const hasDsn = Boolean(import.meta.env.VITE_SENTRY_DSN);
 
 export const monitoring: IMonitoringProvider =
