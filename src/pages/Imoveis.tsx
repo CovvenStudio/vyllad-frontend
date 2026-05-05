@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import {
   Plus, Search, Home, MoreHorizontal, Pencil, PauseCircle, PlayCircle,
   Archive, KeyRound, MapPin, BedDouble, Ruler,
@@ -257,6 +258,7 @@ export default function Imoveis() {
           description: t('properties:limitReached.desc', { count: maxProperties }),
         });
       } else {
+        monitoring.captureException(err, { context: 'set-property-status' });
         toast({ variant: 'destructive', title: t('common:errors.generic'), description: err instanceof Error ? err.message : String(err) });
       }
     }

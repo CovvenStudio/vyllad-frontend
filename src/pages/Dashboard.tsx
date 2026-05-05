@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useToast } from '@/hooks/use-toast';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Calendar, CheckCircle, XCircle, Clock, Eye, Filter,
@@ -672,8 +673,8 @@ export default function Dashboard() {
     try {
       await revertContractLead(currentAgencyId, id);
       await refreshLeads();
-    } catch {
-      // silently ignore
+    } catch (err) {
+      monitoring.captureException(err, { context: 'revert-contract' });
     }
   }
 
@@ -684,8 +685,8 @@ export default function Dashboard() {
       if (!items.length) return;
       await updateAppointmentStatus(currentAgencyId, items[0].id, { status: 'completed' });
       await refreshLeads();
-    } catch {
-      // silently ignore
+    } catch (err) {
+      monitoring.captureException(err, { context: 'complete-appointment' });
     }
   }
 

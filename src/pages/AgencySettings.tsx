@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, Save, Clock, Users, Calendar, CalendarDays, Loader2, GripVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,7 +97,8 @@ export default function AgencySettings() {
       setConfig(data);
       setMaxClientChoicesDraft(String(data.maxClientChoices));
       setMaxVisitsPerTimeDraft(String(data.maxVisitsPerTime));
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-scheduling-config' });
       // use defaults
     } finally {
       setLoading(false);
@@ -117,7 +119,8 @@ export default function AgencySettings() {
       setMaxClientChoicesDraft(String(updated.maxClientChoices));
       setMaxVisitsPerTimeDraft(String(updated.maxVisitsPerTime));
       toast({ title: t('settings:agency.saved'), description: t('settings:agency.savedDesc') });
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'save-scheduling-config' });
       toast({ title: t('settings:agency.error'), variant: 'destructive' });
     } finally {
       setSaving(false);

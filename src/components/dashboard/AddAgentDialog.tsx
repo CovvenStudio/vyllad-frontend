@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,7 @@ const AddAgentDialog = ({ open, onOpenChange, onAdd, agencyCountryCode }: Props)
       setForm({ email: '', phone: getPhonePrefix(agencyCountryCode), role: 'AGENT' });
       onOpenChange(false);
     } catch (e: unknown) {
+      monitoring.captureException(e, { context: 'add-agent' });
       setError((e as { message?: string })?.message ?? t('agents.errorInvite'));
     } finally {
       setLoading(false);

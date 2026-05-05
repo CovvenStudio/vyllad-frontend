@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { PublicScreeningDto, CustomScreeningQuestionDto } from '@/lib/screening-api';
 import {
   CheckCircle2, Loader2, X, ChevronLeft,
@@ -536,7 +537,8 @@ const LeadForm = ({
       });
       setResult({ score: res.score, classification: res.classification });
       setStep('result');
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'lead-form-submit' });
       toast({ title: 'Erro ao enviar candidatura. Tente novamente.', variant: 'destructive' });
     } finally {
       setSubmitting(false);

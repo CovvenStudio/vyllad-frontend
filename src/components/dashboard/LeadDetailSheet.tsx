@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -297,7 +298,8 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
                   try {
                     await sendVisitLink(currentAgencyId, candidate.id);
                     toast({ title: t('dashboard:detailSheet.actions.linkSent'), description: `Link de visita enviado para ${candidate.email}.` });
-                  } catch {
+                  } catch (err) {
+                    monitoring.captureException(err, { context: 'send-visit-link' });
                     toast({ title: t('dashboard:detailSheet.actions.linkError'), variant: 'destructive' });
                   } finally {
                     setSendingEmail(false);

@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useToast } from '@/hooks/use-toast';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import {
   getVisitInfo,
   submitProposedSlots,
@@ -514,7 +515,8 @@ export default function VisitSlotPicker() {
     try {
       await cancelAppointmentPublic(resolvedAptId, resolvedCancelToken);
       setStep('cancelled');
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'cancel-appointment-public' });
       toast({ title: 'Erro ao cancelar. Tente novamente.', variant: 'destructive' });
     } finally {
       setActionBusy(false);
@@ -529,7 +531,8 @@ export default function VisitSlotPicker() {
       const data = await getVisitInfo(leadId, token);
       setInfo(data);
       setStep('choose');
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'start-reschedule-public' });
       toast({ title: 'Erro ao reagendar. Tente novamente.', variant: 'destructive' });
     } finally {
       setActionBusy(false);
@@ -542,7 +545,8 @@ export default function VisitSlotPicker() {
     try {
       await submitProposedSlots(leadId, token, slots);
       setStep('success');
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'submit-proposed-slots' });
       toast({ title: 'Erro ao enviar preferências. Tente novamente.', variant: 'destructive' });
     } finally {
       setSubmitting(false);

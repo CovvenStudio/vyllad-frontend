@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -118,6 +119,7 @@ export default function EditPropertyDialog({ open, onOpenChange, property, onSav
       onSaved?.(saved);
       onOpenChange(false);
     } catch (err: unknown) {
+      monitoring.captureException(err, { context: 'edit-property' });
       const msg = err instanceof Error ? err.message : t('properties:dialog.edit.error');
       toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     } finally {

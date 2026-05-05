@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Plus, Trash2, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -91,7 +92,8 @@ export default function LeadFormSettings() {
         })),
       });
       toast.success(t('settings:leadForm.saved'));
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'save-lead-form-settings' });
       toast.error(t('settings:leadForm.errorSave'));
     } finally {
       setSaving(false);

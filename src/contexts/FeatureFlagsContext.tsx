@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { listFeatureFlags, isFeatureEnabled, type FeatureFlagDto } from '@/lib/feature-flags-api';
+import { monitoring } from '@/lib/monitoring/monitoring';
 
 type FeatureFlagsContextValue = {
   loading: boolean;
@@ -27,8 +28,9 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
     try {
       const data = await listFeatureFlags();
       setFlags(data);
-    } catch {
+    } catch (err) {
       // Fail-open: if flags endpoint fails, keep features enabled.
+      monitoring.captureException(err, { context: 'load-feature-flags' });
       setFlags([]);
     } finally {
       setLoading(false);

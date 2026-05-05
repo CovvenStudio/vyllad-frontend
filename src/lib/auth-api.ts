@@ -2,6 +2,7 @@
 // Thin wrapper over the /api/auth endpoints.
 
 import { apiFetch, tokenStore, BASE_URL, getOrStartRefresh } from './api-client';
+import { monitoring } from './monitoring/monitoring';
 
 // ── Shape returned by POST /auth/google and GET /auth/me ──────────────────────
 export interface AuthUser {
@@ -104,7 +105,8 @@ export async function refreshTokens(): Promise<boolean> {
       tokenStore.set(data.accessToken);
       localStorage.setItem('vyllad_refresh_token', data.refreshToken);
       return true;
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'session-restore' });
       return false;
     }
   });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -89,6 +90,7 @@ const AddPropertyDialog = ({ open, onOpenChange, onCreated }: Props) => {
       });
       setStep('done');
     } catch (err: unknown) {
+      monitoring.captureException(err, { context: 'add-property' });
       const msg = err instanceof Error ? err.message : t('properties:dialog.add.error');
       toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     } finally {

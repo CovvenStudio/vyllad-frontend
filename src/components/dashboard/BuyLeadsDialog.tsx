@@ -4,6 +4,7 @@ import { Minus, Plus, Loader2, Gauge, CheckCircle2, Crown, ArrowRight } from 'lu
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { apiFetch } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { useToast } from '@/hooks/use-toast';
 
 interface SubStatusExtra {
@@ -69,6 +70,7 @@ const BuyLeadsDialog = ({ open, onOpenChange, onUpdated }: Props) => {
       onOpenChange(false);
       onUpdated?.();
     } catch (err) {
+      monitoring.captureException(err, { context: 'buy-leads' });
       toast({
         variant: 'destructive',
         title: 'Erro',

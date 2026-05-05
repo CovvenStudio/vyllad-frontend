@@ -18,6 +18,7 @@ import {
   type AuthMembership,
   type AuthSubscription,
 } from '@/lib/auth-api';
+import { monitoring } from '@/lib/monitoring/monitoring';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -73,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (stored && m.some((mb) => mb.agencyId === stored)) {
           setCurrentAgencyId(stored);
         }
+        monitoring.setUser({ id: u.id, email: u.email });
         setStatus('authenticated');
       })
       .catch(() => {
@@ -94,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     setStatus('authenticated');
+    monitoring.setUser({ id: session.user.id, email: session.user.email });
 
     return {
       needsOnboarding: session.needsOnboarding,
@@ -109,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setMemberships([]);
     setSubscription(null);
     setCurrentAgencyId(null);
+    monitoring.setUser(null);
     setStatus('unauthenticated');
   }, []);
 

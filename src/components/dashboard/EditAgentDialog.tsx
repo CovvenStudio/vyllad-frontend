@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const EditAgentDialog = ({ agent, open, onOpenChange, onSave }: Props) => {
       await onSave(phone.trim() || undefined);
       onOpenChange(false);
     } catch (e: unknown) {
+      monitoring.captureException(e, { context: 'edit-agent' });
       setError((e as { message?: string })?.message ?? t('agents.errorSave'));
     } finally {
       setLoading(false);

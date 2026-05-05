@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import {
   listProperties,
   createProperty,
@@ -21,7 +22,8 @@ export function useProperties() {
     try {
       const data = await listProperties(currentAgencyId);
       setProperties(data.properties);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-properties' });
       setError('Erro ao carregar imóveis.');
     } finally {
       setLoading(false);

@@ -10,6 +10,7 @@ import { BillingCountrySelect } from '@/billing-countries/BillingCountrySelect';
 import type { BillingCountry } from '@/billing-countries/useBillingCountries';
 import type { Plan, PlanId } from '@/plans';
 import { apiFetch } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { StepConfirm } from '@/components/onboarding/StepConfirm';
@@ -218,6 +219,7 @@ export default function UpgradePlan() {
         navigate('/billing', { replace: true });
       }
     } catch (e) {
+      monitoring.captureException(e, { context: 'checkout' });
       toast({ title: e instanceof Error ? e.message : t('billing:upgrade.errorCheckout'), variant: 'destructive' });
       setConfirming(false);
     }

@@ -5,6 +5,7 @@ import { CreditCard, CheckCircle2, Clock, AlertTriangle, ExternalLink, Loader2, 
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiFetch } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -139,6 +140,7 @@ export default function Billing() {
       setExtraLeadsQty(updated.extraLeads ?? 0);
       setSavedLeads(true);
     } catch (e) {
+      monitoring.captureException(e, { context: 'save-extra-leads' });
       setLeadsError(e instanceof Error ? e.message : t('extraLeads.errorSave'));
     } finally {
       setSavingLeads(false);
@@ -151,6 +153,7 @@ export default function Billing() {
       const { url } = await apiFetch<{ url: string }>('/subscriptions/manage', { method: 'POST' });
       window.location.href = url;
     } catch (e) {
+      monitoring.captureException(e, { context: 'open-billing-portal' });
       toast({ title: e instanceof Error ? e.message : t('errors.openPortal'), variant: 'destructive' });
       setPortalLoading(false);
     }

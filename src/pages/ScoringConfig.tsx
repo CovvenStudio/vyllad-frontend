@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Save, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -214,7 +215,8 @@ export default function ScoringConfig() {
       const { agencyId: _, ...rest } = dto;
       setConfig(rest);
       toast({ title: t('scoring.saved') });
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'save-scoring-config' });
       toast({ title: t('scoring.errorSave'), variant: 'destructive' });
     } finally {
       setSaving(false);

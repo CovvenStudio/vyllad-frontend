@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronLeft, ChevronDown, Loader2, Building2, MapPin, Users, FileText, Zap, BarChart3, Link2, Calendar, Star, Clock, SendHorizonal, Mail } from 'lucide-react';
@@ -294,7 +295,7 @@ function StepPlan({
       setTrialRequested(true);
       setShowTrialSuccess(true);
     } catch (err) {
-      console.error('[requestTrial]', err);
+      monitoring.captureException(err, { context: 'request-trial' });
     } finally {
       setTrialRequesting(false);
     }

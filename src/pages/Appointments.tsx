@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import {
   Calendar as CalendarIcon, Clock, MapPin, User, Filter,
   X, CalendarCheck, UserCheck, Plus, ChevronRight, ChevronLeft, Link2, Check, Loader2,
@@ -349,7 +350,8 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
         if (time === slot) setTime('');
         toast({ title: t('appointments:toast.slotBlocked', { slot }) });
       }
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'toggle-blocked-slot' });
       toast({ title: t('appointments:toast.errorBlockUpdate'), variant: 'destructive' });
     } finally {
       setTogglingBlockedTime(null);
@@ -620,7 +622,8 @@ const PendingCard = ({
       await sendVisitLink(currentAgencyId, lead.id);
       toast({ title: t('appointments:toast.emailSent'), description: t('appointments:toast.emailSentDesc', { name: lead.name.split(' ')[0] }) });
       onLinkSent?.();
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'send-visit-link-apt' });
       toast({ title: t('common:errors.generic'), variant: 'destructive' });
     } finally {
       setSendingLink(false);
@@ -741,7 +744,8 @@ const CancelledCard = ({
       await sendVisitLink(currentAgencyId, lead.id);
       toast({ title: t('appointments:toast.emailSent'), description: t('appointments:toast.newEmailSentDesc', { name: lead.name.split(' ')[0] }) });
       onLinkSent?.();
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'send-new-visit-link-apt' });
       toast({ title: t('common:errors.generic'), variant: 'destructive' });
     } finally {
       setSendingLink(false);
@@ -997,7 +1001,8 @@ const Appointments = () => {
         ...cancelledData.leads,
         ...finishedData.leads,
       ]);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-apt-leads' });
       // non-blocking
     } finally {
       setLoadingLeads(false);
@@ -1071,6 +1076,7 @@ const Appointments = () => {
       setSchedulingFor(null);
       toast({ title: t('appointments:toast.scheduled'), description: `${input.date} às ${input.time}` });
     } catch (err: unknown) {
+      monitoring.captureException(err, { context: 'schedule-appointment' });
       const msg = err instanceof Error ? err.message : t('appointments:toast.errorSchedule');
       toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     }
@@ -1083,7 +1089,8 @@ const Appointments = () => {
       refreshApts();
       await loadLeads();
       toast({ title: t('appointments:toast.visitFinalized'), description: `${apt.lead?.name ?? ''} — ${apt.date}` });
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'complete-appointment-apt' });
       toast({ title: t('common:errors.generic'), variant: 'destructive' });
     }
   };
@@ -1098,6 +1105,7 @@ const Appointments = () => {
         description: t('appointments:toast.contractedDesc', { name: apt.lead.name, property: apt.property?.title ?? '' }),
       });
     } catch (err: unknown) {
+      monitoring.captureException(err, { context: 'contract-apt-lead' });
       const msg = err instanceof Error ? err.message : t('appointments:toast.errorContract');
       toast({ title: t('common:errors.generic'), description: msg, variant: 'destructive' });
     }
@@ -1110,7 +1118,8 @@ const Appointments = () => {
       refreshApts();
       await loadLeads();
       toast({ title: t('appointments:toast.visitCancelled'), description: `${apt.date} às ${apt.time}` });
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'cancel-appointment-apt' });
       toast({ title: t('appointments:toast.errorCancel'), variant: 'destructive' });
     }
   };
@@ -1125,7 +1134,8 @@ const Appointments = () => {
         title: t('appointments:toast.rescheduled'),
         description: t('appointments:toast.contractReverted'),
       });
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'reschedule-appointment-apt' });
       toast({ title: t('common:errors.generic'), variant: 'destructive' });
     }
   };

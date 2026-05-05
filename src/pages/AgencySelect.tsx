@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
 import { resolveFirstAccessibleLoggedRoute } from '@/lib/route-access';
 import { apiFetch } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
@@ -40,7 +41,8 @@ const AgencySelect = () => {
     try {
       const { url } = await apiFetch<{ url: string }>('/subscriptions/portal', { method: 'POST' });
       window.location.href = url;
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'open-renewal-portal' });
       setRenewError(t('auth:select.renewError'));
       setRenewing(false);
     }

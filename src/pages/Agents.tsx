@@ -10,6 +10,7 @@ import { useAgents } from '@/hooks/useAgents';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlans } from '@/plans';
 import { apiFetch } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
 import { cn } from '@/lib/utils';
 
@@ -49,7 +50,8 @@ const Agents = () => {
     try {
       const { url } = await apiFetch<{ url: string }>('/subscriptions/manage', { method: 'POST' });
       window.location.href = url;
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'open-upgrade-portal' });
       setActionError(t('agents:upgradePortalError'));
     } finally {
       setUpgrading(false);
@@ -77,6 +79,7 @@ const Agents = () => {
     try {
       await remove(confirmDelete.id);
     } catch (e: unknown) {
+      monitoring.captureException(e, { context: 'remove-agent' });
       setActionError((e as { message?: string })?.message ?? t('agents:removeError'));
     } finally {
       setConfirmDelete(null);
@@ -87,7 +90,8 @@ const Agents = () => {
     if (!confirmDeleteInvite) return;
     try {
       await removeInvite(confirmDeleteInvite.id);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'cancel-invite' });
       setActionError(t('agents:cancelError'));
     } finally {
       setConfirmDeleteInvite(null);

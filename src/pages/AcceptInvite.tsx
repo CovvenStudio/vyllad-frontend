@@ -7,6 +7,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/contexts/AuthContext';
 import { getInviteInfo, acceptInvite } from '@/lib/agents-api';
 import { ApiError } from '@/lib/api-client';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
@@ -69,6 +70,7 @@ const AcceptInvite = () => {
               : e.message
           );
         } else {
+          monitoring.captureException(e, { context: 'accept-invite' });
           setErrorMsg('Erro ao aceitar convite.');
         }
         setInviteState('error');
@@ -85,7 +87,8 @@ const AcceptInvite = () => {
       try {
         await signIn(tokenResponse.access_token);
         // useEffect above will fire automatically after user state updates
-      } catch {
+      } catch (err) {
+        monitoring.captureException(err, { context: 'accept-invite-google-signin' });
         setErrorMsg(t('invite.errorAuth'));
         setInviteState('error');
       } finally {

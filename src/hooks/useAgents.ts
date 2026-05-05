@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { listAgents, inviteAgent, updateAgent, removeAgent, cancelInvite } from '@/lib/agents-api';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
 
 export function useAgents() {
@@ -20,7 +21,8 @@ export function useAgents() {
       setAgents(data.agents);
       setPending(data.pending);
       setOwnerPlanId(data.ownerPlanId ?? null);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-agents' });
       setError('Erro ao carregar agentes.');
     } finally {
       setLoading(false);

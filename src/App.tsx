@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { monitoring } from "@/lib/monitoring/monitoring";
 import Index from "./pages/Index.tsx";
 import PropertyPage from "./pages/PropertyPage.tsx";
 import PropertyPublic from "./pages/PropertyPublic.tsx";
@@ -36,8 +37,18 @@ import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
 const queryClient = new QueryClient();
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
+const ErrorFallback = (
+  <div className="min-h-screen flex items-center justify-center text-center px-4">
+    <div>
+      <h1 className="text-lg font-semibold mb-2">Algo correu mal</h1>
+      <p className="text-sm text-muted-foreground">Por favor recarregue a página.</p>
+    </div>
+  </div>
+);
+
 const App = () => (
-  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+  <monitoring.ErrorBoundary fallback={ErrorFallback}>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <FeatureFlagsProvider>
@@ -75,6 +86,7 @@ const App = () => (
       </AuthProvider>
     </QueryClientProvider>
   </GoogleOAuthProvider>
+  </monitoring.ErrorBoundary>
 );
 
 export default App;

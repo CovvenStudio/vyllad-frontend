@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { listLeads, updateLeadStatus, getScoringConfig } from '@/lib/leads-api';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import type { LeadDto, ScoringConfigDto } from '@/lib/leads-api';
 import type { Candidate } from '@/lib/types';
 
@@ -114,7 +115,8 @@ export function useLeads(propertyId: string | null) {
       setLeadsTotal(data.total);
       setHiddenCount(data.hiddenCount);
       setScoringConfig(cfg);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-leads' });
       setError('Erro ao carregar candidatos.');
     } finally {
       setLoading(false);

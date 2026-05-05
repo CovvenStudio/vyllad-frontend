@@ -3,6 +3,7 @@
 // - Attaches Bearer token from the in-memory AuthStore
 // - Automatically retries once on 401 by refreshing the token (deduplicated)
 
+import { monitoring } from '@/lib/monitoring/monitoring';
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 export { BASE_URL };
 
@@ -43,7 +44,9 @@ async function refreshAccessToken(): Promise<boolean> {
     tokenStore.set(data.accessToken);
     localStorage.setItem('vyllad_refresh_token', data.refreshToken);
     return true;
-  } catch {
+  } catch (err) {
+    // Network-level failure (offline, timeout) — capture but don't crash
+    monitoring.captureException(err, { context: 'token-refresh' });
     return false;
   }
 }
@@ -80,9 +83,18 @@ export async function apiFetch<T>(
 async function buildApiError(res: Response): Promise<ApiError> {
   try {
     const body = await res.json();
-    return new ApiError(res.status, body?.message ?? res.statusText, body?.errorCode ?? null);
+    const err = new ApiError(res.status, body?.message ?? res.statusText, body?.errorCode ?? null);
+    // Only report unexpected server errors — 4xx are user/client errors, not bugs
+    if (res.status >= 500) {
+      monitoring.captureException(err, { url: res.url, status: res.status });
+    }
+    return err;
   } catch {
-    return new ApiError(res.status, res.statusText, null);
+    const err = new ApiError(res.status, res.statusText, null);
+    if (res.status >= 500) {
+      monitoring.captureException(err, { url: res.url, status: res.status });
+    }
+    return err;
   }
 }
 

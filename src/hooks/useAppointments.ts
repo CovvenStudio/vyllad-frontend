@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { monitoring } from '@/lib/monitoring/monitoring';
 import {
   listAppointments,
   createAppointment,
@@ -21,7 +22,8 @@ export function useAppointments() {
     try {
       const data = await listAppointments(currentAgencyId, { take: 200 });
       setAppointments(data.items);
-    } catch {
+    } catch (err) {
+      monitoring.captureException(err, { context: 'load-appointments' });
       setError('Erro ao carregar agendamentos.');
     } finally {
       setLoading(false);
