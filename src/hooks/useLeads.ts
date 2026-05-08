@@ -5,6 +5,51 @@ import { monitoring } from '@/lib/monitoring/monitoring';
 import type { LeadDto, ScoringConfigDto } from '@/lib/leads-api';
 import type { Candidate } from '@/lib/types';
 
+// ── Pet type emoji map ────────────────────────────────────────────────────────
+
+const PET_EMOJI_MAP: Record<string, string> = {
+  'dog': '🐕', 'Dog': '🐕',
+  'cat': '🐈', 'Cat': '🐈',
+  'bird': '🦜', 'Bird': '🦜',
+  'rabbit': '🐇', 'Rabbit': '🐇',
+  'fish': '🐟', 'Fish': '🐟',
+  'reptile': '🦎', 'Reptile': '🦎',
+  'hamster': '🐹', 'Hamster': '🐹',
+};
+
+const PET_NAME_MAP: Record<string, string> = {
+  'dog': 'Cachorro', 'Dog': 'Cachorro',
+  'cat': 'Gato', 'Cat': 'Gato',
+  'bird': 'Pássaro', 'Bird': 'Pássaro',
+  'rabbit': 'Coelho', 'Rabbit': 'Coelho',
+  'fish': 'Peixe', 'Fish': 'Peixe',
+  'reptile': 'Réptil', 'Reptile': 'Réptil',
+  'hamster': 'Hamster', 'Hamster': 'Hamster',
+};
+
+function formatPetDetails(petTypes: string[]): string | undefined {
+  if (!petTypes || petTypes.length === 0) return undefined;
+  
+  try {
+    const formatted = petTypes
+      .map(item => {
+        const [type, qtyStr] = item.split(':');
+        const qty = parseInt(qtyStr, 10) || 0;
+        if (qty <= 0) return null;
+        
+        const emoji = PET_EMOJI_MAP[type] || '🐾';
+        const name = PET_NAME_MAP[type] || type;
+        return `${emoji} ${name} (${qty})`;
+      })
+      .filter(Boolean)
+      .join(', ');
+    
+    return formatted || undefined;
+  } catch {
+    return petTypes.join(', ');
+  }
+}
+
 // ── Map backend LeadDto → frontend Candidate shape ───────────────────────────
 
 const PEOPLE_MAP: Record<string, number> = {
@@ -42,7 +87,7 @@ function leadToCandidate(l: LeadDto): Candidate {
     monthlyIncome:    parseFloat(l.income) || 0,
     numberOfPeople:   PEOPLE_MAP[l.household] ?? 1,
     hasPets:          l.hasPets,
-    petDetails:       l.petTypes.join(', ') || undefined,
+    petDetails:       formatPetDetails(l.petTypes),
     hasGuarantor:     l.hasGuarantor === 'yes' || l.hasGuarantor === 'Sim',
     employmentType:   mapJob(l.job),
     employmentDuration: mapEmploymentDuration(l.employmentDuration),

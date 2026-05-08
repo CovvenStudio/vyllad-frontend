@@ -131,8 +131,7 @@ interface LeadData {
   urgency: string;
   household: string;
   hasPets: boolean;
-  petCount: string;
-  petTypes: string[];
+  petTypes: Record<string, number>; // { "dog": 1, "cat": 2 }
   income: string;
   monthlyCommitments: string;  // new D1
   job: string;
@@ -441,7 +440,7 @@ const LeadForm = ({
   const [step, setStep] = useState<string>('disclaimer');
   const [stepHistory, setStepHistory] = useState<string[]>([]);
   const [data, setData] = useState<LeadData>({
-    urgency: '', household: '', hasPets: false, petCount: '', petTypes: [],
+    urgency: '', household: '', hasPets: false, petTypes: {},
     income: '', monthlyCommitments: '',
     job: '', employmentDuration: '',
     hasGuarantor: '', hasVisited: '', stayDuration: '', motivation: '',
@@ -495,13 +494,16 @@ const LeadForm = ({
   const set = (field: keyof LeadData, value: string | boolean | string[]) =>
     setData(prev => ({ ...prev, [field]: value }));
 
-  const togglePetType = (type: string) => {
-    setData(prev => ({
-      ...prev,
-      petTypes: prev.petTypes.includes(type)
-        ? prev.petTypes.filter(t => t !== type)
-        : [...prev.petTypes, type],
-    }));
+  const togglePetType = (type: string, quantity: number) => {
+    setData(prev => {
+      const updated = { ...prev.petTypes };
+      if (quantity <= 0) {
+        delete updated[type];
+      } else {
+        updated[type] = quantity;
+      }
+      return { ...prev, petTypes: updated };
+    });
   };
 
   const next = (nextStep: string) => {
@@ -524,7 +526,7 @@ const LeadForm = ({
         hasGuarantor: data.hasGuarantor,
         household: data.household,
         hasPets: data.hasPets,
-        petTypes: data.petTypes,
+        petTypes: Object.entries(data.petTypes).map(([type, qty]) => `${type}:${qty}`),
         urgency: data.urgency,
         stayDuration: data.stayDuration,
         hasVisited: data.hasVisited,
@@ -678,29 +680,27 @@ const LeadForm = ({
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
               <div className="pt-2 space-y-4">
                 <div>
-                  <Label className="text-xs font-medium mb-2 block">{t('public:form.steps.pets.count')}</Label>
-                  <div className="flex gap-2">
-                    {['1', '2', '3+'].map(n => (
-                      <button key={n} type="button" onClick={() => set('petCount', n)}
-                        className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${data.petCount === n ? 'border-primary bg-primary/5 text-primary' : 'border-border hover:bg-muted/50'}`}>
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs font-medium mb-2 block">{t('public:form.steps.pets.types')}</Label>
+                  <Label className="text-xs font-medium mb-3 block">{t('public:form.steps.pets.types')}</Label>
                   <div className="flex flex-wrap gap-2">
-                    {PET_TYPES.map(({ label, icon }) => (
-                      <button key={label} type="button" onClick={() => togglePetType(label)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${data.petTypes.includes(label) ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-muted/50'}`}>
-                        <span>{icon}</span> {label}
-                        {data.petTypes.includes(label) && <X className="w-2.5 h-2.5 ml-0.5" />}
-                      </button>
-                    ))}
+                    {PET_TYPES.map(({ label, icon }) => {
+                      const qty = data.petTypes[label] || 0;
+                      return (
+                        <div key={label} className={`flex items-center gap-2 px-3 py-2 rounded-full border transition-all ${qty > 0 ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'}`}>
+                          <span>{icon}</span>
+                          <span className="text-xs font-medium">{label}</span>
+                          <div className="flex items-center gap-1 ml-1">
+                            <button type="button" onClick={() => togglePetType(label, qty - 1)} disabled={qty === 0}
+                              className="w-5 h-5 rounded flex items-center justify-center text-xs hover:bg-muted disabled:opacity-40">−</button>
+                            <span className="w-6 text-center text-xs font-semibold">{qty}</span>
+                            <button type="button" onClick={() => togglePetType(label, qty + 1)}
+                              className="w-5 h-5 rounded flex items-center justify-center text-xs hover:bg-muted">+</button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-                <Button onClick={() => next(nextAfter('pets'))} disabled={!data.petCount || data.petTypes.length === 0} className="w-full rounded-xl">
+                <Button onClick={() => next(nextAfter('pets'))} disabled={Object.values(data.petTypes).every(q => q === 0)} className="w-full rounded-xl">
                   {t('public:form.steps.next')}
                 </Button>
               </div>
