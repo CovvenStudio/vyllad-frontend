@@ -10,6 +10,8 @@
     "submitPreferences": "Enviar preferências",
     "submitSuccess": "Pedido de visita enviado!",
     "submitSubtitle": "O agente irá confirmar em breve.",
+    "leadSubmitSuccess": "Candidatura enviada!",
+    "leadSubmitSubtitle": "O agente responsável irá analisar o seu perfil e entrar em contato.",
     "errorSend": "Erro ao enviar preferências. Tente novamente.",
     "errorReschedule": "Erro ao reagendar. Tente novamente.",
     "errorCancel": "Erro ao cancelar. Tente novamente."

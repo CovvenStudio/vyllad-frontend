@@ -566,16 +566,10 @@ const LeadForm = ({
           <CheckCircle2 className="w-8 h-8 text-emerald-600" />
         </div>
         <div>
-          <h3 className="font-display text-xl font-bold mb-2">{t('public:visit.submitSuccess')}</h3>
+          <h3 className="font-display text-xl font-bold mb-2">{t('public:visit.leadSubmitSuccess')}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('public:visit.submitSubtitle')}
+            {t('public:visit.leadSubmitSubtitle')}
           </p>
-        </div>
-        <div className="p-4 rounded-xl bg-muted/50 border text-sm text-left space-y-3">
-          <div className="flex gap-3">
-            <Home className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <p className="text-muted-foreground">{t('public:form.disclaimer.description')}</p>
-          </div>
         </div>
       </motion.div>
     );

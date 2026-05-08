@@ -10,6 +10,8 @@
     "submitPreferences": "Send preferences",
     "submitSuccess": "Visit request sent!",
     "submitSubtitle": "The agent will confirm shortly.",
+    "leadSubmitSuccess": "Application submitted!",
+    "leadSubmitSubtitle": "The responsible agent will review your profile and get in touch.",
     "errorSend": "Error sending preferences. Please try again.",
     "errorReschedule": "Error rescheduling. Please try again.",
     "errorCancel": "Error cancelling. Please try again."
