@@ -49,6 +49,7 @@ export interface Candidate {
   petDetails?: string;
   hasGuarantor: boolean;
   employmentType: 'permanent' | 'contract' | 'freelancer' | 'student' | 'retired' | 'other';
+  monthlyCommitments?: number;
   employmentDuration: number;
   employmentDurationRaw?: string;
   score: number;

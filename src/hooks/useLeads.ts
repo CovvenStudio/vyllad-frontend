@@ -85,6 +85,7 @@ function leadToCandidate(l: LeadDto): Candidate {
     email:            l.email,
     phone:            l.phone,
     monthlyIncome:    parseFloat(l.income) || 0,
+    monthlyCommitments: parseFloat(l.monthlyCommitments) || undefined,
     numberOfPeople:   PEOPLE_MAP[l.household] ?? 1,
     hasPets:          l.hasPets,
     petDetails:       formatPetDetails(l.petTypes),

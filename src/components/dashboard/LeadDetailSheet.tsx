@@ -15,6 +15,7 @@ import { tScreeningOption } from '@/lib/screening-i18n';
 import { Candidate, Property } from '@/lib/types';
 import { motion } from 'framer-motion';
 import type { ScoringConfigDto } from '@/lib/leads-api';
+import type { CustomScreeningQuestionDto } from '@/lib/screening-api';
 import { sendVisitLink } from '@/lib/leads-api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +25,7 @@ interface LeadDetailSheetProps {
   candidate: Candidate | null;
   property: Property | null;
   scoringConfig: ScoringConfigDto | null;
+  customQuestions?: CustomScreeningQuestionDto[];
   open: boolean;
   onClose: () => void;
   onStatusChange: (id: string, status: Candidate['status']) => void;
@@ -81,7 +83,7 @@ function ScoreRing({ score, classification }: { score: number; classification: C
   );
 }
 
-export default function LeadDetailSheet({ candidate, property, scoringConfig, open, onClose, onStatusChange }: LeadDetailSheetProps) {
+export default function LeadDetailSheet({ candidate, property, scoringConfig, customQuestions = [], open, onClose, onStatusChange }: LeadDetailSheetProps) {
   const [xRayOpen, setXRayOpen] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const navigate = useNavigate();
@@ -213,6 +215,7 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
             {[
               { Icon: TrendingUp, label: t('dashboard:detailSheet.income'), value: `€${candidate.monthlyIncome.toLocaleString('pt-PT')}/mês` },
               { Icon: Target, label: t('dashboard:detailSheet.incomeRatio'), value: `${incomeRatio}×` },
+              ...(candidate.monthlyCommitments ? [{ Icon: TrendingUp, label: t('dashboard:detailSheet.commitments'), value: `€${candidate.monthlyCommitments.toLocaleString('pt-PT')}/mês` }] : []),
               { Icon: Users, label: t('dashboard:detailSheet.people'), value: t('dashboard:detailSheet.people', { count: candidate.numberOfPeople }) },
               { Icon: PawPrint, label: t('dashboard:detailSheet.pets'), value: candidate.hasPets ? (candidate.petDetails || t('common:yesNo.yes')) : t('common:yesNo.no') },
               { Icon: Briefcase, label: t('dashboard:detailSheet.job'), value: t(`dashboard:detailSheet.employment.${candidate.employmentType}`, { defaultValue: candidate.employmentType }) },
@@ -234,20 +237,25 @@ export default function LeadDetailSheet({ candidate, property, scoringConfig, op
               </div>
             ))}
           </div>
-          {candidate.customAnswers && Object.keys(candidate.customAnswers).length > 0 && (
-            <div className="mt-3 space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{t('dashboard:detailSheet.customQuestions')}</p>
-              {Object.entries(candidate.customAnswers).map(([q, a]) => (
-                <div key={q} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
-                  <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                  <div>
-                    <div className="text-[10px] text-muted-foreground">{q}</div>
-                    <div className="text-xs font-semibold mt-0.5">{a || '—'}</div>
-                  </div>
+          {candidate.customAnswers && Object.keys(candidate.customAnswers).length > 0 && (() => {
+            const labelMap = Object.fromEntries(customQuestions.map(q => [q.id, q.label]));
+            return (
+              <div className="mt-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-3">{t('dashboard:detailSheet.customQuestions')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(candidate.customAnswers).map(([id, a]) => (
+                    <div key={id} className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/40">
+                      <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                      <div>
+                        <div className="text-[10px] text-muted-foreground">{labelMap[id] ?? id}</div>
+                        <div className="text-xs font-semibold mt-0.5">{Array.isArray(a) ? (a as string[]).join(', ') : a || '—'}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            );
+          })()}
           {candidate.notes && (
             <div className="mt-3 p-3 rounded-xl bg-muted/40 text-xs text-muted-foreground italic">
               "{candidate.notes}"

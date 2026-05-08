@@ -18,6 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Candidate, Property } from '@/lib/types';
 import { useLeads } from '@/hooks/useLeads';
 import { contractLead, revertContractLead } from '@/lib/leads-api';
+import { getAgencyScreeningConfig, type CustomScreeningQuestionDto } from '@/lib/screening-api';
 import { listAppointments, updateAppointmentStatus, type AppointmentDto } from '@/lib/appointments-api';
 import { useAuth } from '@/contexts/AuthContext';
 import { PropertyDto } from '@/lib/properties-api';
@@ -607,6 +608,11 @@ export default function Dashboard() {
   const property = filteredProperties.find(p => p.id === effectiveSelected) ?? null;
 
   const { candidates, scoringConfig, loading: leadsLoading, setStatus: setLeadStatus, refresh: refreshLeads, planLimit: leadPlanLimit, leadsTotal, hiddenCount: leadsHiddenCount } = useLeads(effectiveSelected);
+  const [customQuestions, setCustomQuestions] = useState<CustomScreeningQuestionDto[]>([]);
+  useEffect(() => {
+    if (!currentAgencyId) return;
+    getAgencyScreeningConfig(currentAgencyId).then(cfg => setCustomQuestions(cfg.customQuestions)).catch(() => {});
+  }, [currentAgencyId]);
   const remainingLeads = leadPlanLimit !== null ? Math.max(0, leadPlanLimit - leadsTotal) : null;
   const atLeadLimit = leadPlanLimit !== null && leadsTotal >= leadPlanLimit;
   const nearLeadLimit = !atLeadLimit && leadPlanLimit !== null && leadsTotal / leadPlanLimit >= 0.80;
@@ -1277,6 +1283,7 @@ export default function Dashboard() {
         candidate={selectedCandidate}
         property={candidateProperty}
         scoringConfig={scoringConfig}
+        customQuestions={customQuestions}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         onStatusChange={handleStatusChange}

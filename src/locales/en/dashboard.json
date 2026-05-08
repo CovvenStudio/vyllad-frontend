@@ -68,6 +68,7 @@
     "title": "Profile",
     "income": "Income",
     "incomeRatio": "Rent ratio",
+    "commitments": "Monthly commitments",
     "people": "People",
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",

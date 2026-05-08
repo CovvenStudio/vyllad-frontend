@@ -68,6 +68,7 @@
     "title": "Perfil",
     "income": "Rendimento",
     "incomeRatio": "Rácio renda",
+    "commitments": "Encargos mensais",
     "people": "Pessoas",
     "people_one": "{{count}} pessoa",
     "people_other": "{{count}} pessoas",

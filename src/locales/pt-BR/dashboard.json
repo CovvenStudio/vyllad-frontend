@@ -67,8 +67,7 @@
   "detailSheet": {
     "title": "Perfil",
     "income": "Renda",
-    "incomeRatio": "Razão aluguel",
-    "people": "Pessoas",
+    "incomeRatio": "Razão aluguel",    "commitments": "Encargos mensais",    "people": "Pessoas",
     "people_one": "{{count}} pessoa",
     "people_other": "{{count}} pessoas",
     "pets": "Animais",
