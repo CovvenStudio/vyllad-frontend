@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // https://vitejs.dev/config/
@@ -19,7 +18,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === "development" && componentTagger(),
     // Upload source maps to Sentry only when SENTRY_AUTH_TOKEN is set (CI/CD)
     // In local dev this plugin is skipped entirely — no DSN or token needed
     process.env.SENTRY_AUTH_TOKEN && sentryVitePlugin({
