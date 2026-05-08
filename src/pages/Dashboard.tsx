@@ -919,7 +919,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2 sm:ml-auto shrink-0">
                   {property?.slug && (
                     <Link
-                      to={`/p/${currentAgencySlug}/${property.slug}`}
+                      to={`/${currentAgencySlug}/property/${property.slug}`}
                       target="_blank"
                       className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white text-foreground hover:bg-muted transition-all"
                     >

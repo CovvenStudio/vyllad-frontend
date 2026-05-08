@@ -59,7 +59,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/p/:agencySlug/:propertySlug" element={<PropertyPage />} />
+                <Route path="/:agencySlug/property/:propertySlug" element={<PropertyPage />} />
                 <Route path="/property/:id" element={<PropertyPublic />} />
                 <Route path="/announcement/:id" element={<AnnouncementPublic />} />
                 <Route path="/visit/:candidateId" element={<VisitSlotPicker />} />

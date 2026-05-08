@@ -198,7 +198,7 @@ export default function PropertyDetail() {
           <div className="flex items-center gap-2 shrink-0">
             {property?.slug && (
               <a
-                href={`/p/${currentAgencySlug}/${property.slug}`}
+                href={`/${currentAgencySlug}/property/${property.slug}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/60 bg-white text-muted-foreground hover:text-foreground hover:border-border transition-all"
