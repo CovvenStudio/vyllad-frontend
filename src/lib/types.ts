@@ -50,6 +50,7 @@ export interface Candidate {
   hasGuarantor: boolean;
   employmentType: 'permanent' | 'contract' | 'freelancer' | 'student' | 'retired' | 'other';
   employmentDuration: number;
+  employmentDurationRaw?: string;
   score: number;
   /** Per-factor raw scores (0-100). Keys: incomeRatio, commitments, jobType, employmentDuration, guarantor, household, pets, urgency, stayDuration, hasVisited, motivation */
   factorScores: Record<string, number>;

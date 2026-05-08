@@ -91,6 +91,7 @@ function leadToCandidate(l: LeadDto): Candidate {
     hasGuarantor:     l.hasGuarantor === 'yes' || l.hasGuarantor === 'Sim',
     employmentType:   mapJob(l.job),
     employmentDuration: mapEmploymentDuration(l.employmentDuration),
+    employmentDurationRaw: l.employmentDuration || undefined,
     score:            l.score,
     factorScores:     l.factorScores ?? {},
     classification:   l.classification,
