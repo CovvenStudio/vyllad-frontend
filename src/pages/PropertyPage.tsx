@@ -44,10 +44,10 @@ const PropertyPage = () => {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!agencySlug || !propertySlug) return;
     setLoading(true);
     setNotFound(false);
-    Promise.all([getPublicProperty(slug), getPublicScreening(slug)])
+    Promise.all([getPublicPropertyByAgency(agencySlug, propertySlug), getPublicScreeningByAgency(agencySlug, propertySlug)])
       .then(([prop, screening]) => { setProperty(prop); setScreeningConfig(screening); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
