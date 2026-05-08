@@ -174,7 +174,7 @@ const JOB_SCORE: Record<string, number> = {
 // Returns whether the candidate needs to be asked about guarantor
 function needsGuarantorStep(job: string, criteria: Property['criteria']): boolean {
   if (!criteria.guarantorRequired) return false;
-  return job !== 'permanent_contract' && job !== 'fixed_term_contract';
+  return job !== 'permanent_contract';
 }
 
 function calcScore(data: LeadData, property: Property): number {
