@@ -1,6 +1,7 @@
 export interface Property {
   id: string;
   slug: string;
+  agencySlug?: string;
   title: string;
   description: string;
   agencyId: string;

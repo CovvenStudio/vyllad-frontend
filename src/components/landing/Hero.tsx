@@ -129,7 +129,7 @@ const Hero = () => {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
-          <Link to="/p/t2-campo-ourique-lisboa">
+          <Link to="/p/vyllad-demo/t2-campo-ourique-lisboa">
             <Button
               size="lg"
               className="h-12 px-8 text-sm font-semibold rounded-2xl bg-white/10 border border-white/25 text-white hover:bg-white/20 backdrop-blur-sm shadow-none"

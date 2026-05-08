@@ -19,6 +19,7 @@ export interface PropertyCriteriaDto {
 export interface PropertyDto {
   id: string;
   agencyId: string;
+  agencySlug: string;
   agentIds: string[];
   slug: string;
   title: string;
@@ -125,3 +126,6 @@ export const setPropertyStatus = (
 
 export const getPublicProperty = (slug: string) =>
   apiFetch<PropertyDto>(`/public/properties/${slug}`);
+
+export const getPublicPropertyByAgency = (agencySlug: string, propertySlug: string) =>
+  apiFetch<PropertyDto>(`/public/agencies/${agencySlug}/properties/${propertySlug}`);

@@ -122,7 +122,8 @@ function CandidateRow({ lead, i }: { lead: LeadDto; i: number }) {
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentAgencyId } = useAuth();
+  const { currentAgencyId, memberships } = useAuth();
+  const currentAgencySlug = memberships.find(m => m.agencyId === currentAgencyId)?.agencySlug ?? '';
   const { t } = useTranslation(['properties', 'common']);
 
   const [property, setProperty] = useState<PropertyDto | null>(null);
@@ -197,7 +198,7 @@ export default function PropertyDetail() {
           <div className="flex items-center gap-2 shrink-0">
             {property?.slug && (
               <a
-                href={`/p/${property.slug}`}
+                href={`/p/${currentAgencySlug}/${property.slug}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/60 bg-white text-muted-foreground hover:text-foreground hover:border-border transition-all"

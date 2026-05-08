@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Property } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { submitLead } from '@/lib/leads-api';
+import { submitLead, submitLeadByAgency } from '@/lib/leads-api';
 
 // ─── Scoring Engine ──────────────────────────────────────────────────────────
 
@@ -512,7 +512,7 @@ const LeadForm = ({
   const submit = async () => {
     setSubmitting(true);
     try {
-      const res = await submitLead(property.slug, {
+      const payload = {
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -534,7 +534,10 @@ const LeadForm = ({
         customAnswers: Object.fromEntries(
           Object.entries(customAnswers).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : v])
         ),
-      });
+      };
+      const res = property.agencySlug
+        ? await submitLeadByAgency(property.agencySlug, property.slug, payload)
+        : await submitLead(property.slug, payload);
       setResult({ score: res.score, classification: res.classification });
       setStep('result');
     } catch (err) {

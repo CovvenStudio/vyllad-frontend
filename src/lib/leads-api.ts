@@ -149,6 +149,24 @@ export async function submitLead(
   return res.json();
 }
 
+/** Public — no auth needed, uses agencySlug/propertySlug URL */
+export async function submitLeadByAgency(
+  agencySlug: string,
+  propertySlug: string,
+  input: SubmitLeadInput,
+): Promise<SubmitLeadResponse> {
+  const res = await fetch(`${BASE_URL}/public/agencies/${agencySlug}/properties/${propertySlug}/leads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.message ?? 'Erro ao submeter candidatura.');
+  }
+  return res.json();
+}
+
 /** Authenticated */
 export const listLeads = (agencyId: string, propertyId: string, skip = 0, take = 50) =>
   apiFetch<LeadListResponse>(

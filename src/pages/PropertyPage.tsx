@@ -7,8 +7,8 @@ import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { getPublicProperty, PropertyDto } from '@/lib/properties-api';
-import { getPublicScreening, PublicScreeningDto } from '@/lib/screening-api';
+import { getPublicPropertyByAgency, PropertyDto } from '@/lib/properties-api';
+import { getPublicScreeningByAgency, PublicScreeningDto } from '@/lib/screening-api';
 import { Property } from '@/lib/types';
 import LeadForm from '@/components/property/LeadForm';
 import heroVillaImg from '@/assets/hero-villa.jpg';
@@ -16,6 +16,7 @@ import heroVillaImg from '@/assets/hero-villa.jpg';
 function toLeadProperty(dto: PropertyDto): Property {
   return {
     ...dto,
+    agencySlug: dto.agencySlug,
     description: dto.description ?? '',
     price: dto.rentalPrice,
     availableSlots: [],
@@ -33,7 +34,7 @@ function toLeadProperty(dto: PropertyDto): Property {
 }
 
 const PropertyPage = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { agencySlug, propertySlug } = useParams<{ agencySlug: string; propertySlug: string }>();
   const { t } = useTranslation(['public', 'properties', 'common']);
   const [property, setProperty] = useState<PropertyDto | null>(null);
   const [screeningConfig, setScreeningConfig] = useState<PublicScreeningDto | null>(null);
@@ -50,7 +51,7 @@ const PropertyPage = () => {
       .then(([prop, screening]) => { setProperty(prop); setScreeningConfig(screening); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [agencySlug, propertySlug]);
 
   if (loading) {
     return (

@@ -62,3 +62,6 @@ export const saveAgencyScreeningConfig = (agencyId: string, dto: SaveScreeningCo
 
 export const getPublicScreening = (slug: string) =>
   apiFetch<PublicScreeningDto>(`/public/properties/${slug}/screening`);
+
+export const getPublicScreeningByAgency = (agencySlug: string, propertySlug: string) =>
+  apiFetch<PublicScreeningDto>(`/public/agencies/${agencySlug}/properties/${propertySlug}/screening`);

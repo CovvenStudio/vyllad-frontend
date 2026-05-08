@@ -85,7 +85,7 @@ const CTA = () => {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/p/t2-campo-ourique-lisboa">
+              <Link to="/p/vyllad-demo/t2-campo-ourique-lisboa">
                 <Button
                   size="lg"
                   variant="ghost"

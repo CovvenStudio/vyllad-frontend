@@ -564,6 +564,7 @@ const CANDIDATES_PAGE_SIZE = 10;
 export default function Dashboard() {
   const navigate = useNavigate();
   const { currentAgencyId, user, status: authStatus, memberships } = useAuth();
+  const currentAgencySlug = memberships.find(m => m.agencyId === currentAgencyId)?.agencySlug ?? '';
   const isOwner = (memberships.find(m => m.agencyId === currentAgencyId)?.role ?? '') === 'OWNER';
   const { toast } = useToast();
   const { t } = useTranslation(['dashboard', 'common']);
@@ -918,7 +919,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2 sm:ml-auto shrink-0">
                   {property?.slug && (
                     <Link
-                      to={`/p/${property.slug}`}
+                      to={`/p/${currentAgencySlug}/${property.slug}`}
                       target="_blank"
                       className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white text-foreground hover:bg-muted transition-all"
                     >
