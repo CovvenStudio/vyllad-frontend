@@ -201,9 +201,13 @@ export default function LeadFormSettings() {
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">{q.category}</p>
                         {q.options.length > 0 && (
-                          <p className="text-xs text-muted-foreground/60 mt-0.5 truncate">
-                            {q.options.join(' · ')}
-                          </p>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {q.options.map(opt => (
+                              <span key={opt} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground border">
+                                {opt}
+                              </span>
+                            ))}
+                          </div>
                         )}
                       </div>
                       <div className="flex items-center gap-1">

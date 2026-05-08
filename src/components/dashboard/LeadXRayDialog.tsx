@@ -151,6 +151,7 @@ function factorNote(
 
   // ── All other option-based factors: data-driven from MongoDB ───────────────
   const answerKey = String(
+    (key === 'employmentDuration' ? (raw.employmentDurationRaw ?? raw[key]) : undefined) ??
     raw[key] ??
     (key === 'hasVisited' ? raw.hasVisited : undefined) ??
     (key === 'urgency' ? (raw.urgency ?? c.moveInTimeline) : undefined) ??
