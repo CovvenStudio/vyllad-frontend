@@ -41,20 +41,6 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [status]);
 
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-
-    const onFocus = () => { void refresh(); };
-
-    window.addEventListener('focus', onFocus);
-    document.addEventListener('visibilitychange', onFocus);
-
-    return () => {
-      window.removeEventListener('focus', onFocus);
-      document.removeEventListener('visibilitychange', onFocus);
-    };
-  }, [status]);
-
   const value = useMemo<FeatureFlagsContextValue>(() => ({
     loading,
     flags,

@@ -116,7 +116,9 @@
       "descriptionField": "Descripción interna (opcional)",
       "descriptionPlaceholder": "Para uso interno de la agencia...",
       "requiredToggle": "Respuesta obligatoria",
-      "requiredHint": "El candidato no puede avanzar sin responder"
+      "requiredHint": "El candidato no puede avanzar sin responder",
+      "enabledToggle": "Incluir en el Formulario de Candidatura",
+      "enabledHint": "La pregunta aparece en el formulario de candidatura"
     }
   }
 }

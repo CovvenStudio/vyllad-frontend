@@ -88,6 +88,7 @@ export default function LeadFormSettings() {
           type: q.type,
           options: q.options,
           required: q.required,
+          enabled: q.enabled,
           order: q.order,
         })),
       });
@@ -221,6 +222,21 @@ export default function LeadFormSettings() {
                             </Button>
                           </>
                         )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Switch
+                          checked={q.enabled}
+                          onCheckedChange={(checked) => {
+                            setConfig(prev => {
+                              if (!prev) return prev;
+                              const updatedQuestions = prev.customQuestions.map(c =>
+                                c.id === q.id ? { ...c, enabled: checked } : c
+                              );
+                              return { ...prev, customQuestions: updatedQuestions };
+                            });
+                          }}
+                          disabled={isReadOnly}
+                        />
                       </div>
                     </div>
                   ))}

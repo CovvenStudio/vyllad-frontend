@@ -22,6 +22,7 @@ export interface CustomScreeningQuestionDto {
   type: 'single_choice' | 'multi_choice' | 'text' | 'boolean';
   options: string[];
   required: boolean;
+  enabled: boolean;
   order: number;
 }
 

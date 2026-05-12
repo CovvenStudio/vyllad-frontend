@@ -282,6 +282,7 @@ function computeSteps(
   // if nationality wasn't in system questions at all, still ensure both are absent (no half-pair)
 
   const customSteps = screeningConfig.customQuestions
+    .filter(q => q.enabled)
     .sort((a, b) => a.order - b.order)
     .map(q => `custom_${q.id}`);
 
@@ -319,14 +320,27 @@ function CustomQuestionStep({
         <p className="text-sm text-muted-foreground mb-4">{question.description}</p>
       )}
 
-      {question.type === 'single_choice' && question.options.map(opt => (
-        <OptionBtn
-          key={opt}
-          label={opt}
-          selected={strVal === opt}
-          onClick={() => { onChange(opt); setTimeout(onNext, 200); }}
-        />
-      ))}
+      {question.type === 'single_choice' && (
+        <>
+          {question.options.map(opt => (
+            <OptionBtn
+              key={opt}
+              label={opt}
+              selected={strVal === opt}
+              onClick={() => { onChange(opt); setTimeout(onNext, 200); }}
+            />
+          ))}
+          {!question.required && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              Saltar esta pergunta →
+            </button>
+          )}
+        </>
+      )}
 
       {question.type === 'multi_choice' && (
         <>
@@ -345,14 +359,34 @@ function CustomQuestionStep({
           >
             Continuar
           </Button>
+          {!question.required && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              Saltar esta pergunta →
+            </button>
+          )}
         </>
       )}
 
       {question.type === 'boolean' && (
-        <div className="grid grid-cols-2 gap-3">
-          <OptionBtn label="Sim" selected={strVal === 'Sim'} onClick={() => { onChange('Sim'); setTimeout(onNext, 200); }} />
-          <OptionBtn label="Não" selected={strVal === 'Não'} onClick={() => { onChange('Não'); setTimeout(onNext, 200); }} />
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <OptionBtn label="Sim" selected={strVal === 'Sim'} onClick={() => { onChange('Sim'); setTimeout(onNext, 200); }} />
+            <OptionBtn label="Não" selected={strVal === 'Não'} onClick={() => { onChange('Não'); setTimeout(onNext, 200); }} />
+          </div>
+          {!question.required && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              Saltar esta pergunta →
+            </button>
+          )}
+        </>
       )}
 
       {question.type === 'text' && (
@@ -371,17 +405,16 @@ function CustomQuestionStep({
           >
             Continuar
           </Button>
+          {!question.required && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              Saltar esta pergunta →
+            </button>
+          )}
         </>
-      )}
-
-      {!question.required && question.type !== 'single_choice' && question.type !== 'boolean' && (
-        <button
-          type="button"
-          onClick={onNext}
-          className="w-full text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
-        >
-          Saltar esta pergunta →
-        </button>
       )}
     </div>
   );
@@ -577,7 +610,7 @@ const LeadForm = ({
 
   // Custom question step renderers (generated from screeningConfig)
   const customStepContent: Record<string, React.ReactNode> = Object.fromEntries(
-    (screeningConfig?.customQuestions ?? []).map(q => [
+    (screeningConfig?.customQuestions ?? []).filter(q => q.enabled).map(q => [
       `custom_${q.id}`,
       <CustomQuestionStep
         key={q.id}

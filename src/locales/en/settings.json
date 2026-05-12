@@ -116,7 +116,9 @@
       "descriptionField": "Internal description (optional)",
       "descriptionPlaceholder": "For agency internal use...",
       "requiredToggle": "Required answer",
-      "requiredHint": "Candidate cannot proceed without answering"
+      "requiredHint": "Candidate cannot proceed without answering",
+      "enabledToggle": "Include in Application Form",
+      "enabledHint": "The question appears in the application form"
     }
   }
 }

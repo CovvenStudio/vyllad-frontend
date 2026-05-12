@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,20 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
   const [options, setOptions] = useState<string[]>(question?.options ?? []);
   const [optionInput, setOptionInput] = useState('');
   const [required, setRequired] = useState(question?.required ?? false);
+  const [enabled, setEnabled] = useState(question?.enabled ?? true);
+
+  useEffect(() => {
+    if (!open) return;
+
+    setLabel(question?.label ?? '');
+    setCategory(question?.category ?? 'Outro');
+    setDescription(question?.description ?? '');
+    setType(question?.type ?? 'single_choice');
+    setOptions(question?.options ?? []);
+    setOptionInput('');
+    setRequired(question?.required ?? false);
+    setEnabled(question?.enabled ?? true);
+  }, [open, question]);
 
   // Reset when dialog opens/closes
   const handleOpenChange = (val: boolean) => {
@@ -42,6 +56,7 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
       setOptions(question?.options ?? []);
       setOptionInput('');
       setRequired(question?.required ?? false);
+      setEnabled(question?.enabled ?? true);
     }
     onOpenChange(val);
   };
@@ -67,6 +82,7 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
       type,
       options: needsOptions ? options : [],
       required,
+      enabled,
       order: question?.order ?? nextOrder,
     });
   };
@@ -173,6 +189,15 @@ export default function AddCustomQuestionDialog({ open, question, onOpenChange, 
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
+          </div>
+
+          {/* Enabled toggle */}
+          <div className="flex items-center justify-between py-1">
+            <div>
+              <p className="text-sm font-medium">{t('settings:leadForm.dialog.enabledToggle')}</p>
+              <p className="text-xs text-muted-foreground">{t('settings:leadForm.dialog.enabledHint')}</p>
+            </div>
+            <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
 
           {/* Required toggle */}
