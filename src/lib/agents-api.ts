@@ -16,6 +16,7 @@ export interface PendingInviteDto {
   email: string;
   role: string;
   expiresAt: string;
+  expired: boolean;
 }
 
 export interface AgentsListResponse {
@@ -33,7 +34,7 @@ export const inviteAgent = (agencyId: string, data: { email: string; phone?: str
     body: JSON.stringify(data),
   });
 
-export const updateAgent = (agencyId: string, membershipId: string, data: { phone?: string }) =>
+export const updateAgent = (agencyId: string, membershipId: string, data: { phone?: string; role?: string }) =>
   apiFetch<AgentDto>(`/agencies/${agencyId}/agents/${membershipId}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -44,6 +45,9 @@ export const removeAgent = (agencyId: string, membershipId: string) =>
 
 export const cancelInvite = (agencyId: string, inviteId: string) =>
   apiFetch<void>(`/agencies/${agencyId}/agents/invites/${inviteId}`, { method: 'DELETE' });
+
+export const resendInvite = (agencyId: string, inviteId: string) =>
+  apiFetch<void>(`/agencies/${agencyId}/agents/invites/${inviteId}/resend`, { method: 'POST' });
 
 export const getInviteInfo = (token: string) =>
   fetch(`${import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'}/invites/${token}`)

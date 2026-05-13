@@ -30,6 +30,12 @@ export function useProperties() {
     }
   }, [currentAgencyId]);
 
+  // Clear stale data immediately when agency changes
+  useEffect(() => {
+    setProperties([]);
+    setError(null);
+  }, [currentAgencyId]);
+
   useEffect(() => { load(); }, [load]);
 
   const create = useCallback(async (input: CreatePropertyInput) => {

@@ -31,6 +31,7 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "cancel": "Cancelar",
+    "keep": "Mantener",
     "edit": "Editar",
     "delete": "Eliminar",
     "add": "Añadir",
@@ -88,7 +89,6 @@
   "copied": "Copiado",
   "linkCopied": "¡Enlace copiado!",
   "optional": "(opcional)",
-  "months": "meses",
   "agents": {
     "invite": "Invitar agente",
     "gmailOnly": "Solo se aceptan direcciones @gmail.com.",

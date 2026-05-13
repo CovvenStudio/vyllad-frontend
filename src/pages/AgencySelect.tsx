@@ -109,7 +109,7 @@ const AgencySelect = () => {
               {t('auth:select.title')}
             </h1>
             <p className="text-muted-foreground text-sm text-center mb-8">
-              {t('auth:select.subtitle')}
+              {isOwnerAnywhere ? t('auth:select.subtitleOwner') : t('auth:select.subtitle')}
             </p>
 
             <div className="space-y-3">

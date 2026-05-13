@@ -170,6 +170,16 @@ export function useLeads(propertyId: string | null) {
     }
   }, [currentAgencyId, propertyId]);
 
+  // Clear stale data immediately when agency or property changes
+  useEffect(() => {
+    setLeads([]);
+    setScoringConfig(null);
+    setPlanLimit(null);
+    setLeadsTotal(0);
+    setHiddenCount(0);
+    setError(null);
+  }, [currentAgencyId, propertyId]);
+
   useEffect(() => { load(); }, [load]);
 
   const setStatus = useCallback(async (id: string, status: string) => {

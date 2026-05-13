@@ -57,6 +57,12 @@ const AcceptInvite = () => {
       } catch (e) {
         if (e instanceof ApiError) {
           if (e.status === 409) {
+            // Could be "already a member" or "plan limit reached"
+            if (e.message.toLowerCase().includes('limite')) {
+              setErrorMsg(e.message);
+              setInviteState('error');
+              return;
+            }
             // already a member — just go to dashboard
             await refreshSession();
             navigate('/dashboard', { replace: true });

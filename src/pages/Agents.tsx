@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import { Plus, Mail, Phone, Clock, Trash2, Pencil, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { Plus, Mail, Phone, Clock, Trash2, Pencil, AlertTriangle, TrendingUp, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import AddAgentDialog from '@/components/dashboard/AddAgentDialog';
@@ -10,7 +11,6 @@ import { useAgents } from '@/hooks/useAgents';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlans } from '@/plans';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
-import { apiFetch } from '@/lib/api-client';
 import { monitoring } from '@/lib/monitoring/monitoring';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ function getAvatar(agent: AgentDto) {
 }
 
 const Agents = () => {
-  const { agents, pending, ownerPlanId, loading, error, invite, update, remove, removeInvite } = useAgents();
+  const { agents, pending, ownerPlanId, loading, error, invite, update, remove, removeInvite, resendInvite } = useAgents();
   const { user, memberships, currentAgencyId } = useAuth();
   const { t } = useTranslation(['agents', 'common']);
   const { plans } = usePlans();
@@ -36,30 +36,20 @@ const Agents = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
   const [confirmDeleteInvite, setConfirmDeleteInvite] = useState<PendingInviteDto | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [upgrading, setUpgrading] = useState(false);
 
   // ── Plan limit — based on owner's plan, not the logged-in user's plan ──────
   const currentPlan = plans.find((p) => p.backendPlanId === ownerPlanId) ?? null;
   const { subStatus } = useSubscriptionStatus();
   const agentLimit = subStatus?.effectiveMaxAgents ?? currentPlan?.limits.agents ?? null;
   const hasAgentGrant = subStatus?.hasAgentGrant ?? false;
-  // OWNER does not count toward the limit — only non-owner members + pending invites
-  const totalUsed = agents.filter((a) => a.role !== 'OWNER').length + pending.length;
+  // OWNER does not count toward the limit — only active non-owner members count
+  const totalUsed = agents.filter((a) => a.role !== 'OWNER').length;
   const isAtLimit = agentLimit !== null && totalUsed >= agentLimit;
   const slotsLeft = agentLimit !== null ? Math.max(0, agentLimit - totalUsed) : null;
 
-  const handleUpgrade = async () => {
-    setUpgrading(true);
-    try {
-      const { url } = await apiFetch<{ url: string }>('/subscriptions/manage', { method: 'POST' });
-      window.location.href = url;
-    } catch (err) {
-      monitoring.captureException(err, { context: 'open-upgrade-portal' });
-      setActionError(t('agents:upgradePortalError'));
-    } finally {
-      setUpgrading(false);
-    }
-  };
+  const navigate = useNavigate();
+
+  const handleUpgrade = () => navigate('/onboarding/upgrade');
 
   const handleInvite = async (email: string, role: string, phone?: string) => {
     setActionError(null);
@@ -72,8 +62,8 @@ const Agents = () => {
     }
   };
 
-  const handleUpdate = async (membershipId: string, phone?: string) => {
-    await update(membershipId, phone);
+  const handleUpdate = async (membershipId: string, phone?: string, role?: string) => {
+    await update(membershipId, phone, role);
     setEditTarget(null);
   };
 
@@ -98,6 +88,16 @@ const Agents = () => {
       setActionError(t('agents:cancelError'));
     } finally {
       setConfirmDeleteInvite(null);
+    }
+  };
+
+  const handleResendInvite = async (inviteId: string) => {
+    setActionError(null);
+    try {
+      await resendInvite(inviteId);
+    } catch (err) {
+      monitoring.captureException(err, { context: 'resend-invite' });
+      setActionError(t('agents:resendError'));
     }
   };
 
@@ -164,7 +164,11 @@ const Agents = () => {
                 </div>
                 {isAtLimit ? (
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    {t('agents:atLimit', { plan: currentPlan?.name, max: agentLimit })}
+                    <Trans
+                      i18nKey="agents:atLimit"
+                      values={{ plan: currentPlan?.name, max: agentLimit }}
+                      components={{ strong: <strong className="text-foreground" /> }}
+                    />
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-1.5">
@@ -178,10 +182,9 @@ const Agents = () => {
                 <Button
                   size="sm"
                   onClick={handleUpgrade}
-                  disabled={upgrading}
                   className="rounded-xl font-semibold shrink-0 gap-2"
                 >
-                  {upgrading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <TrendingUp className="w-3.5 h-3.5" />}
+                  <TrendingUp className="w-3.5 h-3.5" />
                   {t('agents:upgrade')}
                 </Button>
               )}
@@ -243,7 +246,7 @@ const Agents = () => {
                           {t(`common:roles.${agent.role.toLowerCase()}`)}
                         </span>
                       </div>
-                      {agent.role !== 'OWNER' && (
+                      {agent.role !== 'OWNER' && canManage && (
                         <div className="flex gap-1 shrink-0">
                           <button
                             onClick={() => { setActionError(null); setEditTarget(agent); }}
@@ -292,24 +295,51 @@ const Agents = () => {
               {pending.map((inv) => (
                 <div
                   key={inv.id}
-                  className="flex items-center justify-between gap-4 px-5 py-4 rounded-xl border border-dashed bg-card"
+                  className={cn(
+                    "flex items-center justify-between gap-4 px-5 py-4 rounded-xl border border-dashed bg-card",
+                    inv.expired && "opacity-60"
+                  )}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                    {inv.expired
+                      ? <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                      : <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                    }
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{inv.email}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium truncate">{inv.email}</p>
+                        {inv.expired && (
+                          <span className="text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-full shrink-0">
+                            {t('agents:expired')}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">
-                        {t('agents:pendingExpires', { role: t(`common:roles.${inv.role.toLowerCase()}`), date: new Date(inv.expiresAt).toLocaleDateString() })}
+                        {inv.expired
+                          ? t('agents:expiredOn', { date: new Date(inv.expiresAt).toLocaleDateString() })
+                          : t('agents:pendingExpires', { role: t(`common:roles.${inv.role.toLowerCase()}`), date: new Date(inv.expiresAt).toLocaleDateString() })
+                        }
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => { setActionError(null); setConfirmDeleteInvite(inv); }}
-                    className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                    title="Cancelar convite"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {inv.expired && (
+                      <button
+                        onClick={() => handleResendInvite(inv.id)}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title={t('agents:resendInvite')}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { setActionError(null); setConfirmDeleteInvite(inv); }}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                      title={t('agents:dialog.cancelInvite.title')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -335,15 +365,16 @@ const Agents = () => {
           agent={editTarget}
           open={!!editTarget}
           onOpenChange={(o) => { if (!o) setEditTarget(null); }}
-          onSave={(phone) => handleUpdate(editTarget.id, phone)}
+          onSave={(phone, role) => handleUpdate(editTarget.id, phone, role)}
         />
       )}
 
       {confirmDelete && (
         <ConfirmDialog
           title={t('agents:dialog.removeAgent.title')}
-          description={t('agents:dialog.removeAgent.description', { name: confirmDelete.name })}
+          description={<>Tens a certeza que queres remover <strong className="text-foreground">{confirmDelete.name}</strong> da agência? Esta ação não pode ser desfeita.</>}
           confirmLabel={t('agents:dialog.removeAgent.confirm')}
+          cancelLabel={t('common:actions.keep')}
           onConfirm={handleRemove}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -352,8 +383,9 @@ const Agents = () => {
       {confirmDeleteInvite && (
         <ConfirmDialog
           title={t('agents:dialog.cancelInvite.title')}
-          description={t('agents:dialog.cancelInvite.description', { email: confirmDeleteInvite.email })}
-          confirmLabel={t('common:actions.cancel')}
+          description={<>Tens a certeza que queres cancelar o convite para <strong className="text-foreground">{confirmDeleteInvite.email}</strong>?</>}
+          confirmLabel={t('agents:dialog.cancelInvite.confirm')}
+          cancelLabel={t('common:actions.keep')}
           onConfirm={handleRemoveInvite}
           onCancel={() => setConfirmDeleteInvite(null)}
         />
@@ -373,12 +405,14 @@ function ConfirmDialog({
   title,
   description,
   confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
 }: {
   title: string;
-  description: string;
+  description: React.ReactNode;
   confirmLabel?: string;
+  cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -390,7 +424,7 @@ function ConfirmDialog({
         <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
         <div className="flex gap-3 pt-1">
           <Button variant="outline" className="flex-1 rounded-xl" onClick={onCancel}>
-            {t('actions.cancel')}
+            {cancelLabel ?? t('actions.cancel')}
           </Button>
           <Button variant="destructive" className="flex-1 rounded-xl" onClick={onConfirm}>
             {confirmLabel ?? t('actions.delete')}

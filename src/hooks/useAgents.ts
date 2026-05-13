@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { listAgents, inviteAgent, updateAgent, removeAgent, cancelInvite } from '@/lib/agents-api';
+import { listAgents, inviteAgent, updateAgent, removeAgent, cancelInvite, resendInvite } from '@/lib/agents-api';
 import { monitoring } from '@/lib/monitoring/monitoring';
 import type { AgentDto, PendingInviteDto } from '@/lib/agents-api';
 
@@ -29,6 +29,14 @@ export function useAgents() {
     }
   }, [currentAgencyId]);
 
+  // Clear stale data immediately when agency changes
+  useEffect(() => {
+    setAgents([]);
+    setPending([]);
+    setOwnerPlanId(null);
+    setError(null);
+  }, [currentAgencyId]);
+
   useEffect(() => { load(); }, [load]);
 
   const invite = useCallback(async (email: string, role: string, phone?: string) => {
@@ -37,9 +45,9 @@ export function useAgents() {
     await load();
   }, [currentAgencyId, load]);
 
-  const update = useCallback(async (membershipId: string, phone?: string) => {
+  const update = useCallback(async (membershipId: string, phone?: string, role?: string) => {
     if (!currentAgencyId) return;
-    await updateAgent(currentAgencyId, membershipId, { phone });
+    await updateAgent(currentAgencyId, membershipId, { phone, role });
     await load();
   }, [currentAgencyId, load]);
 
@@ -55,5 +63,11 @@ export function useAgents() {
     await load();
   }, [currentAgencyId, load]);
 
-  return { agents, pending, ownerPlanId, loading, error, invite, update, remove, removeInvite, refresh: load };
+  const resendInviteById = useCallback(async (inviteId: string) => {
+    if (!currentAgencyId) return;
+    await resendInvite(currentAgencyId, inviteId);
+    await load();
+  }, [currentAgencyId, load]);
+
+  return { agents, pending, ownerPlanId, loading, error, invite, update, remove, removeInvite, resendInvite: resendInviteById, refresh: load };
 }

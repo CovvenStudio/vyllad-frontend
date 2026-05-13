@@ -18,6 +18,9 @@
   "upgrade": "Hacer upgrade",
   "contactOwnerUpgrade": "Contacte al propietario para hacer upgrade.",
   "pendingExpires": "{{role}} · Expira {{date}}",
+  "expired": "Expirado",
+  "expiredOn": "Expiró el {{date}}",
+  "resendInvite": "Reenviar invitación",
   "slotsLeft_one": "{{count}} plaza disponible en el plan",
   "slotsLeft_other": "{{count}} plazas disponibles en el plan",
   "atLimit": "El plan <strong>{{plan}}</strong> permite hasta {{max}} agentes. Haz upgrade para añadir más.",
@@ -26,6 +29,7 @@
   "inviteError": "Error al invitar agente.",
   "removeError": "Error al eliminar agente.",
   "cancelError": "Error al cancelar invitación.",
+  "resendError": "Error al reenviar invitación.",
   "dialog": {
     "invite": {
       "title": "Invitar agente",

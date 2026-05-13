@@ -35,11 +35,11 @@ const Login = () => {
       const { needsOnboarding, memberships } = await signIn(tokenResponse.access_token);
       if (needsOnboarding) {
         navigate('/onboarding', { replace: true });
-      } else if (memberships.length === 1) {
+      } else if (memberships.length === 1 && memberships[0].role === 'OWNER') {
         const target = resolveFirstAccessibleLoggedRoute(memberships[0].role, { isEnabled }) ?? '/system-unavailable';
         navigate(target, { replace: true });
       } else {
-        // Multiple agencies, or not an owner — show agency select
+        // Multiple agencies, or single agency but not owner — show select so they can create their own
         navigate('/select-agency', { replace: true });
       }
     } catch (err) {

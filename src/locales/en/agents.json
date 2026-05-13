@@ -18,6 +18,9 @@
   "upgrade": "Upgrade",
   "contactOwnerUpgrade": "Contact the owner to upgrade.",
   "pendingExpires": "{{role}} · Expires {{date}}",
+  "expired": "Expired",
+  "expiredOn": "Expired on {{date}}",
+  "resendInvite": "Resend invite",
   "slotsLeft_one": "{{count}} slot available in the plan",
   "slotsLeft_other": "{{count}} slots available in the plan",
   "atLimit": "The <strong>{{plan}}</strong> plan allows up to {{max}} agents. Upgrade to add more.",
@@ -26,6 +29,7 @@
   "inviteError": "Error inviting agent.",
   "removeError": "Error removing agent.",
   "cancelError": "Error cancelling invite.",
+  "resendError": "Error resending invite.",
   "dialog": {
     "invite": {
       "title": "Invite agent",

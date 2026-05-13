@@ -30,6 +30,12 @@ export function useAppointments() {
     }
   }, [currentAgencyId]);
 
+  // Clear stale data immediately when agency changes
+  useEffect(() => {
+    setAppointments([]);
+    setError(null);
+  }, [currentAgencyId]);
+
   useEffect(() => { load(); }, [load]);
 
   const schedule = useCallback(async (input: CreateAppointmentInput): Promise<AppointmentDto> => {

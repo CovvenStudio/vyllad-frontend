@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CreditCard, CheckCircle2, Clock, AlertTriangle, ExternalLink, Loader2, Receipt, Download, FileText, Crown, Calendar, Info, Gauge, Minus, Plus, Check, Users, Building2, UserCheck } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -92,6 +92,7 @@ export default function Billing() {
 
   const currentMembership = memberships.find((m) => m.agencyId === currentAgencyId) ?? null;
   const isOwner = currentMembership?.role === 'OWNER';
+  const location = useLocation();
 
   const [subStatus, setSubStatus] = useState<SubscriptionStatus | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -106,29 +107,31 @@ export default function Billing() {
   const [savedLeads, setSavedLeads] = useState(false);
   const [leadsError, setLeadsError] = useState<string | null>(null);
 
+  const fetchBillingData = async () => {
+    const data = await apiFetch<SubscriptionStatus>('/subscriptions/status');
+    setSubStatus(data);
+    setExtraLeadsQty(data.extraLeads ?? 0);
+    if (data.status && data.status !== 'trialing') {
+      setInvoicesLoading(true);
+      apiFetch<{ invoices: Invoice[]; upcoming: UpcomingInvoice | null }>('/subscriptions/invoices')
+        .then((r) => { setInvoices(r.invoices); setUpcoming(r.upcoming ?? null); })
+        .catch(() => {})
+        .finally(() => setInvoicesLoading(false));
+    }
+    return data;
+  };
+
   useEffect(() => {
     if (!isOwner) {
       navigate('/dashboard', { replace: true });
       return;
     }
-    apiFetch<SubscriptionStatus>('/subscriptions/status')
-      .then((data) => {
-        setSubStatus(data);
-        setExtraLeadsQty(data.extraLeads ?? 0);
-        // Only fetch invoices if there's an active-ish subscription
-        if (data.status && data.status !== 'trialing') {
-          setInvoicesLoading(true);
-          apiFetch<{ invoices: Invoice[]; upcoming: UpcomingInvoice | null }>('/subscriptions/invoices')
-            .then((r) => { setInvoices(r.invoices); setUpcoming(r.upcoming ?? null); })
-            .catch(() => {})
-            .finally(() => setInvoicesLoading(false));
-        }
-      })
+    fetchBillingData()
       .catch(() => {
         toast({ title: t('errors.loadSubscription'), variant: 'destructive' });
       })
       .finally(() => setLoading(false));
-  }, [isOwner]);
+  }, [isOwner, location.key]);
 
   const handleUpgrade = () => navigate('/onboarding/upgrade');
 
@@ -141,9 +144,7 @@ export default function Billing() {
         method: 'PATCH',
         body: JSON.stringify({ quantity: extraLeadsQty }),
       });
-      const updated = await apiFetch<SubscriptionStatus>('/subscriptions/status');
-      setSubStatus(updated);
-      setExtraLeadsQty(updated.extraLeads ?? 0);
+      await fetchBillingData();
       setSavedLeads(true);
     } catch (e) {
       monitoring.captureException(e, { context: 'save-extra-leads' });

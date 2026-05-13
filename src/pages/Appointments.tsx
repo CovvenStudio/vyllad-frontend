@@ -213,14 +213,43 @@ function generateSubSlots(start: string, end: string, intervalMinutes: number): 
   return slots;
 }
 
+function getNextAvailableDate(fromDate: string, availableWeekdays?: number[]): string {
+  const d = new Date(fromDate + 'T00:00');
+  for (let i = 1; i <= 60; i++) {
+    d.setDate(d.getDate() + 1);
+    if (!availableWeekdays || availableWeekdays.includes(d.getDay())) {
+      return toLocalDateString(d);
+    }
+  }
+  const fallback = new Date(fromDate + 'T00:00');
+  fallback.setDate(fallback.getDate() + 1);
+  return toLocalDateString(fallback);
+}
+
 const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, confirmedAppointments, onClose, onConfirm }: ScheduleModalProps) => {
   const { toast } = useToast();
   const { t } = useTranslation(['appointments', 'common']);
   const proposedSlots = lead.proposedSlots ?? [];
   const hasSuggestions = proposedSlots.length > 0;
 
-  // Default: first proposed slot's date, or today
-  const defaultDate = proposedSlots[0]?.date ?? new Date().toISOString().slice(0, 10);
+  // Default: first proposed slot >= today (skip stale past dates), or today
+  const todayStr = toLocalDateString(new Date());
+  const rawDefault = proposedSlots.find(s => s.date >= todayStr)?.date ?? todayStr;
+  // If rawDefault is today but all slots have already passed, jump to next available day
+  const defaultDate = (() => {
+    if (rawDefault !== todayStr) return rawDefault;
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const todaySlots = (() => {
+      if (!schedulingConfig) return TIME_SLOTS;
+      const all: string[] = [];
+      for (const p of schedulingConfig.periods)
+        all.push(...generateSubSlots(p.start, p.end, schedulingConfig.agentSlotIntervalMinutes));
+      return all.length ? all : TIME_SLOTS;
+    })();
+    const remaining = todaySlots.filter(s => toMinutes(s) > nowMinutes);
+    return remaining.length > 0 ? todayStr : getNextAvailableDate(todayStr, schedulingConfig?.availableWeekdays);
+  })();
 
   const [date, setDate] = useState(defaultDate);
   const [time, setTime] = useState('');
@@ -321,6 +350,13 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
       mounted = false;
     };
   }, [agencyId, lead.propertyId, date]);
+
+  // Auto-advance from today when all time slots have passed
+  useEffect(() => {
+    if (date !== toLocalDateString(new Date())) return;
+    if (timeSlots.length > 0) return;
+    setDate(getNextAvailableDate(date, schedulingConfig?.availableWeekdays));
+  }, [date, timeSlots, schedulingConfig]);
 
   useEffect(() => {
     if (!time) return;
@@ -444,7 +480,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
                 {activePeriod && (
                   <p className="text-[11px] text-amber-600 mt-2 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {t('appointments:modal.showingPeriod', { period: activePeriod.label, start: activePeriod.start, end: activePeriod.end })}
+                    {t('appointments:modal.showingPeriod', { label: activePeriod.label, start: activePeriod.start, end: activePeriod.end })}
                   </p>
                 )}
               </div>
@@ -523,7 +559,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
                           ? t('appointments:modal.updating')
                           : isBlocked
                             ? t('appointments:modal.blocked')
-                            : t('appointments:modal.occupancy', { count: occupancy, max: maxVisitsPerTime })}
+                            : t('appointments:modal.occupancy', { current: occupancy, max: maxVisitsPerTime })}
                       </div>
                     </button>
                   );
@@ -548,7 +584,7 @@ const ScheduleModal = ({ agencyId, lead, property, agents, schedulingConfig, con
 
             {/* Notes */}
             <div>
-              <Label className="text-xs font-medium mb-1.5 block">{t('appointments:modal.notesLabel')} <span className="text-muted-foreground font-normal">({t('appointments:modal.optional')})</span></Label>
+              <Label className="text-xs font-medium mb-1.5 block">{t('appointments:modal.notesLabel')} <span className="text-muted-foreground font-normal">{t('appointments:modal.optional')}</span></Label>
               <Textarea
                 placeholder="Ex: trazer documentos de rendimento, visita guiada ao exterior…"
                 value={notes}
