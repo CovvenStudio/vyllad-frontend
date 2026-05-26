@@ -184,7 +184,7 @@ export default function PropertyDetail() {
         {/* ─── TOP NAV BAR ──────────────────────────────────────────────── */}
         <div className="bg-white border-b border-border/60 px-6 md:px-8 h-14 flex items-center justify-between gap-4 sticky top-0 z-30">
           <button
-            onClick={() => navigate('/properties')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />

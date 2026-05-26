@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MapPin, ArrowLeft, ChevronLeft, ChevronRight, X, ExternalLink, Loader2, CalendarDays } from 'lucide-react';
@@ -35,6 +35,7 @@ function toLeadProperty(dto: PropertyDto): Property {
 
 const PropertyPage = () => {
   const { agencySlug, propertySlug } = useParams<{ agencySlug: string; propertySlug: string }>();
+  const navigate = useNavigate();
   const { t } = useTranslation(['public', 'properties', 'common']);
   const [property, setProperty] = useState<PropertyDto | null>(null);
   const [screeningConfig, setScreeningConfig] = useState<PublicScreeningDto | null>(null);
@@ -77,10 +78,10 @@ const PropertyPage = () => {
       {/* Top bar */}
       <div className="border-b bg-card/80 backdrop-blur-xl sticky top-0 z-30">
         <div className="container mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{t('public:property.back')}</span>
-          </Link>
+          </button>
           <div className="flex items-center gap-1">
             <span className="font-display text-lg font-700 tracking-tight">vyllad</span>
             <span className="text-accent text-lg">.</span>

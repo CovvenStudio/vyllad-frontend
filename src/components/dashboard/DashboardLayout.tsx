@@ -63,7 +63,7 @@ function NavContent({ onNav }: { onNav?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <div className="p-5 border-b flex justify-center">
-        <Link to="/" className="flex items-center gap-1" onClick={onNav}>
+        <Link to="/dashboard" className="flex items-center gap-1" onClick={onNav}>
           <span className="font-display text-2xl font-700 tracking-tight">vyllad</span>
           <span className="text-accent text-2xl">.</span>
         </Link>
