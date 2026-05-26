@@ -85,15 +85,6 @@ const CTA = () => {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/vyllad-demo/property/t2-campo-ourique-lisboa">
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  className="h-12 px-8 text-sm font-semibold rounded-2xl text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10"
-                >
-                  {t('cta.ctaDemo')}
-                </Button>
-              </Link>
             </motion.div>
 
             {/* Trust line */}
