@@ -1,3 +1,3 @@
 # Vyllad Frontend
 
-Plataforma de arrendamento inteligente em Portugal.
+Gestão inteligente de locação — Do lead à visita, sem esforço.

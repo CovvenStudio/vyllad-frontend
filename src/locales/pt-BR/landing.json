@@ -4,7 +4,7 @@
     "start": "Comece já"
   },
   "hero": {
-    "badge": "Plataforma de arrendamento inteligente",
+    "badge": "Plataforma de locação inteligente",
     "headline1": "O próximo",
     "headline2": "inquilino ideal",
     "headline3": "já existe.",
@@ -35,7 +35,7 @@
   },
   "showcase": {
     "tag": "O problema real",
-    "headline1": "O arrendamento está",
+    "headline1": "A locação está",
     "headline2": "a custar-lhe",
     "headline3": "mais do que pensa.",
     "pain": [
@@ -61,7 +61,7 @@
     "tag": "Como funciona",
     "headline1": "Tudo o que precisa.",
     "headline2": "Nada que não precisa.",
-    "sub": "Uma plataforma construída especificamente para quem gere imóveis em Portugal — sem excessos, sem curva de aprendizagem.",
+    "sub": "Uma plataforma construída especificamente para quem gere imóveis — sem excessos, sem curva de aprendizagem.",
     "items": [
       {
         "title": "Imóvel publicado em 2 minutos",
